@@ -1,0 +1,116 @@
+---
+title: Quickstart
+description: Accept your first payment in 5 minutes
+---
+
+Follow these steps to integrate Kyren Pay and collect your first payment.
+
+## Prerequisites
+
+- A Kyren Pay merchant account ([sign up here](https://dashboard.kyren.top))
+- Your API key (found in the Developer section of your dashboard)
+
+## Step 1: Get your API Key
+
+After signing up, navigate to **Dashboard > Developer** and copy your API key.
+
+- **Test key**: `kyren_test_xxxxxxxxxxxx` — use this for development
+- **Live key**: `kyren_live_xxxxxxxxxxxx` — use this for production
+
+<Warning>
+  Keep your API keys secure. Never expose them in client-side code or public repositories.
+</Warning>
+
+## Step 2: Create a Product
+
+Create a product that represents what you're selling:
+
+```bash
+curl -X POST https://api.kyren.top/v1/products \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: kyren_test_xxxxxxxxxxxx" \
+  -d '{
+    "name": "1000 AI Credits",
+    "description": "Top up 1000 credits for AI API usage",
+    "price": 9.99,
+    "currency": "USD"
+  }'
+```
+
+Save the `id` from the response — you'll need it to create checkout sessions.
+
+## Step 3: Create a Checkout Session
+
+When a customer wants to pay, create a checkout session:
+
+```bash
+curl -X POST https://api.kyren.top/v1/checkouts \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: kyren_test_xxxxxxxxxxxx" \
+  -d '{
+    "productId": "prod_abc123",
+    "successUrl": "https://yoursite.com/success",
+    "cancelUrl": "https://yoursite.com/cancel"
+  }'
+```
+
+The response includes a `url` field — redirect your customer to this URL to complete payment.
+
+## Step 4: Redirect to Checkout
+
+Redirect the customer to the checkout URL returned in Step 3. They will see a hosted payment page where they can choose their preferred payment method.
+
+```javascript
+// Example: redirect in your web app
+window.location.href = checkoutResponse.data.url;
+```
+
+## Step 5: Handle the Webhook
+
+After payment is completed, Kyren Pay sends a webhook to your server:
+
+```javascript
+// Express.js example
+app.post('/webhooks/kyren', express.raw({ type: 'application/json' }), (req, res) => {
+  const signature = req.headers['x-kyren-signature'];
+  const timestamp = req.headers['x-kyren-timestamp'];
+  const payload = req.body.toString();
+
+  // Verify the signature (see Webhook Signatures for details)
+  if (!verifySignature(payload, signature, timestamp)) {
+    return res.status(400).send('Invalid signature');
+  }
+
+  const event = JSON.parse(payload);
+
+  if (event.type === 'order.paid') {
+    const orderId = event.data.order_id;
+    const amount = event.data.amount;
+    // Fulfill the order in your system
+    console.log(`Payment received: ${amount} ${event.data.currency}`);
+  }
+
+  res.status(200).send('OK');
+});
+```
+
+<Info>
+  Configure your webhook URL in **Dashboard > Developer > Webhook Settings**.
+</Info>
+
+## What's Next?
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/authentication">
+    Learn about API authentication in detail
+  </Card>
+  <Card title="Webhook Signatures" icon="shield-check" href="/webhooks/signatures">
+    Implement secure webhook verification
+  </Card>
+  <Card title="Testing" icon="flask" href="/testing">
+    Use the sandbox environment for development
+  </Card>
+  <Card title="Code Examples" icon="code" href="/guides/code-examples">
+    See examples in Python, Node.js, Go, and more
+  </Card>
+</CardGroup>

@@ -1,0 +1,180 @@
+---
+title: Webhook Events
+description: All webhook event types and their payloads
+---
+
+Kyren Pay sends webhook notifications for the following event types.
+
+## Event Types
+
+| Event | Description | Trigger |
+| --- | --- | --- |
+| `order.paid` | A payment has been confirmed | Customer completes checkout |
+| `checkout.completed` | A checkout session has been completed | Payment successfully processed |
+| `checkout.expired` | A checkout session has expired | 30 minutes without payment |
+| `order.refunded` | An order has been refunded | Admin processes a refund |
+| `payout.completed` | A payout has been processed | Funds transferred to merchant |
+| `payout.failed` | A payout has failed | Transfer failed |
+| `kyc.approved` | KYC verification approved | Admin approves KYC |
+| `kyc.rejected` | KYC verification rejected | Admin rejects KYC |
+
+## Event Object Structure
+
+All webhook events share the same top-level structure:
+
+```json
+{
+  "id": "evt_abc123",
+  "type": "order.paid",
+  "created_at": "2026-01-15T10:35:00Z",
+  "data": {
+    // Event-specific data
+  }
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | string | Unique event identifier (use for deduplication) |
+| `type` | string | The event type |
+| `created_at` | string | ISO 8601 timestamp |
+| `data` | object | Event-specific payload |
+
+## order.paid
+
+Sent when a customer successfully completes a payment.
+
+```json
+{
+  "id": "evt_abc123",
+  "type": "order.paid",
+  "created_at": "2026-01-15T10:35:00Z",
+  "data": {
+    "order_id": "order_def456",
+    "product_id": "prod_abc123",
+    "customer_email": "customer@example.com",
+    "amount": 9.99,
+    "currency": "USD",
+    "net_amount": 9.29,
+    "paid_at": "2026-01-15T10:35:00Z"
+  }
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `order_id` | string | The order ID |
+| `product_id` | string | The product that was purchased |
+| `customer_email` | string | Customer's email address |
+| `amount` | number | Total payment amount |
+| `currency` | string | Three-letter currency code |
+| `net_amount` | number | Amount after fees |
+| `paid_at` | string | When the payment was confirmed |
+
+<Tip>
+  This is the most important event. Use it to fulfill orders — for example, adding credits to a user's account.
+</Tip>
+
+## checkout.completed
+
+Sent when a checkout session is completed successfully. Contains the same data as `order.paid`.
+
+## checkout.expired
+
+Sent when a checkout session expires without payment (after 30 minutes).
+
+```json
+{
+  "id": "evt_ghi789",
+  "type": "checkout.expired",
+  "created_at": "2026-01-15T11:00:00Z",
+  "data": {
+    "checkout_id": "cs_xyz789",
+    "product_id": "prod_abc123",
+    "expired_at": "2026-01-15T11:00:00Z"
+  }
+}
+```
+
+## order.refunded
+
+Sent when an order is refunded by the platform.
+
+```json
+{
+  "id": "evt_jkl012",
+  "type": "order.refunded",
+  "created_at": "2026-01-16T14:00:00Z",
+  "data": {
+    "order_id": "order_def456",
+    "product_id": "prod_abc123",
+    "amount": 9.99,
+    "currency": "USD",
+    "refunded_at": "2026-01-16T14:00:00Z"
+  }
+}
+```
+
+## payout.completed
+
+Sent when a payout to your bank account is successfully processed.
+
+```json
+{
+  "id": "evt_mno345",
+  "type": "payout.completed",
+  "created_at": "2026-01-20T09:00:00Z",
+  "data": {
+    "payout_id": "po_abc123",
+    "amount": 500.00,
+    "currency": "USD",
+    "completed_at": "2026-01-20T09:00:00Z"
+  }
+}
+```
+
+## payout.failed
+
+Sent when a payout fails.
+
+```json
+{
+  "id": "evt_pqr678",
+  "type": "payout.failed",
+  "created_at": "2026-01-20T09:00:00Z",
+  "data": {
+    "payout_id": "po_abc123",
+    "amount": 500.00,
+    "currency": "USD",
+    "reason": "Invalid bank account details"
+  }
+}
+```
+
+## Handling Events
+
+Here's how to handle different event types in your webhook endpoint:
+
+```javascript
+app.post('/webhooks/kyren', (req, res) => {
+  // ... verify signature first ...
+
+  const event = JSON.parse(req.body.toString());
+
+  switch (event.type) {
+    case 'order.paid':
+      handleOrderPaid(event.data);
+      break;
+    case 'order.refunded':
+      handleOrderRefunded(event.data);
+      break;
+    case 'checkout.expired':
+      handleCheckoutExpired(event.data);
+      break;
+    default:
+      console.log(`Unhandled event: ${event.type}`);
+  }
+
+  res.status(200).send('OK');
+});
+```

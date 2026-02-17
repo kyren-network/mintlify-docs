@@ -1,0 +1,91 @@
+---
+title: Testing
+description: Use the sandbox environment to test your integration
+---
+
+Kyren Pay provides a fully functional sandbox environment for testing your integration without processing real payments.
+
+## Sandbox Environment
+
+| Setting | Value |
+| --- | --- |
+| **Base URL** | `https://test-api.kyren.top` |
+| **API Key Prefix** | `kyren_test_` |
+| **Dashboard** | [dashboard.kyren.top](https://dashboard.kyren.top) (switch to Test Mode) |
+
+<Info>
+  The sandbox environment mirrors production exactly. All API endpoints, webhooks, and responses behave identically.
+</Info>
+
+## Test API Keys
+
+Use your test API key (prefixed with `kyren_test_`) to interact with the sandbox:
+
+```bash
+curl https://test-api.kyren.top/v1/products \
+  -H "x-api-key: kyren_test_xxxxxxxxxxxxxxxxxxxx"
+```
+
+## Test Card Numbers
+
+Use these test card numbers on the checkout page to simulate different payment scenarios:
+
+| Card Number | Behavior |
+| --- | --- |
+| `4242 4242 4242 4242` | Payment succeeds |
+| `4000 0000 0000 0002` | Card declined |
+| `4000 0000 0000 9995` | Insufficient funds |
+
+For all test cards:
+- Use any future expiration date (e.g., `12/28`)
+- Use any 3-digit CVV (e.g., `123`)
+- Use any cardholder name
+- Use any billing address
+
+## Test WeChat Pay / Alipay
+
+In the sandbox, QR code payments are automatically completed after a short delay. No actual scanning is required.
+
+## Testing Webhooks
+
+When testing webhooks locally, you can use a tunneling tool like [ngrok](https://ngrok.com) to expose your local server:
+
+```bash
+# Start your local webhook handler
+node server.js  # listening on port 3000
+
+# In another terminal, create a tunnel
+ngrok http 3000
+```
+
+Then configure the ngrok URL as your webhook endpoint in the Dashboard:
+
+```
+https://abc123.ngrok.io/webhooks/kyren
+```
+
+<Tip>
+  Remember to update your webhook URL to your production endpoint before going live.
+</Tip>
+
+## Going Live Checklist
+
+Before switching to production, make sure you have:
+
+<Steps>
+  <Step title="Replace API keys">
+    Switch from `kyren_test_` to `kyren_live_` keys
+  </Step>
+  <Step title="Update base URL">
+    Change from `test-api.kyren.top` to `api.kyren.top`
+  </Step>
+  <Step title="Update webhook URL">
+    Set your production webhook endpoint in the Dashboard
+  </Step>
+  <Step title="Verify webhook signatures">
+    Ensure your server correctly verifies `X-Kyren-Signature` headers
+  </Step>
+  <Step title="Handle errors gracefully">
+    Test error scenarios and ensure your app handles them properly
+  </Step>
+</Steps>

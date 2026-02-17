@@ -1,0 +1,115 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Kyren Pay",
+  "colors": {
+    "primary": "#2563EB",
+    "light": "#3B82F6",
+    "dark": "#1D4ED8"
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "favicon": "/logo/favicon.svg",
+  "navigation": {
+    "languages": [
+      {
+        "language": "en",
+        "default": true,
+        "tabs": [
+          {
+            "tab": "Documentation",
+            "groups": [
+              {
+                "group": "Getting Started",
+                "pages": [
+                  "introduction",
+                  "quickstart",
+                  "authentication"
+                ]
+              },
+              {
+                "group": "Webhooks",
+                "pages": [
+                  "webhooks/overview",
+                  "webhooks/events",
+                  "webhooks/signatures",
+                  "webhooks/retries"
+                ]
+              },
+              {
+                "group": "References",
+                "pages": [
+                  "errors",
+                  "testing"
+                ]
+              },
+              {
+                "group": "Guides",
+                "pages": [
+                  "guides/collect-first-payment",
+                  "guides/code-examples"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "API Reference",
+            "openapi": "openapi.yaml"
+          }
+        ]
+      },
+      {
+        "language": "zh",
+        "tabs": [
+          {
+            "tab": "文档",
+            "groups": [
+              {
+                "group": "快速开始",
+                "pages": [
+                  "zh/introduction",
+                  "zh/quickstart",
+                  "zh/authentication"
+                ]
+              },
+              {
+                "group": "Webhook",
+                "pages": [
+                  "zh/webhooks/overview",
+                  "zh/webhooks/events",
+                  "zh/webhooks/signatures",
+                  "zh/webhooks/retries"
+                ]
+              },
+              {
+                "group": "参考",
+                "pages": [
+                  "zh/errors",
+                  "zh/testing"
+                ]
+              },
+              {
+                "group": "指南",
+                "pages": [
+                  "zh/guides/collect-first-payment",
+                  "zh/guides/code-examples"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "API 参考",
+            "openapi": "openapi.yaml"
+          }
+        ]
+      }
+    ]
+  },
+  "footer": {
+    "socials": {
+      "website": "https://kyren.top"
+    }
+  }
+}

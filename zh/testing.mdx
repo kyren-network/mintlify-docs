@@ -1,0 +1,91 @@
+---
+title: 测试
+description: 使用沙盒环境测试你的集成
+---
+
+启润支付提供完整的沙盒环境，让你无需处理真实付款即可测试集成。
+
+## 沙盒环境
+
+| 配置 | 值 |
+| --- | --- |
+| **接口地址** | `https://test-api.kyren.top` |
+| **API 密钥前缀** | `kyren_test_` |
+| **控制台** | [dashboard.kyren.top](https://dashboard.kyren.top)（切换到测试模式） |
+
+<Info>
+  沙盒环境与生产环境完全一致。所有 API 端点、Webhook 和响应的行为完全相同。
+</Info>
+
+## 测试 API 密钥
+
+使用测试 API 密钥（前缀为 `kyren_test_`）与沙盒交互：
+
+```bash
+curl https://test-api.kyren.top/v1/products \
+  -H "x-api-key: kyren_test_xxxxxxxxxxxxxxxxxxxx"
+```
+
+## 测试卡号
+
+在收银页面使用以下测试卡号模拟不同的支付场景：
+
+| 卡号 | 行为 |
+| --- | --- |
+| `4242 4242 4242 4242` | 支付成功 |
+| `4000 0000 0000 0002` | 卡被拒绝 |
+| `4000 0000 0000 9995` | 余额不足 |
+
+对于所有测试卡：
+- 使用任意未来的过期日期（如 `12/28`）
+- 使用任意 3 位 CVV（如 `123`）
+- 使用任意持卡人姓名
+- 使用任意账单地址
+
+## 测试微信支付 / 支付宝
+
+在沙盒环境中，二维码支付会在短暂延迟后自动完成，无需实际扫码。
+
+## 测试 Webhook
+
+在本地测试 Webhook 时，可以使用 [ngrok](https://ngrok.com) 等隧道工具暴露本地服务器：
+
+```bash
+# 启动本地 Webhook 处理服务
+node server.js  # 监听 3000 端口
+
+# 在另一个终端创建隧道
+ngrok http 3000
+```
+
+然后在控制台中将 ngrok URL 配置为你的 Webhook 端点：
+
+```
+https://abc123.ngrok.io/webhooks/kyren
+```
+
+<Tip>
+  正式上线前，记得将 Webhook URL 更新为你的生产环境端点。
+</Tip>
+
+## 上线检查清单
+
+切换到生产环境前，请确保你已经完成以下步骤：
+
+<Steps>
+  <Step title="替换 API 密钥">
+    从 `kyren_test_` 切换到 `kyren_live_` 密钥
+  </Step>
+  <Step title="更新接口地址">
+    从 `test-api.kyren.top` 切换到 `api.kyren.top`
+  </Step>
+  <Step title="更新 Webhook URL">
+    在控制台中设置生产环境的 Webhook 端点
+  </Step>
+  <Step title="验证 Webhook 签名">
+    确保你的服务器正确验证 `X-Kyren-Signature` 请求头
+  </Step>
+  <Step title="优雅处理错误">
+    测试各种错误场景，确保你的应用能正确处理
+  </Step>
+</Steps>

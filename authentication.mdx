@@ -1,0 +1,73 @@
+---
+title: Authentication
+description: Authenticate your API requests with API keys
+---
+
+All API requests must be authenticated using an API key passed in the `x-api-key` header.
+
+## API Keys
+
+Kyren Pay uses API keys to authenticate requests. You can manage your API keys from the [Merchant Dashboard](https://dashboard.kyren.top).
+
+There are two types of API keys:
+
+| Key Type | Prefix | Purpose |
+| --- | --- | --- |
+| **Live** | `kyren_live_` | Production environment — real payments |
+| **Test** | `kyren_test_` | Sandbox environment — no real charges |
+
+## Making Authenticated Requests
+
+Include your API key in the `x-api-key` header of every request:
+
+```bash
+curl https://api.kyren.top/v1/products \
+  -H "x-api-key: kyren_live_xxxxxxxxxxxxxxxxxxxx"
+```
+
+<Warning>
+  **Keep your API keys secure.**
+  - Never expose API keys in client-side code (JavaScript, mobile apps)
+  - Never commit API keys to version control
+  - Use environment variables to store keys in your server
+  - Regenerate keys immediately if they are compromised
+</Warning>
+
+## Environments
+
+| Environment | Base URL | API Key Prefix |
+| --- | --- | --- |
+| Production | `https://api.kyren.top` | `kyren_live_` |
+| Sandbox | `https://test-api.kyren.top` | `kyren_test_` |
+
+<Info>
+  Test and live API keys are completely separate. Data created with test keys is not visible in the live environment, and vice versa.
+</Info>
+
+## Regenerating API Keys
+
+If your API key is compromised, you can regenerate it from the Dashboard:
+
+1. Go to **Dashboard > Developer**
+2. Click **Regenerate** next to the key you want to replace
+3. Confirm the action
+
+<Warning>
+  Regenerating a key immediately invalidates the old key. Make sure to update all your integrations with the new key.
+</Warning>
+
+## Error Responses
+
+If authentication fails, the API returns a `401 Unauthorized` response:
+
+```json
+{
+  "code": 401,
+  "message": "Unauthorized"
+}
+```
+
+Common causes:
+- Missing `x-api-key` header
+- Invalid or expired API key
+- Using a test key against the production URL (or vice versa)

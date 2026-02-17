@@ -1,0 +1,131 @@
+---
+title: Errors
+description: Understanding API error responses
+---
+
+Kyren Pay uses conventional HTTP status codes to indicate the success or failure of an API request.
+
+## HTTP Status Codes
+
+| Status Code | Description |
+| --- | --- |
+| `200` | OK — Request succeeded |
+| `201` | Created — Resource created successfully |
+| `400` | Bad Request — Invalid parameters |
+| `401` | Unauthorized — Missing or invalid API key |
+| `403` | Forbidden — Insufficient permissions |
+| `404` | Not Found — Resource does not exist |
+| `429` | Too Many Requests — Rate limit exceeded |
+| `500` | Internal Server Error — Something went wrong on our end |
+
+## Error Response Format
+
+When an error occurs, the response body contains a JSON object with the following structure:
+
+```json
+{
+  "code": 400,
+  "message": "Bad Request",
+  "error": {
+    "field": "productId",
+    "reason": "Product ID is required"
+  }
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `code` | integer | HTTP status code |
+| `message` | string | A human-readable error message |
+| `error.field` | string | The parameter that caused the error (if applicable) |
+| `error.reason` | string | Detailed explanation of what went wrong |
+
+<Note>
+  The `error` object is only present for validation errors (400). Other error types only include `code` and `message`.
+</Note>
+
+## Common Errors
+
+### 400 Bad Request
+
+Returned when the request body or parameters are invalid.
+
+```json
+{
+  "code": 400,
+  "message": "Bad Request",
+  "error": {
+    "field": "price",
+    "reason": "Price must be at least 0.01"
+  }
+}
+```
+
+### 401 Unauthorized
+
+Returned when the API key is missing or invalid.
+
+```json
+{
+  "code": 401,
+  "message": "Unauthorized"
+}
+```
+
+### 404 Not Found
+
+Returned when the requested resource does not exist.
+
+```json
+{
+  "code": 404,
+  "message": "Not Found"
+}
+```
+
+### 429 Too Many Requests
+
+Returned when you exceed the API rate limit (100 requests per minute).
+
+```json
+{
+  "code": 429,
+  "message": "Too Many Requests"
+}
+```
+
+<Tip>
+  Implement exponential backoff in your integration to handle rate limiting gracefully.
+</Tip>
+
+## Success Response Format
+
+Successful responses always include `code: 0` and `message: "success"`:
+
+```json
+{
+  "code": 0,
+  "message": "success",
+  "data": {
+    // Response data here
+  }
+}
+```
+
+For paginated endpoints, the `data` field contains `items` and `pagination`:
+
+```json
+{
+  "code": 0,
+  "message": "success",
+  "data": {
+    "items": [...],
+    "pagination": {
+      "page": 1,
+      "size": 20,
+      "total": 42,
+      "totalPages": 3
+    }
+  }
+}
+```

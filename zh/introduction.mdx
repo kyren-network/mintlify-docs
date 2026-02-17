@@ -1,0 +1,69 @@
+---
+title: 简介
+description: 使用启润支付接收来自全球客户的付款
+---
+
+## 什么是启润支付？
+
+启润支付是专为**中国出海 AI Startup** 打造的收款平台。它提供标准化的方式来接收海外客户的付款，让你专注于产品开发，而非支付基础设施。
+
+<CardGroup cols={2}>
+  <Card title="快速集成" icon="bolt">
+    几分钟内即可上线。创建产品，生成收银链接，开始接收付款。
+  </Card>
+  <Card title="多种支付方式" icon="credit-card">
+    通过单一集成支持信用卡、微信支付、支付宝和 PayNow。
+  </Card>
+  <Card title="安全 Webhook" icon="shield-check">
+    通过 HMAC-SHA256 签名的 Webhook 接收实时支付通知，实现安全的服务器间通信。
+  </Card>
+  <Card title="开发者友好" icon="code">
+    简洁的 REST API，完善的文档，多语言代码示例，以及沙盒测试环境。
+  </Card>
+</CardGroup>
+
+## 工作原理
+
+典型的集成流程包含四个步骤：
+
+<Steps>
+  <Step title="创建产品">
+    使用产品 API 定义你的产品，包括名称、价格和货币。
+  </Step>
+  <Step title="创建 Checkout Session">
+    当客户要付款时，创建一个 Checkout Session 并将客户重定向到支付页面。
+  </Step>
+  <Step title="客户完成支付">
+    客户在托管的收银页面上选择支付方式（信用卡、微信支付等）并完成付款。
+  </Step>
+  <Step title="接收 Webhook 通知">
+    启润支付向你的服务器发送 Webhook 确认付款。据此更新你的系统。
+  </Step>
+</Steps>
+
+## 支持的支付方式
+
+| 方式 | 地区 | 货币 |
+| --- | --- | --- |
+| 信用卡（Visa、Mastercard） | 全球 | USD、EUR、GBP 等 |
+| 微信支付 | 中国、东南亚 | CNY、USD |
+| 支付宝 | 中国、东南亚 | CNY、USD |
+| PayNow | 新加坡 | SGD |
+
+## 接口地址
+
+| 环境 | URL |
+| --- | --- |
+| 生产环境 | `https://api.kyren.top` |
+| 测试/沙盒环境 | `https://test-api.kyren.top` |
+
+## 下一步
+
+<CardGroup cols={2}>
+  <Card title="快速开始" icon="rocket" href="/zh/quickstart">
+    5 分钟内完成第一笔收款
+  </Card>
+  <Card title="API 参考" icon="book" href="/api-reference">
+    查看完整的 API 文档
+  </Card>
+</CardGroup>

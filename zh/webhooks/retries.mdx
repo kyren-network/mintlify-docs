@@ -1,0 +1,106 @@
+---
+title: Webhook 重试机制
+description: 启润支付如何重试失败的 Webhook 投递
+---
+
+如果你的 Webhook 端点未返回 `2xx` 状态码，启润支付将自动重试投递。
+
+## 重试计划
+
+启润支付最多重试 **5 次**，间隔递增：
+
+| 重试次数 | 失败后等待时间 |
+| --- | --- |
+| 第 1 次重试 | 1 分钟 |
+| 第 2 次重试 | 5 分钟 |
+| 第 3 次重试 | 30 分钟 |
+| 第 4 次重试 | 2 小时 |
+| 第 5 次重试 | 24 小时 |
+
+5 次重试失败后，Webhook 将被标记为**失败**，不再继续重试。
+
+## 什么算作失败
+
+以下情况 Webhook 投递被视为失败：
+
+- 你的端点返回非 `2xx` HTTP 状态码（如 `400`、`500`）
+- 你的端点在 **30 秒**内未响应
+- 无法连接到你的服务器（DNS 错误、连接被拒绝、超时）
+
+<Info>
+  `2xx` 响应（如 `200`、`201`、`204`）即被视为投递成功，不论响应体内容如何。
+</Info>
+
+## 处理重试
+
+由于 Webhook 可能被重试，你的端点应该是**幂等的** — 多次处理同一事件应产生相同的结果。
+
+### 使用事件 ID 去重
+
+每个 Webhook 事件都有唯一的 `id` 字段。存储已处理的事件 ID 并跳过重复事件：
+
+```javascript
+const processedEvents = new Set(); // 生产环境请使用数据库
+
+app.post('/webhooks/kyren', (req, res) => {
+  // ... 验证签名 ...
+
+  const event = JSON.parse(req.body.toString());
+
+  // 检查是否已处理过此事件
+  if (processedEvents.has(event.id)) {
+    console.log(`重复事件 ${event.id}，跳过`);
+    return res.status(200).send('OK');
+  }
+
+  // 处理事件
+  processEvent(event);
+
+  // 标记为已处理
+  processedEvents.add(event.id);
+
+  res.status(200).send('OK');
+});
+```
+
+<Tip>
+  在生产环境中，将已处理的事件 ID 存储在数据库（如 Redis 或你的主数据库）中，而不是内存中。
+</Tip>
+
+### 快速返回 200
+
+收到并验证 Webhook 后立即返回 `200` 响应。如果处理需要较长时间，请异步执行：
+
+```javascript
+app.post('/webhooks/kyren', (req, res) => {
+  // ... 验证签名 ...
+
+  const event = JSON.parse(req.body.toString());
+
+  // 立即响应
+  res.status(200).send('OK');
+
+  // 异步处理
+  processEventAsync(event).catch(err => {
+    console.error('处理事件失败:', err);
+  });
+});
+```
+
+## 监控 Webhook 投递
+
+你可以在[商户控制台](https://dashboard.kyren.top)的 **开发者 > Webhook 日志** 中查看 Webhook 投递状态，包括：
+
+- 投递状态（已送达、重试中、失败）
+- 你的端点的响应码
+- 尝试次数
+- 下次重试时间
+
+## 故障排除
+
+| 问题 | 解决方案 |
+| --- | --- |
+| 未收到 Webhook | 检查 Webhook URL 是否正确且可公开访问 |
+| 签名验证失败 | 确保使用原始请求体（未解析的 JSON）进行验证 |
+| 频繁超时 | 立即返回 `200`，异步处理事件 |
+| 重复事件 | 使用事件 `id` 字段实现幂等性 |

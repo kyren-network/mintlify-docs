@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 36" fill="none">
+  <rect x="0" y="2" width="32" height="32" rx="8" fill="#3B82F6"/>
+  <path d="M10 18L16 10L18 16H22L16 24L14 18H10Z" fill="white"/>
+  <text x="40" y="26" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" fill="#F1F5F9">Kyren Pay</text>
+</svg>

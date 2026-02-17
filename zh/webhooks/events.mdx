@@ -1,0 +1,180 @@
+---
+title: Webhook 事件
+description: 所有 Webhook 事件类型及其载荷
+---
+
+启润支付会为以下事件类型发送 Webhook 通知。
+
+## 事件类型
+
+| 事件 | 描述 | 触发条件 |
+| --- | --- | --- |
+| `order.paid` | 付款已确认 | 客户完成收银台付款 |
+| `checkout.completed` | Checkout Session 已完成 | 支付成功处理 |
+| `checkout.expired` | Checkout Session 已过期 | 30 分钟内未付款 |
+| `order.refunded` | 订单已退款 | 管理员处理退款 |
+| `payout.completed` | 结款已处理 | 资金已转入商户 |
+| `payout.failed` | 结款失败 | 转账失败 |
+| `kyc.approved` | KYC 验证通过 | 管理员审核通过 |
+| `kyc.rejected` | KYC 验证拒绝 | 管理员审核拒绝 |
+
+## 事件对象结构
+
+所有 Webhook 事件共享相同的顶层结构：
+
+```json
+{
+  "id": "evt_abc123",
+  "type": "order.paid",
+  "created_at": "2026-01-15T10:35:00Z",
+  "data": {
+    // 事件特定数据
+  }
+}
+```
+
+| 字段 | 类型 | 描述 |
+| --- | --- | --- |
+| `id` | string | 唯一事件标识符（用于去重） |
+| `type` | string | 事件类型 |
+| `created_at` | string | ISO 8601 时间戳 |
+| `data` | object | 事件特定载荷 |
+
+## order.paid
+
+客户成功完成付款时发送。
+
+```json
+{
+  "id": "evt_abc123",
+  "type": "order.paid",
+  "created_at": "2026-01-15T10:35:00Z",
+  "data": {
+    "order_id": "order_def456",
+    "product_id": "prod_abc123",
+    "customer_email": "customer@example.com",
+    "amount": 9.99,
+    "currency": "USD",
+    "net_amount": 9.29,
+    "paid_at": "2026-01-15T10:35:00Z"
+  }
+}
+```
+
+| 字段 | 类型 | 描述 |
+| --- | --- | --- |
+| `order_id` | string | 订单 ID |
+| `product_id` | string | 购买的产品 |
+| `customer_email` | string | 客户邮箱地址 |
+| `amount` | number | 总支付金额 |
+| `currency` | string | 三字母货币代码 |
+| `net_amount` | number | 扣除手续费后的金额 |
+| `paid_at` | string | 付款确认时间 |
+
+<Tip>
+  这是最重要的事件。用它来完成订单处理 — 例如，为用户的账户充值额度。
+</Tip>
+
+## checkout.completed
+
+Checkout Session 成功完成时发送。包含与 `order.paid` 相同的数据。
+
+## checkout.expired
+
+Checkout Session 过期（30 分钟未付款）时发送。
+
+```json
+{
+  "id": "evt_ghi789",
+  "type": "checkout.expired",
+  "created_at": "2026-01-15T11:00:00Z",
+  "data": {
+    "checkout_id": "cs_xyz789",
+    "product_id": "prod_abc123",
+    "expired_at": "2026-01-15T11:00:00Z"
+  }
+}
+```
+
+## order.refunded
+
+订单被平台退款时发送。
+
+```json
+{
+  "id": "evt_jkl012",
+  "type": "order.refunded",
+  "created_at": "2026-01-16T14:00:00Z",
+  "data": {
+    "order_id": "order_def456",
+    "product_id": "prod_abc123",
+    "amount": 9.99,
+    "currency": "USD",
+    "refunded_at": "2026-01-16T14:00:00Z"
+  }
+}
+```
+
+## payout.completed
+
+结款成功处理时发送。
+
+```json
+{
+  "id": "evt_mno345",
+  "type": "payout.completed",
+  "created_at": "2026-01-20T09:00:00Z",
+  "data": {
+    "payout_id": "po_abc123",
+    "amount": 500.00,
+    "currency": "USD",
+    "completed_at": "2026-01-20T09:00:00Z"
+  }
+}
+```
+
+## payout.failed
+
+结款失败时发送。
+
+```json
+{
+  "id": "evt_pqr678",
+  "type": "payout.failed",
+  "created_at": "2026-01-20T09:00:00Z",
+  "data": {
+    "payout_id": "po_abc123",
+    "amount": 500.00,
+    "currency": "USD",
+    "reason": "Invalid bank account details"
+  }
+}
+```
+
+## 处理事件
+
+以下是在 Webhook 端点中处理不同事件类型的方式：
+
+```javascript
+app.post('/webhooks/kyren', (req, res) => {
+  // ... 先验证签名 ...
+
+  const event = JSON.parse(req.body.toString());
+
+  switch (event.type) {
+    case 'order.paid':
+      handleOrderPaid(event.data);
+      break;
+    case 'order.refunded':
+      handleOrderRefunded(event.data);
+      break;
+    case 'checkout.expired':
+      handleCheckoutExpired(event.data);
+      break;
+    default:
+      console.log(`未处理的事件类型: ${event.type}`);
+  }
+
+  res.status(200).send('OK');
+});
+```

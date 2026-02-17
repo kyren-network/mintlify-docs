@@ -1,0 +1,106 @@
+---
+title: Webhook Retries
+description: How Kyren Pay retries failed webhook deliveries
+---
+
+If your webhook endpoint doesn't respond with a `2xx` status code, Kyren Pay will automatically retry the delivery.
+
+## Retry Schedule
+
+Kyren Pay retries failed webhooks up to **5 times** with increasing delays:
+
+| Attempt | Delay After Failure |
+| --- | --- |
+| 1st retry | 1 minute |
+| 2nd retry | 5 minutes |
+| 3rd retry | 30 minutes |
+| 4th retry | 2 hours |
+| 5th retry | 24 hours |
+
+After 5 failed attempts, the webhook is marked as **failed** and no further retries are attempted.
+
+## What Counts as a Failure
+
+A webhook delivery is considered failed if:
+
+- Your endpoint returns a non-`2xx` HTTP status code (e.g., `400`, `500`)
+- Your endpoint doesn't respond within **30 seconds**
+- The connection to your server fails (DNS error, connection refused, timeout)
+
+<Info>
+  A `2xx` response (e.g., `200`, `201`, `204`) is considered a successful delivery regardless of the response body.
+</Info>
+
+## Handling Retries
+
+Since webhooks may be retried, your endpoint should be **idempotent** — processing the same event multiple times should produce the same result.
+
+### Use Event IDs for Deduplication
+
+Every webhook event has a unique `id` field. Store processed event IDs and skip duplicates:
+
+```javascript
+const processedEvents = new Set(); // Use a database in production
+
+app.post('/webhooks/kyren', (req, res) => {
+  // ... verify signature ...
+
+  const event = JSON.parse(req.body.toString());
+
+  // Check if we've already processed this event
+  if (processedEvents.has(event.id)) {
+    console.log(`Duplicate event ${event.id}, skipping`);
+    return res.status(200).send('OK');
+  }
+
+  // Process the event
+  processEvent(event);
+
+  // Mark as processed
+  processedEvents.add(event.id);
+
+  res.status(200).send('OK');
+});
+```
+
+<Tip>
+  In production, store processed event IDs in a database (e.g., Redis or your primary database) rather than in-memory.
+</Tip>
+
+### Return 200 Quickly
+
+Return a `200` response as soon as you receive and validate the webhook. If processing takes a long time, do it asynchronously:
+
+```javascript
+app.post('/webhooks/kyren', (req, res) => {
+  // ... verify signature ...
+
+  const event = JSON.parse(req.body.toString());
+
+  // Respond immediately
+  res.status(200).send('OK');
+
+  // Process asynchronously
+  processEventAsync(event).catch(err => {
+    console.error('Failed to process event:', err);
+  });
+});
+```
+
+## Monitoring Webhook Deliveries
+
+You can view webhook delivery status in the [Merchant Dashboard](https://dashboard.kyren.top) under **Developer > Webhook Logs**, including:
+
+- Delivery status (delivered, retrying, failed)
+- Response code from your endpoint
+- Number of attempts
+- Next retry time
+
+## Troubleshooting
+
+| Problem | Solution |
+| --- | --- |
+| Not receiving webhooks | Check your webhook URL is correct and publicly accessible |
+| Signature verification fails | Ensure you're using the raw request body (not parsed JSON) |
+| Frequent timeouts | Respond with `200` immediately and process events asynchronously |
+| Duplicate events | Implement idempotency using the event `id` field |

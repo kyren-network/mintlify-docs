@@ -1,0 +1,131 @@
+---
+title: 错误处理
+description: 了解 API 错误响应
+---
+
+启润支付使用标准 HTTP 状态码来表示 API 请求的成功或失败。
+
+## HTTP 状态码
+
+| 状态码 | 描述 |
+| --- | --- |
+| `200` | 成功 — 请求已成功处理 |
+| `201` | 已创建 — 资源创建成功 |
+| `400` | 错误请求 — 参数无效 |
+| `401` | 未认证 — 缺少或无效的 API 密钥 |
+| `403` | 禁止访问 — 权限不足 |
+| `404` | 未找到 — 资源不存在 |
+| `429` | 请求过多 — 超出频率限制 |
+| `500` | 服务器内部错误 — 我们这边出了问题 |
+
+## 错误响应格式
+
+发生错误时，响应体包含以下 JSON 结构：
+
+```json
+{
+  "code": 400,
+  "message": "Bad Request",
+  "error": {
+    "field": "productId",
+    "reason": "Product ID is required"
+  }
+}
+```
+
+| 字段 | 类型 | 描述 |
+| --- | --- | --- |
+| `code` | integer | HTTP 状态码 |
+| `message` | string | 人类可读的错误信息 |
+| `error.field` | string | 导致错误的参数（如适用） |
+| `error.reason` | string | 详细的错误说明 |
+
+<Note>
+  `error` 对象仅在验证错误（400）时出现。其他错误类型只包含 `code` 和 `message`。
+</Note>
+
+## 常见错误
+
+### 400 错误请求
+
+请求体或参数无效时返回。
+
+```json
+{
+  "code": 400,
+  "message": "Bad Request",
+  "error": {
+    "field": "price",
+    "reason": "Price must be at least 0.01"
+  }
+}
+```
+
+### 401 未认证
+
+API 密钥缺失或无效时返回。
+
+```json
+{
+  "code": 401,
+  "message": "Unauthorized"
+}
+```
+
+### 404 未找到
+
+请求的资源不存在时返回。
+
+```json
+{
+  "code": 404,
+  "message": "Not Found"
+}
+```
+
+### 429 请求过多
+
+超过 API 频率限制（每分钟 100 次请求）时返回。
+
+```json
+{
+  "code": 429,
+  "message": "Too Many Requests"
+}
+```
+
+<Tip>
+  在你的集成中实现指数退避策略，以优雅地处理频率限制。
+</Tip>
+
+## 成功响应格式
+
+成功的响应始终包含 `code: 0` 和 `message: "success"`：
+
+```json
+{
+  "code": 0,
+  "message": "success",
+  "data": {
+    // 响应数据
+  }
+}
+```
+
+对于分页接口，`data` 字段包含 `items` 和 `pagination`：
+
+```json
+{
+  "code": 0,
+  "message": "success",
+  "data": {
+    "items": [...],
+    "pagination": {
+      "page": 1,
+      "size": 20,
+      "total": 42,
+      "totalPages": 3
+    }
+  }
+}
+```

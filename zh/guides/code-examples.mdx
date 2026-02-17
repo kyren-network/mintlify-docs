@@ -1,0 +1,275 @@
+---
+title: 代码示例
+description: cURL、Python、Node.js 和 Go 的集成示例
+---
+
+常用启润支付 API 操作的多语言完整代码示例。
+
+## 创建产品
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.kyren.top/v1/products \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: kyren_live_xxxxxxxxxxxx" \
+  -d '{
+    "name": "1000 AI Credits",
+    "description": "充值 1000 个 AI API 额度",
+    "price": 9.99,
+    "currency": "USD",
+    "metadata": {
+      "credits": "1000"
+    }
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    "https://api.kyren.top/v1/products",
+    headers={
+        "Content-Type": "application/json",
+        "x-api-key": "kyren_live_xxxxxxxxxxxx",
+    },
+    json={
+        "name": "1000 AI Credits",
+        "description": "充值 1000 个 AI API 额度",
+        "price": 9.99,
+        "currency": "USD",
+        "metadata": {"credits": "1000"},
+    },
+)
+
+product = response.json()["data"]
+print(f"产品已创建: {product['id']}")
+```
+
+```javascript Node.js
+const axios = require('axios');
+
+const response = await axios.post('https://api.kyren.top/v1/products', {
+  name: '1000 AI Credits',
+  description: '充值 1000 个 AI API 额度',
+  price: 9.99,
+  currency: 'USD',
+  metadata: { credits: '1000' },
+}, {
+  headers: { 'x-api-key': 'kyren_live_xxxxxxxxxxxx' },
+});
+
+const product = response.data.data;
+console.log(`产品已创建: ${product.id}`);
+```
+
+```go Go
+package main
+
+import (
+    "bytes"
+    "encoding/json"
+    "fmt"
+    "net/http"
+    "io"
+)
+
+func createProduct() {
+    payload := map[string]interface{}{
+        "name":        "1000 AI Credits",
+        "description": "充值 1000 个 AI API 额度",
+        "price":       9.99,
+        "currency":    "USD",
+        "metadata":    map[string]string{"credits": "1000"},
+    }
+
+    body, _ := json.Marshal(payload)
+    req, _ := http.NewRequest("POST", "https://api.kyren.top/v1/products", bytes.NewBuffer(body))
+    req.Header.Set("Content-Type", "application/json")
+    req.Header.Set("x-api-key", "kyren_live_xxxxxxxxxxxx")
+
+    resp, err := http.DefaultClient.Do(req)
+    if err != nil {
+        panic(err)
+    }
+    defer resp.Body.Close()
+
+    respBody, _ := io.ReadAll(resp.Body)
+    fmt.Println(string(respBody))
+}
+```
+</CodeGroup>
+
+## 创建 Checkout Session
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.kyren.top/v1/checkouts \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: kyren_live_xxxxxxxxxxxx" \
+  -d '{
+    "productId": "prod_abc123",
+    "successUrl": "https://yoursite.com/success",
+    "cancelUrl": "https://yoursite.com/cancel",
+    "customerEmail": "customer@example.com",
+    "metadata": {
+      "userId": "user_456"
+    }
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    "https://api.kyren.top/v1/checkouts",
+    headers={
+        "Content-Type": "application/json",
+        "x-api-key": "kyren_live_xxxxxxxxxxxx",
+    },
+    json={
+        "productId": "prod_abc123",
+        "successUrl": "https://yoursite.com/success",
+        "cancelUrl": "https://yoursite.com/cancel",
+        "customerEmail": "customer@example.com",
+        "metadata": {"userId": "user_456"},
+    },
+)
+
+checkout = response.json()["data"]
+print(f"将客户重定向到: {checkout['url']}")
+```
+
+```javascript Node.js
+const response = await axios.post('https://api.kyren.top/v1/checkouts', {
+  productId: 'prod_abc123',
+  successUrl: 'https://yoursite.com/success',
+  cancelUrl: 'https://yoursite.com/cancel',
+  customerEmail: 'customer@example.com',
+  metadata: { userId: 'user_456' },
+}, {
+  headers: { 'x-api-key': 'kyren_live_xxxxxxxxxxxx' },
+});
+
+const checkout = response.data.data;
+console.log(`将客户重定向到: ${checkout.url}`);
+```
+
+```go Go
+func createCheckout() {
+    payload := map[string]interface{}{
+        "productId":     "prod_abc123",
+        "successUrl":    "https://yoursite.com/success",
+        "cancelUrl":     "https://yoursite.com/cancel",
+        "customerEmail": "customer@example.com",
+        "metadata":      map[string]string{"userId": "user_456"},
+    }
+
+    body, _ := json.Marshal(payload)
+    req, _ := http.NewRequest("POST", "https://api.kyren.top/v1/checkouts", bytes.NewBuffer(body))
+    req.Header.Set("Content-Type", "application/json")
+    req.Header.Set("x-api-key", "kyren_live_xxxxxxxxxxxx")
+
+    resp, _ := http.DefaultClient.Do(req)
+    defer resp.Body.Close()
+
+    respBody, _ := io.ReadAll(resp.Body)
+    fmt.Println(string(respBody))
+}
+```
+</CodeGroup>
+
+## 查询订单列表
+
+<CodeGroup>
+```bash cURL
+curl https://api.kyren.top/v1/orders?status=PAID&page=1&size=10 \
+  -H "x-api-key: kyren_live_xxxxxxxxxxxx"
+```
+
+```python Python
+response = requests.get(
+    "https://api.kyren.top/v1/orders",
+    headers={"x-api-key": "kyren_live_xxxxxxxxxxxx"},
+    params={"status": "PAID", "page": 1, "size": 10},
+)
+
+data = response.json()["data"]
+for order in data["items"]:
+    print(f"订单 {order['id']}: {order['amount']} {order['currency']}")
+
+print(f"总计: {data['pagination']['total']} 笔订单")
+```
+
+```javascript Node.js
+const response = await axios.get('https://api.kyren.top/v1/orders', {
+  headers: { 'x-api-key': 'kyren_live_xxxxxxxxxxxx' },
+  params: { status: 'PAID', page: 1, size: 10 },
+});
+
+const { items, pagination } = response.data.data;
+items.forEach(order => {
+  console.log(`订单 ${order.id}: ${order.amount} ${order.currency}`);
+});
+console.log(`总计: ${pagination.total} 笔订单`);
+```
+
+```go Go
+func listOrders() {
+    req, _ := http.NewRequest("GET", "https://api.kyren.top/v1/orders?status=PAID&page=1&size=10", nil)
+    req.Header.Set("x-api-key", "kyren_live_xxxxxxxxxxxx")
+
+    resp, _ := http.DefaultClient.Do(req)
+    defer resp.Body.Close()
+
+    body, _ := io.ReadAll(resp.Body)
+    fmt.Println(string(body))
+}
+```
+</CodeGroup>
+
+## 查询账户余额
+
+<CodeGroup>
+```bash cURL
+curl https://api.kyren.top/v1/balance \
+  -H "x-api-key: kyren_live_xxxxxxxxxxxx"
+```
+
+```python Python
+response = requests.get(
+    "https://api.kyren.top/v1/balance",
+    headers={"x-api-key": "kyren_live_xxxxxxxxxxxx"},
+)
+
+balance = response.json()["data"]
+print(f"可用余额: {balance['available']} {balance['currency']}")
+print(f"待结算: {balance['pending']} {balance['currency']}")
+```
+
+```javascript Node.js
+const response = await axios.get('https://api.kyren.top/v1/balance', {
+  headers: { 'x-api-key': 'kyren_live_xxxxxxxxxxxx' },
+});
+
+const balance = response.data.data;
+console.log(`可用余额: ${balance.available} ${balance.currency}`);
+console.log(`待结算: ${balance.pending} ${balance.currency}`);
+```
+
+```go Go
+func getBalance() {
+    req, _ := http.NewRequest("GET", "https://api.kyren.top/v1/balance", nil)
+    req.Header.Set("x-api-key", "kyren_live_xxxxxxxxxxxx")
+
+    resp, _ := http.DefaultClient.Do(req)
+    defer resp.Body.Close()
+
+    body, _ := io.ReadAll(resp.Body)
+    fmt.Println(string(body))
+}
+```
+</CodeGroup>
+
+## 验证 Webhook 签名
+
+请参阅 [Webhook 签名验证](/zh/webhooks/signatures) 页面，获取 Node.js、Python 和 Go 的完整验证示例。

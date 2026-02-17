@@ -1,0 +1,73 @@
+---
+title: 认证
+description: 使用 API 密钥认证你的 API 请求
+---
+
+所有 API 请求必须通过在 `x-api-key` 请求头中传递 API 密钥来进行认证。
+
+## API 密钥
+
+启润支付使用 API 密钥来认证请求。你可以在[商户控制台](https://dashboard.kyren.top)中管理你的 API 密钥。
+
+有两种类型的 API 密钥：
+
+| 密钥类型 | 前缀 | 用途 |
+| --- | --- | --- |
+| **生产密钥** | `kyren_live_` | 生产环境 — 真实付款 |
+| **测试密钥** | `kyren_test_` | 沙盒环境 — 不会产生真实扣款 |
+
+## 发送认证请求
+
+在每个请求的 `x-api-key` 请求头中包含你的 API 密钥：
+
+```bash
+curl https://api.kyren.top/v1/products \
+  -H "x-api-key: kyren_live_xxxxxxxxxxxxxxxxxxxx"
+```
+
+<Warning>
+  **请妥善保管你的 API 密钥。**
+  - 切勿在客户端代码（JavaScript、移动应用）中暴露 API 密钥
+  - 切勿将 API 密钥提交到版本控制系统
+  - 在服务器上使用环境变量存储密钥
+  - 如果密钥泄露，请立即重新生成
+</Warning>
+
+## 环境
+
+| 环境 | 接口地址 | API 密钥前缀 |
+| --- | --- | --- |
+| 生产环境 | `https://api.kyren.top` | `kyren_live_` |
+| 沙盒环境 | `https://test-api.kyren.top` | `kyren_test_` |
+
+<Info>
+  测试密钥和生产密钥完全隔离。使用测试密钥创建的数据在生产环境中不可见，反之亦然。
+</Info>
+
+## 重新生成 API 密钥
+
+如果你的 API 密钥泄露，可以在控制台中重新生成：
+
+1. 前往 **控制台 > 开发者**
+2. 点击要替换的密钥旁边的**重新生成**
+3. 确认操作
+
+<Warning>
+  重新生成密钥会立即使旧密钥失效。请确保更新所有集成中的密钥。
+</Warning>
+
+## 错误响应
+
+认证失败时，API 返回 `401 Unauthorized` 响应：
+
+```json
+{
+  "code": 401,
+  "message": "Unauthorized"
+}
+```
+
+常见原因：
+- 缺少 `x-api-key` 请求头
+- API 密钥无效或已过期
+- 在生产环境 URL 上使用了测试密钥（或反之）

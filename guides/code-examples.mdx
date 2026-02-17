@@ -1,0 +1,275 @@
+---
+title: Code Examples
+description: Integration examples in cURL, Python, Node.js, and Go
+---
+
+Complete code examples for common Kyren Pay API operations in multiple languages.
+
+## Create a Product
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.kyren.top/v1/products \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: kyren_live_xxxxxxxxxxxx" \
+  -d '{
+    "name": "1000 AI Credits",
+    "description": "Top up 1000 credits for AI API usage",
+    "price": 9.99,
+    "currency": "USD",
+    "metadata": {
+      "credits": "1000"
+    }
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    "https://api.kyren.top/v1/products",
+    headers={
+        "Content-Type": "application/json",
+        "x-api-key": "kyren_live_xxxxxxxxxxxx",
+    },
+    json={
+        "name": "1000 AI Credits",
+        "description": "Top up 1000 credits for AI API usage",
+        "price": 9.99,
+        "currency": "USD",
+        "metadata": {"credits": "1000"},
+    },
+)
+
+product = response.json()["data"]
+print(f"Product created: {product['id']}")
+```
+
+```javascript Node.js
+const axios = require('axios');
+
+const response = await axios.post('https://api.kyren.top/v1/products', {
+  name: '1000 AI Credits',
+  description: 'Top up 1000 credits for AI API usage',
+  price: 9.99,
+  currency: 'USD',
+  metadata: { credits: '1000' },
+}, {
+  headers: { 'x-api-key': 'kyren_live_xxxxxxxxxxxx' },
+});
+
+const product = response.data.data;
+console.log(`Product created: ${product.id}`);
+```
+
+```go Go
+package main
+
+import (
+    "bytes"
+    "encoding/json"
+    "fmt"
+    "net/http"
+    "io"
+)
+
+func createProduct() {
+    payload := map[string]interface{}{
+        "name":        "1000 AI Credits",
+        "description": "Top up 1000 credits for AI API usage",
+        "price":       9.99,
+        "currency":    "USD",
+        "metadata":    map[string]string{"credits": "1000"},
+    }
+
+    body, _ := json.Marshal(payload)
+    req, _ := http.NewRequest("POST", "https://api.kyren.top/v1/products", bytes.NewBuffer(body))
+    req.Header.Set("Content-Type", "application/json")
+    req.Header.Set("x-api-key", "kyren_live_xxxxxxxxxxxx")
+
+    resp, err := http.DefaultClient.Do(req)
+    if err != nil {
+        panic(err)
+    }
+    defer resp.Body.Close()
+
+    respBody, _ := io.ReadAll(resp.Body)
+    fmt.Println(string(respBody))
+}
+```
+</CodeGroup>
+
+## Create a Checkout Session
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.kyren.top/v1/checkouts \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: kyren_live_xxxxxxxxxxxx" \
+  -d '{
+    "productId": "prod_abc123",
+    "successUrl": "https://yoursite.com/success",
+    "cancelUrl": "https://yoursite.com/cancel",
+    "customerEmail": "customer@example.com",
+    "metadata": {
+      "userId": "user_456"
+    }
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    "https://api.kyren.top/v1/checkouts",
+    headers={
+        "Content-Type": "application/json",
+        "x-api-key": "kyren_live_xxxxxxxxxxxx",
+    },
+    json={
+        "productId": "prod_abc123",
+        "successUrl": "https://yoursite.com/success",
+        "cancelUrl": "https://yoursite.com/cancel",
+        "customerEmail": "customer@example.com",
+        "metadata": {"userId": "user_456"},
+    },
+)
+
+checkout = response.json()["data"]
+print(f"Redirect customer to: {checkout['url']}")
+```
+
+```javascript Node.js
+const response = await axios.post('https://api.kyren.top/v1/checkouts', {
+  productId: 'prod_abc123',
+  successUrl: 'https://yoursite.com/success',
+  cancelUrl: 'https://yoursite.com/cancel',
+  customerEmail: 'customer@example.com',
+  metadata: { userId: 'user_456' },
+}, {
+  headers: { 'x-api-key': 'kyren_live_xxxxxxxxxxxx' },
+});
+
+const checkout = response.data.data;
+console.log(`Redirect customer to: ${checkout.url}`);
+```
+
+```go Go
+func createCheckout() {
+    payload := map[string]interface{}{
+        "productId":     "prod_abc123",
+        "successUrl":    "https://yoursite.com/success",
+        "cancelUrl":     "https://yoursite.com/cancel",
+        "customerEmail": "customer@example.com",
+        "metadata":      map[string]string{"userId": "user_456"},
+    }
+
+    body, _ := json.Marshal(payload)
+    req, _ := http.NewRequest("POST", "https://api.kyren.top/v1/checkouts", bytes.NewBuffer(body))
+    req.Header.Set("Content-Type", "application/json")
+    req.Header.Set("x-api-key", "kyren_live_xxxxxxxxxxxx")
+
+    resp, _ := http.DefaultClient.Do(req)
+    defer resp.Body.Close()
+
+    respBody, _ := io.ReadAll(resp.Body)
+    fmt.Println(string(respBody))
+}
+```
+</CodeGroup>
+
+## List Orders
+
+<CodeGroup>
+```bash cURL
+curl https://api.kyren.top/v1/orders?status=PAID&page=1&size=10 \
+  -H "x-api-key: kyren_live_xxxxxxxxxxxx"
+```
+
+```python Python
+response = requests.get(
+    "https://api.kyren.top/v1/orders",
+    headers={"x-api-key": "kyren_live_xxxxxxxxxxxx"},
+    params={"status": "PAID", "page": 1, "size": 10},
+)
+
+data = response.json()["data"]
+for order in data["items"]:
+    print(f"Order {order['id']}: {order['amount']} {order['currency']}")
+
+print(f"Total: {data['pagination']['total']} orders")
+```
+
+```javascript Node.js
+const response = await axios.get('https://api.kyren.top/v1/orders', {
+  headers: { 'x-api-key': 'kyren_live_xxxxxxxxxxxx' },
+  params: { status: 'PAID', page: 1, size: 10 },
+});
+
+const { items, pagination } = response.data.data;
+items.forEach(order => {
+  console.log(`Order ${order.id}: ${order.amount} ${order.currency}`);
+});
+console.log(`Total: ${pagination.total} orders`);
+```
+
+```go Go
+func listOrders() {
+    req, _ := http.NewRequest("GET", "https://api.kyren.top/v1/orders?status=PAID&page=1&size=10", nil)
+    req.Header.Set("x-api-key", "kyren_live_xxxxxxxxxxxx")
+
+    resp, _ := http.DefaultClient.Do(req)
+    defer resp.Body.Close()
+
+    body, _ := io.ReadAll(resp.Body)
+    fmt.Println(string(body))
+}
+```
+</CodeGroup>
+
+## Get Account Balance
+
+<CodeGroup>
+```bash cURL
+curl https://api.kyren.top/v1/balance \
+  -H "x-api-key: kyren_live_xxxxxxxxxxxx"
+```
+
+```python Python
+response = requests.get(
+    "https://api.kyren.top/v1/balance",
+    headers={"x-api-key": "kyren_live_xxxxxxxxxxxx"},
+)
+
+balance = response.json()["data"]
+print(f"Available: {balance['available']} {balance['currency']}")
+print(f"Pending: {balance['pending']} {balance['currency']}")
+```
+
+```javascript Node.js
+const response = await axios.get('https://api.kyren.top/v1/balance', {
+  headers: { 'x-api-key': 'kyren_live_xxxxxxxxxxxx' },
+});
+
+const balance = response.data.data;
+console.log(`Available: ${balance.available} ${balance.currency}`);
+console.log(`Pending: ${balance.pending} ${balance.currency}`);
+```
+
+```go Go
+func getBalance() {
+    req, _ := http.NewRequest("GET", "https://api.kyren.top/v1/balance", nil)
+    req.Header.Set("x-api-key", "kyren_live_xxxxxxxxxxxx")
+
+    resp, _ := http.DefaultClient.Do(req)
+    defer resp.Body.Close()
+
+    body, _ := io.ReadAll(resp.Body)
+    fmt.Println(string(body))
+}
+```
+</CodeGroup>
+
+## Verify Webhook Signature
+
+See the [Webhook Signatures](/webhooks/signatures) page for complete verification examples in Node.js, Python, and Go.

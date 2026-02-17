@@ -1,0 +1,199 @@
+---
+title: Webhook 签名验证
+description: 验证 Webhook 请求的真实性
+---
+
+启润支付的每个 Webhook 请求都包含一个加密签名，你应该验证此签名以确保请求是真实的且未被篡改。
+
+## 签名算法
+
+启润支付使用 **HMAC-SHA256** 对 Webhook 载荷进行签名：
+
+```
+signature = "sha256=" + HMAC-SHA256(timestamp + "." + payload, webhook_secret)
+```
+
+签名和时间戳通过 HTTP 请求头发送：
+
+| 请求头 | 示例 |
+| --- | --- |
+| `X-Kyren-Signature` | `sha256=5d2dc4f1a...` |
+| `X-Kyren-Timestamp` | `1704628800` |
+
+## 验证步骤
+
+<Steps>
+  <Step title="提取请求头">
+    从请求头中读取 `X-Kyren-Signature` 和 `X-Kyren-Timestamp`。
+  </Step>
+  <Step title="检查时间戳">
+    验证时间戳在当前时间的 5 分钟（300 秒）以内。这可以防止重放攻击。
+  </Step>
+  <Step title="计算期望签名">
+    拼接 `timestamp + "." + 原始请求体`，然后使用你的 Webhook 密钥计算 HMAC-SHA256。
+  </Step>
+  <Step title="比较签名">
+    将计算出的签名与请求头中的签名进行比较。使用常量时间比较以防止时序攻击。
+  </Step>
+</Steps>
+
+## 代码示例
+
+### Node.js
+
+```javascript
+const crypto = require('crypto');
+
+function verifyWebhookSignature(payload, signature, timestamp, secret) {
+  // 检查时间戳容差（5 分钟）
+  const currentTime = Math.floor(Date.now() / 1000);
+  if (Math.abs(currentTime - parseInt(timestamp)) > 300) {
+    return false;
+  }
+
+  // 计算期望签名
+  const data = `${timestamp}.${payload}`;
+  const expected = 'sha256=' + crypto
+    .createHmac('sha256', secret)
+    .update(data)
+    .digest('hex');
+
+  // 常量时间比较
+  try {
+    return crypto.timingSafeEqual(
+      Buffer.from(expected),
+      Buffer.from(signature)
+    );
+  } catch {
+    return false;
+  }
+}
+
+// 在 Express 中使用
+app.post('/webhooks/kyren',
+  express.raw({ type: 'application/json' }),
+  (req, res) => {
+    const isValid = verifyWebhookSignature(
+      req.body.toString(),
+      req.headers['x-kyren-signature'],
+      req.headers['x-kyren-timestamp'],
+      process.env.KYREN_WEBHOOK_SECRET
+    );
+
+    if (!isValid) {
+      return res.status(400).send('Invalid signature');
+    }
+
+    // 处理事件...
+    res.status(200).send('OK');
+  }
+);
+```
+
+### Python
+
+```python
+import hmac
+import hashlib
+import time
+
+def verify_webhook_signature(payload: str, signature: str, timestamp: str, secret: str) -> bool:
+    # 检查时间戳容差（5 分钟）
+    current_time = int(time.time())
+    if abs(current_time - int(timestamp)) > 300:
+        return False
+
+    # 计算期望签名
+    data = f"{timestamp}.{payload}"
+    expected = "sha256=" + hmac.new(
+        secret.encode("utf-8"),
+        data.encode("utf-8"),
+        hashlib.sha256
+    ).hexdigest()
+
+    # 常量时间比较
+    return hmac.compare_digest(expected, signature)
+
+
+# 在 Flask 中使用
+from flask import Flask, request
+
+app = Flask(__name__)
+
+@app.route("/webhooks/kyren", methods=["POST"])
+def webhook():
+    payload = request.get_data(as_text=True)
+    signature = request.headers.get("X-Kyren-Signature", "")
+    timestamp = request.headers.get("X-Kyren-Timestamp", "")
+
+    if not verify_webhook_signature(payload, signature, timestamp, WEBHOOK_SECRET):
+        return "Invalid signature", 400
+
+    event = request.get_json()
+    # 处理事件...
+
+    return "OK", 200
+```
+
+### Go
+
+```go
+package main
+
+import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
+	"fmt"
+	"io"
+	"math"
+	"net/http"
+	"strconv"
+	"time"
+)
+
+func verifyWebhookSignature(payload, signature, timestamp, secret string) bool {
+	// 检查时间戳容差（5 分钟）
+	ts, err := strconv.ParseInt(timestamp, 10, 64)
+	if err != nil {
+		return false
+	}
+	currentTime := time.Now().Unix()
+	if math.Abs(float64(currentTime-ts)) > 300 {
+		return false
+	}
+
+	// 计算期望签名
+	data := fmt.Sprintf("%s.%s", timestamp, payload)
+	mac := hmac.New(sha256.New, []byte(secret))
+	mac.Write([]byte(data))
+	expected := "sha256=" + hex.EncodeToString(mac.Sum(nil))
+
+	// 常量时间比较
+	return hmac.Equal([]byte(expected), []byte(signature))
+}
+
+func webhookHandler(w http.ResponseWriter, r *http.Request) {
+	body, _ := io.ReadAll(r.Body)
+	payload := string(body)
+	signature := r.Header.Get("X-Kyren-Signature")
+	timestamp := r.Header.Get("X-Kyren-Timestamp")
+
+	if !verifyWebhookSignature(payload, signature, timestamp, webhookSecret) {
+		http.Error(w, "Invalid signature", http.StatusBadRequest)
+		return
+	}
+
+	// 处理事件...
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
+}
+```
+
+<Warning>
+  **重要安全注意事项：**
+  - 处理事件前必须先验证签名
+  - 使用常量时间比较函数以防止时序攻击
+  - 拒绝时间戳超过 5 分钟的请求以防止重放攻击
+  - 使用原始请求体进行签名验证（JSON 解析之前）
+</Warning>
