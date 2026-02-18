@@ -20,6 +20,8 @@ security:
   - ApiKeyAuth: []
 
 tags:
+  - name: Config
+    description: Retrieve platform configuration such as supported currencies.
   - name: Products
     description: Create and manage products that represent the goods or services you sell.
   - name: Checkouts
@@ -30,6 +32,36 @@ tags:
     description: View your account balance and transaction history.
 
 paths:
+  /v1/config/currencies:
+    get:
+      operationId: getCurrencies
+      tags: [Config]
+      summary: Get supported currencies
+      description: |
+        Returns the list of currencies supported by the platform and the default currency.
+        Use this when creating products or configuring pricing to ensure you use a supported currency.
+      responses:
+        "200":
+          description: Supported currencies and default currency
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurrenciesResponseWrapper"
+              example:
+                code: 0
+                message: "success"
+                data:
+                  currencies:
+                    - code: "CNY"
+                      label: "CNY"
+                    - code: "HKD"
+                      label: "HKD"
+                    - code: "USD"
+                      label: "USD"
+                  defaultCurrency: "CNY"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
   /v1/products:
     post:
       operationId: createProduct
@@ -769,6 +801,28 @@ components:
           type: string
           format: date-time
 
+    CurrencyOption:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Three-letter ISO currency code (e.g. CNY, HKD, USD)
+        label:
+          type: string
+          description: Display label for the currency
+
+    CurrenciesResponse:
+      type: object
+      properties:
+        currencies:
+          type: array
+          items:
+            $ref: "#/components/schemas/CurrencyOption"
+          description: List of supported currencies
+        defaultCurrency:
+          type: string
+          description: The default currency code used when none is specified
+
     BalanceTransaction:
       type: object
       properties:
@@ -925,6 +979,18 @@ components:
           example: "success"
         data:
           $ref: "#/components/schemas/Balance"
+
+    CurrenciesResponseWrapper:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+        message:
+          type: string
+          example: "success"
+        data:
+          $ref: "#/components/schemas/CurrenciesResponse"
 
     BalanceTransactionListResponseWrapper:
       type: object
