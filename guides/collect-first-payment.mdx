@@ -60,7 +60,7 @@ async function createProduct() {
   const response = await axios.post(`${KYREN_BASE_URL}/v1/products`, {
     name: '1000 AI Credits',
     description: 'Top up 1000 credits for AI API usage',
-    price: 9.99,
+    price: '9.99',
     currency: 'USD',
     metadata: { credits: '1000' }
   }, {

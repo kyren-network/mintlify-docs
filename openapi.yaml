@@ -5,9 +5,10 @@ info:
     The Kyren Pay API enables merchants to accept payments from customers worldwide.
     Integrate checkout sessions, manage products, track orders, and handle webhooks.
 
-    **Data types**: The API uses three types for request/response data:
+    **Data types**: The API uses the following types for request/response data:
+    - **string**: For text, identifiers, and **all amount/price fields** (e.g. `price`, `amount`, `platformFee`, `available`)
+      to avoid floating-point precision issues. Use decimal format like `"9.99"`.
     - **integer**: For counts, pagination, and timestamps
-    - **string**: For text and identifiers
     - **timestamp**: Unix timestamp in milliseconds (integer) for all time fields (e.g. `createdAt`, `paidAt`, `expiresAt`).
       Time parameters (e.g. `startDate`, `endDate`) also use Unix milliseconds.
   version: "1.0.0"
@@ -83,7 +84,7 @@ paths:
             example:
               name: "1000 AI Credits"
               description: "Top up 1000 credits for AI API usage"
-              price: 9.99
+              price: "9.99"
               currency: "USD"
               metadata:
                 credits: "1000"
@@ -102,7 +103,7 @@ paths:
                   name: "1000 AI Credits"
                   description: "Top up 1000 credits for AI API usage"
                   image: null
-                  price: 9.99
+                  price: "9.99"
                   currency: "USD"
                   status: "ACTIVE"
                   metadata:
@@ -194,7 +195,7 @@ paths:
               $ref: "#/components/schemas/UpdateProductRequest"
             example:
               name: "2000 AI Credits"
-              price: 18.99
+              price: "18.99"
       responses:
         "200":
           description: Product updated successfully
@@ -262,7 +263,7 @@ paths:
                 data:
                   id: "cs_xyz789"
                   productId: "prod_abc123"
-                  amount: 9.99
+                  amount: "9.99"
                   currency: "USD"
                   status: "OPEN"
                   url: "https://payment.kyren.io/checkout/cs_xyz789"
@@ -344,11 +345,11 @@ paths:
                       productId: "prod_abc123"
                       customerEmail: "customer@example.com"
                       customerName: null
-                      amount: 9.99
+                      amount: "9.99"
                       currency: "USD"
-                      platformFee: 0.40
-                      paymentFee: 0.30
-                      netAmount: 9.29
+                      platformFee: "0.40"
+                      paymentFee: "0.30"
+                      netAmount: "9.29"
                       paymentMethod: "CREDIT_CARD"
                       status: "PAID"
                       paidAt: 1736932500000
@@ -388,11 +389,11 @@ paths:
                   productId: "prod_abc123"
                   customerEmail: "customer@example.com"
                   customerName: null
-                  amount: 9.99
+                  amount: "9.99"
                   currency: "USD"
-                  platformFee: 0.40
-                  paymentFee: 0.30
-                  netAmount: 9.29
+                  platformFee: "0.40"
+                  paymentFee: "0.30"
+                  netAmount: "9.29"
                   paymentMethod: "CREDIT_CARD"
                   paymentGateway: "allinpay"
                   gatewayOrderId: "gw_001"
@@ -461,9 +462,9 @@ paths:
                 code: 0
                 message: "success"
                 data:
-                  available: 1250.00
-                  pending: 350.00
-                  frozen: 0.00
+                  available: "1250.00"
+                  pending: "350.00"
+                  frozen: "0.00"
                   currency: "USD"
                   updatedAt: 1736932500000
         "401":
@@ -498,11 +499,11 @@ paths:
                   items:
                     - id: "btx_ghi789"
                       type: "PAYMENT"
-                      amount: 9.29
+                      amount: "9.29"
                       currency: "USD"
-                      availableAfter: 1250.00
-                      pendingAfter: 350.00
-                      frozenAfter: 0.00
+                      availableAfter: "1250.00"
+                      pendingAfter: "350.00"
+                      frozenAfter: "0.00"
                       sourceType: "order"
                       sourceId: "order_def456"
                       description: "Payment received for order order_def456"
@@ -645,9 +646,9 @@ components:
           type: string
           description: URL of the product image
         price:
-          type: number
-          minimum: 0.01
-          description: The price of the product
+          type: string
+          pattern: '^\d+(\.\d{1,2})?$'
+          description: The price of the product (e.g. "9.99"), must be at least 0.01
         currency:
           type: string
           default: "CNY"
@@ -670,8 +671,8 @@ components:
         image:
           type: string
         price:
-          type: number
-          minimum: 0.01
+          type: string
+          pattern: '^\d+(\.\d{1,2})?$'
         currency:
           type: string
         metadata:
@@ -721,7 +722,7 @@ components:
         image:
           type: string
         price:
-          type: number
+          type: string
         currency:
           type: string
         status:
@@ -748,7 +749,8 @@ components:
         productId:
           type: string
         amount:
-          type: number
+          type: string
+          description: Order amount (e.g. "9.99")
         currency:
           type: string
         status:
@@ -778,17 +780,17 @@ components:
         customerName:
           type: string
         amount:
-          type: number
+          type: string
         currency:
           type: string
         platformFee:
-          type: number
+          type: string
           description: Platform fee charged by Kyren Pay
         paymentFee:
-          type: number
+          type: string
           description: Payment processing fee
         netAmount:
-          type: number
+          type: string
           description: Net amount after fees (amount - platformFee - paymentFee)
         paymentMethod:
           $ref: "#/components/schemas/PaymentMethod"
@@ -837,13 +839,13 @@ components:
       type: object
       properties:
         available:
-          type: number
+          type: string
           description: Funds available for payout
         pending:
-          type: number
+          type: string
           description: Funds awaiting settlement
         frozen:
-          type: number
+          type: string
           description: Funds currently frozen
         currency:
           type: string
@@ -882,17 +884,17 @@ components:
         type:
           $ref: "#/components/schemas/BalanceTransactionType"
         amount:
-          type: number
+          type: string
           description: Amount change (positive for increase, negative for decrease)
         currency:
           type: string
         availableAfter:
-          type: number
+          type: string
           description: Available balance after this transaction
         pendingAfter:
-          type: number
+          type: string
         frozenAfter:
-          type: number
+          type: string
         sourceType:
           type: string
           description: "Type of the source resource (e.g. order, payout)"
