@@ -145,7 +145,7 @@ paths:
                       name: "1000 AI Credits"
                       description: "Top up 1000 credits for AI API usage"
                       image: null
-                      price: 9.99
+                      price: "9.99"
                       currency: "USD"
                       status: "ACTIVE"
                       metadata:
