@@ -18,7 +18,7 @@ signature = "sha256=" + HMAC-SHA256(timestamp + "." + payload, webhook_secret)
 | 请求头 | 示例 |
 | --- | --- |
 | `X-Kyren-Signature` | `sha256=5d2dc4f1a...` |
-| `X-Kyren-Timestamp` | `1704628800` |
+| `X-Kyren-Timestamp` | `1704628800000`（Unix 毫秒时间戳） |
 
 ## 验证步骤
 
@@ -27,7 +27,7 @@ signature = "sha256=" + HMAC-SHA256(timestamp + "." + payload, webhook_secret)
     从请求头中读取 `X-Kyren-Signature` 和 `X-Kyren-Timestamp`。
   </Step>
   <Step title="检查时间戳">
-    验证时间戳在当前时间的 5 分钟（300 秒）以内。这可以防止重放攻击。
+    验证时间戳在当前时间的 5 分钟（300000 毫秒）以内。这可以防止重放攻击。
   </Step>
   <Step title="计算期望签名">
     拼接 `timestamp + "." + 原始请求体`，然后使用你的 Webhook 密钥计算 HMAC-SHA256。
@@ -46,8 +46,8 @@ const crypto = require('crypto');
 
 function verifyWebhookSignature(payload, signature, timestamp, secret) {
   // 检查时间戳容差（5 分钟）
-  const currentTime = Math.floor(Date.now() / 1000);
-  if (Math.abs(currentTime - parseInt(timestamp)) > 300) {
+  const currentTime = Date.now();
+  if (Math.abs(currentTime - parseInt(timestamp)) > 300000) {
     return false;
   }
 
@@ -99,8 +99,8 @@ import time
 
 def verify_webhook_signature(payload: str, signature: str, timestamp: str, secret: str) -> bool:
     # 检查时间戳容差（5 分钟）
-    current_time = int(time.time())
-    if abs(current_time - int(timestamp)) > 300:
+    current_time = int(time.time() * 1000)
+    if abs(current_time - int(timestamp)) > 300000:
         return False
 
     # 计算期望签名
@@ -158,8 +158,8 @@ func verifyWebhookSignature(payload, signature, timestamp, secret string) bool {
 	if err != nil {
 		return false
 	}
-	currentTime := time.Now().Unix()
-	if math.Abs(float64(currentTime-ts)) > 300 {
+	currentTime := time.Now().UnixMilli()
+	if math.Abs(float64(currentTime-ts)) > 300000 {
 		return false
 	}
 
@@ -194,6 +194,6 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
   **重要安全注意事项：**
   - 处理事件前必须先验证签名
   - 使用常量时间比较函数以防止时序攻击
-  - 拒绝时间戳超过 5 分钟的请求以防止重放攻击
+  - 拒绝时间戳超过 5 分钟（300000 毫秒）的请求以防止重放攻击
   - 使用原始请求体进行签名验证（JSON 解析之前）
 </Warning>

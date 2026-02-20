@@ -26,7 +26,7 @@ All webhook events share the same top-level structure:
 {
   "id": "evt_abc123",
   "type": "order.paid",
-  "created_at": "2026-01-15T10:35:00Z",
+  "created_at": 1736932500000,
   "data": {
     // Event-specific data
   }
@@ -37,7 +37,7 @@ All webhook events share the same top-level structure:
 | --- | --- | --- |
 | `id` | string | Unique event identifier (use for deduplication) |
 | `type` | string | The event type |
-| `created_at` | string | ISO 8601 timestamp |
+| `created_at` | integer | Unix timestamp in milliseconds |
 | `data` | object | Event-specific payload |
 
 ## order.paid
@@ -48,7 +48,7 @@ Sent when a customer successfully completes a payment.
 {
   "id": "evt_abc123",
   "type": "order.paid",
-  "created_at": "2026-01-15T10:35:00Z",
+  "created_at": 1736932500000,
   "data": {
     "order_id": "order_def456",
     "product_id": "prod_abc123",
@@ -56,7 +56,7 @@ Sent when a customer successfully completes a payment.
     "amount": 9.99,
     "currency": "USD",
     "net_amount": 9.29,
-    "paid_at": "2026-01-15T10:35:00Z"
+    "paid_at": 1736932500000
   }
 }
 ```
@@ -69,7 +69,7 @@ Sent when a customer successfully completes a payment.
 | `amount` | number | Total payment amount |
 | `currency` | string | Three-letter currency code |
 | `net_amount` | number | Amount after fees |
-| `paid_at` | string | When the payment was confirmed |
+| `paid_at` | integer | When the payment was confirmed (Unix timestamp in milliseconds) |
 
 <Tip>
   This is the most important event. Use it to fulfill orders — for example, adding credits to a user's account.
@@ -87,11 +87,11 @@ Sent when a checkout session expires without payment (after 30 minutes).
 {
   "id": "evt_ghi789",
   "type": "checkout.expired",
-  "created_at": "2026-01-15T11:00:00Z",
+  "created_at": 1736934000000,
   "data": {
     "checkout_id": "cs_xyz789",
     "product_id": "prod_abc123",
-    "expired_at": "2026-01-15T11:00:00Z"
+    "expired_at": 1736934000000
   }
 }
 ```
@@ -104,13 +104,13 @@ Sent when an order is refunded by the platform.
 {
   "id": "evt_jkl012",
   "type": "order.refunded",
-  "created_at": "2026-01-16T14:00:00Z",
+  "created_at": 1737028800000,
   "data": {
     "order_id": "order_def456",
     "product_id": "prod_abc123",
     "amount": 9.99,
     "currency": "USD",
-    "refunded_at": "2026-01-16T14:00:00Z"
+    "refunded_at": 1737028800000
   }
 }
 ```
@@ -123,12 +123,12 @@ Sent when a payout to your bank account is successfully processed.
 {
   "id": "evt_mno345",
   "type": "payout.completed",
-  "created_at": "2026-01-20T09:00:00Z",
+  "created_at": 1737356400000,
   "data": {
     "payout_id": "po_abc123",
     "amount": 500.00,
     "currency": "USD",
-    "completed_at": "2026-01-20T09:00:00Z"
+    "completed_at": 1737356400000
   }
 }
 ```
@@ -141,7 +141,7 @@ Sent when a payout fails.
 {
   "id": "evt_pqr678",
   "type": "payout.failed",
-  "created_at": "2026-01-20T09:00:00Z",
+  "created_at": 1737356400000,
   "data": {
     "payout_id": "po_abc123",
     "amount": 500.00,

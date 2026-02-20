@@ -18,7 +18,7 @@ The signature and timestamp are sent in HTTP headers:
 | Header | Example |
 | --- | --- |
 | `X-Kyren-Signature` | `sha256=5d2dc4f1a...` |
-| `X-Kyren-Timestamp` | `1704628800` |
+| `X-Kyren-Timestamp` | `1704628800000` (Unix timestamp in milliseconds) |
 
 ## Verification Steps
 
@@ -27,7 +27,7 @@ The signature and timestamp are sent in HTTP headers:
     Read `X-Kyren-Signature` and `X-Kyren-Timestamp` from the request headers.
   </Step>
   <Step title="Check timestamp">
-    Verify the timestamp is within 5 minutes (300 seconds) of the current time. This prevents replay attacks.
+    Verify the timestamp is within 5 minutes (300000 milliseconds) of the current time. This prevents replay attacks.
   </Step>
   <Step title="Compute expected signature">
     Concatenate `timestamp + "." + raw_request_body`, then compute HMAC-SHA256 using your webhook secret.
@@ -46,8 +46,8 @@ const crypto = require('crypto');
 
 function verifyWebhookSignature(payload, signature, timestamp, secret) {
   // Check timestamp tolerance (5 minutes)
-  const currentTime = Math.floor(Date.now() / 1000);
-  if (Math.abs(currentTime - parseInt(timestamp)) > 300) {
+  const currentTime = Date.now();
+  if (Math.abs(currentTime - parseInt(timestamp)) > 300000) {
     return false;
   }
 
@@ -99,8 +99,8 @@ import time
 
 def verify_webhook_signature(payload: str, signature: str, timestamp: str, secret: str) -> bool:
     # Check timestamp tolerance (5 minutes)
-    current_time = int(time.time())
-    if abs(current_time - int(timestamp)) > 300:
+    current_time = int(time.time() * 1000)
+    if abs(current_time - int(timestamp)) > 300000:
         return False
 
     # Compute expected signature
@@ -158,8 +158,8 @@ func verifyWebhookSignature(payload, signature, timestamp, secret string) bool {
 	if err != nil {
 		return false
 	}
-	currentTime := time.Now().Unix()
-	if math.Abs(float64(currentTime-ts)) > 300 {
+	currentTime := time.Now().UnixMilli()
+	if math.Abs(float64(currentTime-ts)) > 300000 {
 		return false
 	}
 
@@ -194,6 +194,6 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
   **Important security considerations:**
   - Always verify signatures before processing events
   - Use constant-time comparison functions to prevent timing attacks
-  - Reject requests with timestamps older than 5 minutes to prevent replay attacks
+  - Reject requests with timestamps older than 5 minutes (300000 ms) to prevent replay attacks
   - Use the raw request body for signature verification (before JSON parsing)
 </Warning>

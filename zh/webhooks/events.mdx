@@ -26,7 +26,7 @@ description: 所有 Webhook 事件类型及其载荷
 {
   "id": "evt_abc123",
   "type": "order.paid",
-  "created_at": "2026-01-15T10:35:00Z",
+  "created_at": 1736932500000,
   "data": {
     // 事件特定数据
   }
@@ -37,7 +37,7 @@ description: 所有 Webhook 事件类型及其载荷
 | --- | --- | --- |
 | `id` | string | 唯一事件标识符（用于去重） |
 | `type` | string | 事件类型 |
-| `created_at` | string | ISO 8601 时间戳 |
+| `created_at` | integer | Unix 毫秒时间戳 |
 | `data` | object | 事件特定载荷 |
 
 ## order.paid
@@ -48,7 +48,7 @@ description: 所有 Webhook 事件类型及其载荷
 {
   "id": "evt_abc123",
   "type": "order.paid",
-  "created_at": "2026-01-15T10:35:00Z",
+  "created_at": 1736932500000,
   "data": {
     "order_id": "order_def456",
     "product_id": "prod_abc123",
@@ -56,7 +56,7 @@ description: 所有 Webhook 事件类型及其载荷
     "amount": 9.99,
     "currency": "USD",
     "net_amount": 9.29,
-    "paid_at": "2026-01-15T10:35:00Z"
+    "paid_at": 1736932500000
   }
 }
 ```
@@ -69,7 +69,7 @@ description: 所有 Webhook 事件类型及其载荷
 | `amount` | number | 总支付金额 |
 | `currency` | string | 三字母货币代码 |
 | `net_amount` | number | 扣除手续费后的金额 |
-| `paid_at` | string | 付款确认时间 |
+| `paid_at` | integer | 付款确认时间（Unix 毫秒时间戳） |
 
 <Tip>
   这是最重要的事件。用它来完成订单处理 — 例如，为用户的账户充值额度。
@@ -87,11 +87,11 @@ Checkout Session 过期（30 分钟未付款）时发送。
 {
   "id": "evt_ghi789",
   "type": "checkout.expired",
-  "created_at": "2026-01-15T11:00:00Z",
+  "created_at": 1736934000000,
   "data": {
     "checkout_id": "cs_xyz789",
     "product_id": "prod_abc123",
-    "expired_at": "2026-01-15T11:00:00Z"
+    "expired_at": 1736934000000
   }
 }
 ```
@@ -104,13 +104,13 @@ Checkout Session 过期（30 分钟未付款）时发送。
 {
   "id": "evt_jkl012",
   "type": "order.refunded",
-  "created_at": "2026-01-16T14:00:00Z",
+  "created_at": 1737028800000,
   "data": {
     "order_id": "order_def456",
     "product_id": "prod_abc123",
     "amount": 9.99,
     "currency": "USD",
-    "refunded_at": "2026-01-16T14:00:00Z"
+    "refunded_at": 1737028800000
   }
 }
 ```
@@ -123,12 +123,12 @@ Checkout Session 过期（30 分钟未付款）时发送。
 {
   "id": "evt_mno345",
   "type": "payout.completed",
-  "created_at": "2026-01-20T09:00:00Z",
+  "created_at": 1737356400000,
   "data": {
     "payout_id": "po_abc123",
     "amount": 500.00,
     "currency": "USD",
-    "completed_at": "2026-01-20T09:00:00Z"
+    "completed_at": 1737356400000
   }
 }
 ```
@@ -141,7 +141,7 @@ Checkout Session 过期（30 分钟未付款）时发送。
 {
   "id": "evt_pqr678",
   "type": "payout.failed",
-  "created_at": "2026-01-20T09:00:00Z",
+  "created_at": 1737356400000,
   "data": {
     "payout_id": "po_abc123",
     "amount": 500.00,

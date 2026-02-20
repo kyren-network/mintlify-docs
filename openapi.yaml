@@ -4,6 +4,12 @@ info:
   description: |
     The Kyren Pay API enables merchants to accept payments from customers worldwide.
     Integrate checkout sessions, manage products, track orders, and handle webhooks.
+
+    **Data types**: The API uses three types for request/response data:
+    - **integer**: For counts, pagination, and timestamps
+    - **string**: For text and identifiers
+    - **timestamp**: Unix timestamp in milliseconds (integer) for all time fields (e.g. `createdAt`, `paidAt`, `expiresAt`).
+      Time parameters (e.g. `startDate`, `endDate`) also use Unix milliseconds.
   version: "1.0.0"
   contact:
     name: Kyren Pay Support
@@ -101,8 +107,8 @@ paths:
                   status: "ACTIVE"
                   metadata:
                     credits: "1000"
-                  createdAt: "2026-01-15T10:30:00Z"
-                  updatedAt: "2026-01-15T10:30:00Z"
+                  createdAt: 1736932200000
+                  updatedAt: 1736932200000
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -143,8 +149,8 @@ paths:
                       status: "ACTIVE"
                       metadata:
                         credits: "1000"
-                      createdAt: "2026-01-15T10:30:00Z"
-                      updatedAt: "2026-01-15T10:30:00Z"
+                      createdAt: 1736932200000
+                      updatedAt: 1736932200000
                   pagination:
                     page: 1
                     size: 20
@@ -260,8 +266,8 @@ paths:
                   currency: "USD"
                   status: "OPEN"
                   url: "https://payment.kyren.io/checkout/cs_xyz789"
-                  expiresAt: "2026-01-15T11:00:00Z"
-                  createdAt: "2026-01-15T10:30:00Z"
+                  expiresAt: 1736934000000
+                  createdAt: 1736932200000
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -310,16 +316,16 @@ paths:
           in: query
           required: false
           schema:
-            type: string
-            format: date
-          description: "Filter orders created on or after this date (ISO 8601, e.g. 2026-01-01)"
+            type: integer
+            format: int64
+          description: "Filter orders created on or after this time (Unix timestamp in milliseconds)"
         - name: endDate
           in: query
           required: false
           schema:
-            type: string
-            format: date
-          description: "Filter orders created on or before this date (ISO 8601, e.g. 2026-01-31)"
+            type: integer
+            format: int64
+          description: "Filter orders created on or before this time (Unix timestamp in milliseconds)"
         - $ref: "#/components/parameters/Page"
         - $ref: "#/components/parameters/Size"
       responses:
@@ -345,11 +351,11 @@ paths:
                       netAmount: 9.29
                       paymentMethod: "CREDIT_CARD"
                       status: "PAID"
-                      paidAt: "2026-01-15T10:35:00Z"
+                      paidAt: 1736932500000
                       settledAt: null
                       metadata:
                         userId: "user_456"
-                      createdAt: "2026-01-15T10:30:00Z"
+                      createdAt: 1736932200000
                   pagination:
                     page: 1
                     size: 20
@@ -392,17 +398,51 @@ paths:
                   gatewayOrderId: "gw_001"
                   gatewayTransactionId: "txn_001"
                   status: "PAID"
-                  paidAt: "2026-01-15T10:35:00Z"
+                  paidAt: 1736932500000
                   settledAt: null
                   payerIp: "203.0.113.1"
                   metadata:
                     userId: "user_456"
-                  createdAt: "2026-01-15T10:30:00Z"
-                  updatedAt: "2026-01-15T10:35:00Z"
+                  createdAt: 1736932200000
+                  updatedAt: 1736932500000
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
+
+  /v1/orders/export:
+    get:
+      operationId: exportOrders
+      tags: [Orders]
+      summary: Export orders as CSV
+      description: |
+        Exports orders within the specified date range as a CSV file.
+        Use Unix timestamps (milliseconds) for startDate and endDate.
+      parameters:
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Start of date range (Unix timestamp in milliseconds, inclusive)
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: End of date range (Unix timestamp in milliseconds, inclusive)
+      responses:
+        "200":
+          description: CSV file of orders
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /v1/balance:
     get:
@@ -425,7 +465,7 @@ paths:
                   pending: 350.00
                   frozen: 0.00
                   currency: "USD"
-                  updatedAt: "2026-01-15T10:35:00Z"
+                  updatedAt: 1736932500000
         "401":
           $ref: "#/components/responses/Unauthorized"
 
@@ -466,7 +506,7 @@ paths:
                       sourceType: "order"
                       sourceId: "order_def456"
                       description: "Payment received for order order_def456"
-                      createdAt: "2026-01-15T10:35:00Z"
+                      createdAt: 1736932500000
                   pagination:
                     page: 1
                     size: 20
@@ -691,11 +731,13 @@ components:
           additionalProperties:
             type: string
         createdAt:
-          type: string
-          format: date-time
+          type: integer
+          format: int64
+          description: Unix timestamp in milliseconds
         updatedAt:
-          type: string
-          format: date-time
+          type: integer
+          format: int64
+          description: Unix timestamp in milliseconds
 
     Checkout:
       type: object
@@ -716,11 +758,13 @@ components:
           format: uri
           description: The URL to redirect the customer to for payment
         expiresAt:
-          type: string
-          format: date-time
+          type: integer
+          format: int64
+          description: Unix timestamp in milliseconds
         createdAt:
-          type: string
-          format: date-time
+          type: integer
+          format: int64
+          description: Unix timestamp in milliseconds
 
     Order:
       type: object
@@ -751,18 +795,23 @@ components:
         status:
           $ref: "#/components/schemas/OrderStatus"
         paidAt:
-          type: string
-          format: date-time
+          type: integer
+          format: int64
+          nullable: true
+          description: Unix timestamp in milliseconds, null if not paid
         settledAt:
-          type: string
-          format: date-time
+          type: integer
+          format: int64
+          nullable: true
+          description: Unix timestamp in milliseconds, null if not settled
         metadata:
           type: object
           additionalProperties:
             type: string
         createdAt:
-          type: string
-          format: date-time
+          type: integer
+          format: int64
+          description: Unix timestamp in milliseconds
 
     OrderDetail:
       allOf:
@@ -780,8 +829,9 @@ components:
             payerIp:
               type: string
             updatedAt:
-              type: string
-              format: date-time
+              type: integer
+              format: int64
+              description: Unix timestamp in milliseconds
 
     Balance:
       type: object
@@ -798,8 +848,9 @@ components:
         currency:
           type: string
         updatedAt:
-          type: string
-          format: date-time
+          type: integer
+          format: int64
+          description: Unix timestamp in milliseconds
 
     CurrencyOption:
       type: object
@@ -851,8 +902,9 @@ components:
         description:
           type: string
         createdAt:
-          type: string
-          format: date-time
+          type: integer
+          format: int64
+          description: Unix timestamp in milliseconds
 
     # --- Pagination ---
     Pagination:
