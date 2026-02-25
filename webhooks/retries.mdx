@@ -7,17 +7,19 @@ If your webhook endpoint doesn't respond with a `2xx` status code, Kyren Pay wil
 
 ## Retry Schedule
 
-Kyren Pay retries failed webhooks up to **5 times** with increasing delays:
+Kyren Pay retries failed webhooks up to **7 times**:
 
 | Attempt | Delay After Failure |
 | --- | --- |
-| 1st retry | 1 minute |
-| 2nd retry | 5 minutes |
-| 3rd retry | 30 minutes |
-| 4th retry | 2 hours |
-| 5th retry | 24 hours |
+| 1st retry | 30 seconds |
+| 2nd retry | 30 seconds |
+| 3rd retry | 1 minute |
+| 4th retry | 1 minute |
+| 5th retry | 30 minutes |
+| 6th retry | 30 minutes |
+| 7th retry | 30 minutes |
 
-After 5 failed attempts, the webhook is marked as **failed** and no further retries are attempted.
+After 7 failed attempts, the webhook is marked as **failed** and no further retries are attempted.
 
 ## What Counts as a Failure
 

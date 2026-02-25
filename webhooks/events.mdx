@@ -10,13 +10,6 @@ Kyren Pay sends webhook notifications for the following event types.
 | Event | Description | Trigger |
 | --- | --- | --- |
 | `order.paid` | A payment has been confirmed | Customer completes checkout |
-| `checkout.completed` | A checkout session has been completed | Payment successfully processed |
-| `checkout.expired` | A checkout session has expired | 30 minutes without payment |
-| `order.refunded` | An order has been refunded | Admin processes a refund |
-| `payout.completed` | A payout has been processed | Funds transferred to merchant |
-| `payout.failed` | A payout has failed | Transfer failed |
-| `kyc.approved` | KYC verification approved | Admin approves KYC |
-| `kyc.rejected` | KYC verification rejected | Admin rejects KYC |
 
 ## Event Object Structure
 
@@ -75,85 +68,9 @@ Sent when a customer successfully completes a payment.
   This is the most important event. Use it to fulfill orders — for example, adding credits to a user's account.
 </Tip>
 
-## checkout.completed
-
-Sent when a checkout session is completed successfully. Contains the same data as `order.paid`.
-
-## checkout.expired
-
-Sent when a checkout session expires without payment (after 30 minutes).
-
-```json
-{
-  "id": "evt_ghi789",
-  "type": "checkout.expired",
-  "created_at": 1736934000000,
-  "data": {
-    "checkout_id": "cs_xyz789",
-    "product_id": "prod_abc123",
-    "expired_at": 1736934000000
-  }
-}
-```
-
-## order.refunded
-
-Sent when an order is refunded by the platform.
-
-```json
-{
-  "id": "evt_jkl012",
-  "type": "order.refunded",
-  "created_at": 1737028800000,
-  "data": {
-    "order_id": "order_def456",
-    "product_id": "prod_abc123",
-    "amount": 9.99,
-    "currency": "USD",
-    "refunded_at": 1737028800000
-  }
-}
-```
-
-## payout.completed
-
-Sent when a payout to your bank account is successfully processed.
-
-```json
-{
-  "id": "evt_mno345",
-  "type": "payout.completed",
-  "created_at": 1737356400000,
-  "data": {
-    "payout_id": "po_abc123",
-    "amount": 500.00,
-    "currency": "USD",
-    "completed_at": 1737356400000
-  }
-}
-```
-
-## payout.failed
-
-Sent when a payout fails.
-
-```json
-{
-  "id": "evt_pqr678",
-  "type": "payout.failed",
-  "created_at": 1737356400000,
-  "data": {
-    "payout_id": "po_abc123",
-    "amount": 500.00,
-    "currency": "USD",
-    "reason": "Invalid bank account details"
-  }
-}
-```
-
 ## Handling Events
 
-Here's how to handle different event types in your webhook endpoint:
+Here's how to handle webhook events in your endpoint:
 
 ```javascript
 app.post('/webhooks/kyren', (req, res) => {
@@ -164,12 +81,6 @@ app.post('/webhooks/kyren', (req, res) => {
   switch (event.type) {
     case 'order.paid':
       handleOrderPaid(event.data);
-      break;
-    case 'order.refunded':
-      handleOrderRefunded(event.data);
-      break;
-    case 'checkout.expired':
-      handleCheckoutExpired(event.data);
       break;
     default:
       console.log(`Unhandled event: ${event.type}`);
