@@ -46,10 +46,11 @@ Sent when a customer successfully completes a payment.
     "order_id": "order_def456",
     "product_id": "prod_abc123",
     "customer_email": "customer@example.com",
-    "amount": 9.99,
+    "amount": "9.99",
     "currency": "USD",
-    "net_amount": 9.29,
-    "paid_at": 1736932500000
+    "net_amount": "9.29",
+    "paid_at": 1736932500000,
+    "metadata": { "user_id": "u_123" }
   }
 }
 ```
@@ -59,10 +60,11 @@ Sent when a customer successfully completes a payment.
 | `order_id` | string | The order ID |
 | `product_id` | string | The product that was purchased |
 | `customer_email` | string | Customer's email address |
-| `amount` | number | Total payment amount |
+| `amount` | string | Total payment amount |
 | `currency` | string | Three-letter currency code |
-| `net_amount` | number | Amount after fees |
+| `net_amount` | string | Amount after fees |
 | `paid_at` | integer | When the payment was confirmed (Unix timestamp in milliseconds) |
+| `metadata` | object \| null | The metadata you passed when creating the checkout session |
 
 <Tip>
   This is the most important event. Use it to fulfill orders — for example, adding credits to a user's account.

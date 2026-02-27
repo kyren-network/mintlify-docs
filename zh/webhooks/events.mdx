@@ -46,10 +46,11 @@ description: 所有 Webhook 事件类型及其载荷
     "order_id": "order_def456",
     "product_id": "prod_abc123",
     "customer_email": "customer@example.com",
-    "amount": 9.99,
+    "amount": "9.99",
     "currency": "USD",
-    "net_amount": 9.29,
-    "paid_at": 1736932500000
+    "net_amount": "9.29",
+    "paid_at": 1736932500000,
+    "metadata": { "user_id": "u_123" }
   }
 }
 ```
@@ -59,10 +60,11 @@ description: 所有 Webhook 事件类型及其载荷
 | `order_id` | string | 订单 ID |
 | `product_id` | string | 购买的产品 |
 | `customer_email` | string | 客户邮箱地址 |
-| `amount` | number | 总支付金额 |
+| `amount` | string | 总支付金额 |
 | `currency` | string | 三字母货币代码 |
-| `net_amount` | number | 扣除手续费后的金额 |
+| `net_amount` | string | 扣除手续费后的金额 |
 | `paid_at` | integer | 付款确认时间（Unix 毫秒时间戳） |
+| `metadata` | object \| null | 创建 Checkout Session 时传入的 metadata |
 
 <Tip>
   这是最重要的事件。用它来完成订单处理 — 例如，为用户的账户充值额度。
