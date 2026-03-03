@@ -1,29 +1,29 @@
 ---
-title: 快速开始
-description: 5 分钟内完成第一笔收款
+title: 快速開始
+description: 5 分鐘內完成第一筆收款
 ---
 
-按照以下步骤集成启润支付并收取你的第一笔付款。
+按照以下步驟整合啟潤支付並收取你的第一筆付款。
 
-## 前提条件
+## 前提條件
 
-- 一个启润支付商户账号（[点此注册](https://dashboard.kyren.top)）
-- 你的 API 密钥（在控制台的「开发者」页面获取）
+- 一個啟潤支付商戶帳號（[點此註冊](https://dashboard.kyren.top)）
+- 你的 API 密鑰（在控制台的「開發者」頁面取得）
 
-## 第一步：获取 API 密钥
+## 第一步：取得 API 密鑰
 
-注册后，前往 **控制台 > 开发者**，复制你的 API 密钥。
+註冊後，前往 **控制台 > 開發者**，複製你的 API 密鑰。
 
-- **测试密钥**：`kyren_test_xxxxxxxxxxxx` — 用于开发测试
-- **生产密钥**：`kyren_live_xxxxxxxxxxxx` — 用于正式收款
+- **測試密鑰**：`kyren_test_xxxxxxxxxxxx` — 用於開發測試
+- **生產密鑰**：`kyren_live_xxxxxxxxxxxx` — 用於正式收款
 
 <Warning>
-  请妥善保管你的 API 密钥。切勿在客户端代码或公开仓库中暴露密钥。
+  請妥善保管你的 API 密鑰。切勿在客戶端程式碼或公開倉庫中暴露密鑰。
 </Warning>
 
-## 第二步：创建产品
+## 第二步：建立產品
 
-创建一个代表你所售商品的产品：
+建立一個代表你所售商品的產品：
 
 ```bash
 curl -X POST https://api.kyren.top/v1/products \
@@ -31,17 +31,17 @@ curl -X POST https://api.kyren.top/v1/products \
   -H "x-api-key: kyren_test_xxxxxxxxxxxx" \
   -d '{
     "name": "1000 AI Credits",
-    "description": "充值 1000 个 AI API 额度",
-    "price": 9.99,
+    "description": "充值 1000 個 AI API 額度",
+    "price": "9.99",
     "currency": "USD"
   }'
 ```
 
-保存响应中的 `id`，后续创建 Checkout Session 时需要用到。
+儲存回應中的 `id`，後續建立 Checkout Session 時需要用到。
 
-## 第三步：创建 Checkout Session
+## 第三步：建立 Checkout Session
 
-当客户要付款时，创建一个 Checkout Session：
+當客戶要付款時，建立一個 Checkout Session：
 
 ```bash
 curl -X POST https://api.kyren.top/v1/checkouts \
@@ -54,29 +54,29 @@ curl -X POST https://api.kyren.top/v1/checkouts \
   }'
 ```
 
-响应中包含 `url` 字段 — 将客户重定向到该 URL 即可完成付款。
+回應中包含 `url` 欄位 — 將客戶重新導向到該 URL 即可完成付款。
 
-## 第四步：重定向到收银台
+## 第四步：重新導向到收銀台
 
-将客户重定向到第三步返回的 Checkout URL。客户会看到一个托管的支付页面，可以选择喜欢的支付方式。
+將客戶重新導向到第三步返回的 Checkout URL。客戶會看到一個託管的支付頁面，可以選擇喜歡的支付方式。
 
 ```javascript
-// 示例：在你的 Web 应用中重定向
+// 範例：在你的 Web 應用中重新導向
 window.location.href = checkoutResponse.data.url;
 ```
 
-## 第五步：处理 Webhook
+## 第五步：處理 Webhook
 
-付款完成后，启润支付会向你的服务器发送 Webhook：
+付款完成後，啟潤支付會向你的伺服器發送 Webhook：
 
 ```javascript
-// Express.js 示例
+// Express.js 範例
 app.post('/webhooks/kyren', express.raw({ type: 'application/json' }), (req, res) => {
   const signature = req.headers['x-kyren-signature'];
   const timestamp = req.headers['x-kyren-timestamp'];
   const payload = req.body.toString();
 
-  // 验证签名（详见 Webhook 签名验证章节）
+  // 驗證簽名（詳見 Webhook 簽名驗證章節）
   if (!verifySignature(payload, signature, timestamp)) {
     return res.status(400).send('Invalid signature');
   }
@@ -86,7 +86,7 @@ app.post('/webhooks/kyren', express.raw({ type: 'application/json' }), (req, res
   if (event.type === 'order.paid') {
     const orderId = event.data.order_id;
     const amount = event.data.amount;
-    // 在你的系统中完成订单
+    // 在你的系統中完成訂單
     console.log(`收到付款: ${amount} ${event.data.currency}`);
   }
 
@@ -95,22 +95,22 @@ app.post('/webhooks/kyren', express.raw({ type: 'application/json' }), (req, res
 ```
 
 <Info>
-  在 **控制台 > 开发者 > Webhook 设置** 中配置你的 Webhook URL。
+  在 **控制台 > 開發者 > Webhook 設定** 中配置你的 Webhook URL。
 </Info>
 
 ## 下一步
 
 <CardGroup cols={2}>
-  <Card title="认证" icon="key" href="/zh/authentication">
-    了解 API 认证详情
+  <Card title="認證" icon="key" href="/zh/authentication">
+    了解 API 認證詳情
   </Card>
-  <Card title="Webhook 签名" icon="shield-check" href="/zh/webhooks/signatures">
-    实现安全的 Webhook 签名验证
+  <Card title="Webhook 簽名" icon="shield-check" href="/zh/webhooks/signatures">
+    實現安全的 Webhook 簽名驗證
   </Card>
-  <Card title="测试" icon="flask" href="/zh/testing">
-    使用沙盒环境进行开发测试
+  <Card title="測試" icon="flask" href="/zh/testing">
+    使用沙盒環境進行開發測試
   </Card>
-  <Card title="代码示例" icon="code" href="/zh/guides/code-examples">
-    查看 Python、Node.js、Go 等语言的示例
+  <Card title="程式碼範例" icon="code" href="/zh/guides/code-examples">
+    查看 Python、Node.js、Go 等語言的範例
   </Card>
 </CardGroup>

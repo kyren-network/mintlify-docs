@@ -1,39 +1,39 @@
 ---
-title: 收取第一笔付款
-description: 使用启润支付完成端到端收款的完整指南
+title: 收取第一筆付款
+description: 使用啟潤支付完成端到端收款的完整指南
 ---
 
-本指南以 Node.js 后端为例，带你完成完整的支付集成。相同的概念适用于任何编程语言。
+本指南以 Node.js 後端為例，帶你完成完整的支付整合。相同的概念適用於任何程式語言。
 
-## 概览
+## 概覽
 
 ```mermaid
 sequenceDiagram
-    participant Customer as 客户
-    participant YourServer as 你的服务器
-    participant KyrenPay as 启润支付 API
-    participant Checkout as 收银页面
+    participant Customer as 客戶
+    participant YourServer as 你的伺服器
+    participant KyrenPay as 啟潤支付 API
+    participant Checkout as 收銀頁面
 
-    Customer->>YourServer: 点击「购买额度」
+    Customer->>YourServer: 點擊「購買額度」
     YourServer->>KyrenPay: POST /v1/checkouts
     KyrenPay-->>YourServer: { url: "https://payment.kyren.io/checkout/cs_..." }
-    YourServer-->>Customer: 重定向到收银 URL
+    YourServer-->>Customer: 重新導向到收銀 URL
     Customer->>Checkout: 完成付款
-    Checkout->>KyrenPay: 支付确认
+    Checkout->>KyrenPay: 支付確認
     KyrenPay->>YourServer: Webhook: order.paid
-    YourServer-->>YourServer: 完成订单
+    YourServer-->>YourServer: 完成訂單
 ```
 
-## 1. 搭建服务器
+## 1. 搭建伺服器
 
-安装所需依赖：
+安裝所需依賴：
 
 ```bash
 npm init -y
 npm install express axios
 ```
 
-创建服务器文件：
+建立伺服器檔案：
 
 ```javascript
 // server.js
@@ -50,15 +50,15 @@ const KYREN_BASE_URL = 'https://api.kyren.top';
 app.use(express.json());
 ```
 
-## 2. 创建产品（一次性操作）
+## 2. 建立產品（一次性操作）
 
-你只需创建一次产品，可以通过 API 或控制台完成。
+你只需建立一次產品，可以透過 API 或控制台完成。
 
 ```javascript
 async function createProduct() {
   const response = await axios.post(`${KYREN_BASE_URL}/v1/products`, {
     name: '1000 AI Credits',
-    description: '充值 1000 个 AI API 额度',
+    description: '充值 1000 個 AI API 額度',
     price: '9.99',
     currency: 'USD',
     metadata: { credits: '1000' }
@@ -66,14 +66,14 @@ async function createProduct() {
     headers: { 'x-api-key': KYREN_API_KEY }
   });
 
-  console.log('产品已创建:', response.data.data.id);
+  console.log('產品已建立:', response.data.data.id);
   return response.data.data;
 }
 ```
 
-## 3. 创建收银接口
+## 3. 建立收銀介面
 
-添加一个在客户点击「购买」时创建 Checkout Session 的接口：
+新增一個在客戶點擊「購買」時建立 Checkout Session 的介面：
 
 ```javascript
 app.post('/api/buy-credits', async (req, res) => {
@@ -90,18 +90,18 @@ app.post('/api/buy-credits', async (req, res) => {
 
     res.json({ checkoutUrl: response.data.data.url });
   } catch (error) {
-    console.error('创建收银失败:', error.response?.data);
-    res.status(500).json({ error: '创建收银失败' });
+    console.error('建立收銀失敗:', error.response?.data);
+    res.status(500).json({ error: '建立收銀失敗' });
   }
 });
 ```
 
-## 4. 处理前端重定向
+## 4. 處理前端重新導向
 
-在前端将客户重定向到收银页面：
+在前端將客戶重新導向到收銀頁面：
 
 ```html
-<button id="buy-btn">购买 1000 额度 - $9.99</button>
+<button id="buy-btn">購買 1000 額度 - $9.99</button>
 
 <script>
 document.getElementById('buy-btn').addEventListener('click', async () => {
@@ -120,9 +120,9 @@ document.getElementById('buy-btn').addEventListener('click', async () => {
 </script>
 ```
 
-## 5. 处理 Webhook
+## 5. 處理 Webhook
 
-添加 Webhook 端点以接收支付通知：
+新增 Webhook 端點以接收支付通知：
 
 ```javascript
 function verifySignature(payload, signature, timestamp) {
@@ -159,11 +159,11 @@ app.post('/webhooks/kyren',
     switch (event.type) {
       case 'order.paid':
         const { order_id, product_id, customer_email, amount, currency } = event.data;
-        console.log(`收到付款: ${amount} ${currency}，来自 ${customer_email}`);
-        // TODO: 完成订单 — 为用户账户充值额度
+        console.log(`收到付款: ${amount} ${currency}，來自 ${customer_email}`);
+        // TODO: 完成訂單 — 為使用者帳戶充值額度
         break;
       default:
-        console.log(`未处理的事件类型: ${event.type}`);
+        console.log(`未處理的事件類型: ${event.type}`);
     }
 
     res.status(200).send('OK');
@@ -171,39 +171,39 @@ app.post('/webhooks/kyren',
 );
 ```
 
-## 6. 启动服务器
+## 6. 啟動伺服器
 
 ```javascript
 app.listen(3000, () => {
-  console.log('服务器运行在 http://localhost:3000');
+  console.log('伺服器執行在 http://localhost:3000');
 });
 ```
 
-运行：
+執行：
 
 ```bash
 KYREN_API_KEY=kyren_test_xxx KYREN_WEBHOOK_SECRET=whsec_xxx node server.js
 ```
 
-## 7. 测试流程
+## 7. 測試流程
 
-1. 打开你的应用，点击「购买 1000 额度」
-2. 你将被重定向到启润支付收银页面
-3. 输入测试卡号 `4242 4242 4242 4242`
+1. 開啟你的應用，點擊「購買 1000 額度」
+2. 你將被重新導向到啟潤支付收銀頁面
+3. 輸入測試卡號 `4242 4242 4242 4242`
 4. 完成付款
-5. 检查服务器日志 — 你应该能看到 Webhook 到达
+5. 檢查伺服器日誌 — 你應該能看到 Webhook 到達
 
 <Check>
-  恭喜！你已经成功集成了启润支付。准备好后，切换到生产 API 密钥即可开始接收真实付款。
+  恭喜！你已經成功整合了啟潤支付。準備好後，切換到生產 API 密鑰即可開始接收真實付款。
 </Check>
 
 ## 下一步
 
 <CardGroup cols={2}>
   <Card title="Webhook 事件" icon="bell" href="/zh/webhooks/events">
-    查看所有可用的 Webhook 事件类型
+    查看所有可用的 Webhook 事件類型
   </Card>
-  <Card title="代码示例" icon="code" href="/zh/guides/code-examples">
-    查看其他语言的集成示例
+  <Card title="程式碼範例" icon="code" href="/zh/guides/code-examples">
+    查看其他語言的整合範例
   </Card>
 </CardGroup>

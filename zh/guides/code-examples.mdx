@@ -1,11 +1,11 @@
 ---
-title: 代码示例
-description: cURL、Python、Node.js 和 Go 的集成示例
+title: 程式碼範例
+description: cURL、Python、Node.js 和 Go 的整合範例
 ---
 
-常用启润支付 API 操作的多语言完整代码示例。
+常用啟潤支付 API 操作的多語言完整程式碼範例。
 
-## 创建产品
+## 建立產品
 
 <CodeGroup>
 ```bash cURL
@@ -14,7 +14,7 @@ curl -X POST https://api.kyren.top/v1/products \
   -H "x-api-key: kyren_live_xxxxxxxxxxxx" \
   -d '{
     "name": "1000 AI Credits",
-    "description": "充值 1000 个 AI API 额度",
+    "description": "充值 1000 個 AI API 額度",
     "price": "9.99",
     "currency": "USD",
     "metadata": {
@@ -34,7 +34,7 @@ response = requests.post(
     },
     json={
         "name": "1000 AI Credits",
-        "description": "充值 1000 个 AI API 额度",
+        "description": "充值 1000 個 AI API 額度",
         "price": "9.99",
         "currency": "USD",
         "metadata": {"credits": "1000"},
@@ -42,7 +42,7 @@ response = requests.post(
 )
 
 product = response.json()["data"]
-print(f"产品已创建: {product['id']}")
+print(f"產品已建立: {product['id']}")
 ```
 
 ```javascript Node.js
@@ -50,7 +50,7 @@ const axios = require('axios');
 
 const response = await axios.post('https://api.kyren.top/v1/products', {
   name: '1000 AI Credits',
-  description: '充值 1000 个 AI API 额度',
+  description: '充值 1000 個 AI API 額度',
   price: '9.99',
   currency: 'USD',
   metadata: { credits: '1000' },
@@ -59,7 +59,7 @@ const response = await axios.post('https://api.kyren.top/v1/products', {
 });
 
 const product = response.data.data;
-console.log(`产品已创建: ${product.id}`);
+console.log(`產品已建立: ${product.id}`);
 ```
 
 ```go Go
@@ -76,7 +76,7 @@ import (
 func createProduct() {
     payload := map[string]interface{}{
         "name":        "1000 AI Credits",
-        "description": "充值 1000 个 AI API 额度",
+        "description": "充值 1000 個 AI API 額度",
         "price":       "9.99",
         "currency":    "USD",
         "metadata":    map[string]string{"credits": "1000"},
@@ -99,7 +99,7 @@ func createProduct() {
 ```
 </CodeGroup>
 
-## 创建 Checkout Session
+## 建立 Checkout Session
 
 <CodeGroup>
 ```bash cURL
@@ -136,7 +136,7 @@ response = requests.post(
 )
 
 checkout = response.json()["data"]
-print(f"将客户重定向到: {checkout['url']}")
+print(f"將客戶重新導向到: {checkout['url']}")
 ```
 
 ```javascript Node.js
@@ -151,7 +151,7 @@ const response = await axios.post('https://api.kyren.top/v1/checkouts', {
 });
 
 const checkout = response.data.data;
-console.log(`将客户重定向到: ${checkout.url}`);
+console.log(`將客戶重新導向到: ${checkout.url}`);
 ```
 
 ```go Go
@@ -178,7 +178,7 @@ func createCheckout() {
 ```
 </CodeGroup>
 
-## 查询订单列表
+## 查詢訂單列表
 
 <CodeGroup>
 ```bash cURL
@@ -195,9 +195,9 @@ response = requests.get(
 
 data = response.json()["data"]
 for order in data["items"]:
-    print(f"订单 {order['id']}: {order['amount']} {order['currency']}")
+    print(f"訂單 {order['id']}: {order['amount']} {order['currency']}")
 
-print(f"总计: {data['pagination']['total']} 笔订单")
+print(f"總計: {data['pagination']['total']} 筆訂單")
 ```
 
 ```javascript Node.js
@@ -208,9 +208,9 @@ const response = await axios.get('https://api.kyren.top/v1/orders', {
 
 const { items, pagination } = response.data.data;
 items.forEach(order => {
-  console.log(`订单 ${order.id}: ${order.amount} ${order.currency}`);
+  console.log(`訂單 ${order.id}: ${order.amount} ${order.currency}`);
 });
-console.log(`总计: ${pagination.total} 笔订单`);
+console.log(`總計: ${pagination.total} 筆訂單`);
 ```
 
 ```go Go
@@ -227,7 +227,7 @@ func listOrders() {
 ```
 </CodeGroup>
 
-## 查询账户余额
+## 查詢帳戶餘額
 
 <CodeGroup>
 ```bash cURL
@@ -242,8 +242,8 @@ response = requests.get(
 )
 
 balance = response.json()["data"]
-print(f"可用余额: {balance['available']} {balance['currency']}")
-print(f"待结算: {balance['pending']} {balance['currency']}")
+print(f"可用餘額: {balance['available']} {balance['currency']}")
+print(f"待結算: {balance['pending']} {balance['currency']}")
 ```
 
 ```javascript Node.js
@@ -252,8 +252,8 @@ const response = await axios.get('https://api.kyren.top/v1/balance', {
 });
 
 const balance = response.data.data;
-console.log(`可用余额: ${balance.available} ${balance.currency}`);
-console.log(`待结算: ${balance.pending} ${balance.currency}`);
+console.log(`可用餘額: ${balance.available} ${balance.currency}`);
+console.log(`待結算: ${balance.pending} ${balance.currency}`);
 ```
 
 ```go Go
@@ -270,6 +270,6 @@ func getBalance() {
 ```
 </CodeGroup>
 
-## 验证 Webhook 签名
+## 驗證 Webhook 簽名
 
-请参阅 [Webhook 签名验证](/zh/webhooks/signatures) 页面，获取 Node.js、Python 和 Go 的完整验证示例。
+請參閱 [Webhook 簽名驗證](/zh/webhooks/signatures) 頁面，取得 Node.js、Python 和 Go 的完整驗證範例。

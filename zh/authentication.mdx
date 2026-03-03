@@ -1,24 +1,24 @@
 ---
-title: 认证
-description: 使用 API 密钥认证你的 API 请求
+title: 認證
+description: 使用 API 密鑰認證你的 API 請求
 ---
 
-所有 API 请求必须通过在 `x-api-key` 请求头中传递 API 密钥来进行认证。
+所有 API 請求必須透過在 `x-api-key` 請求標頭中傳遞 API 密鑰來進行認證。
 
-## API 密钥
+## API 密鑰
 
-启润支付使用 API 密钥来认证请求。你可以在[商户控制台](https://dashboard.kyren.top)中管理你的 API 密钥。
+啟潤支付使用 API 密鑰來認證請求。你可以在[商戶控制台](https://dashboard.kyren.top)中管理你的 API 密鑰。
 
-有两种类型的 API 密钥：
+有兩種類型的 API 密鑰：
 
-| 密钥类型 | 前缀 | 用途 |
+| 密鑰類型 | 前綴 | 用途 |
 | --- | --- | --- |
-| **生产密钥** | `kyren_live_` | 生产环境 — 真实付款 |
-| **测试密钥** | `kyren_test_` | 沙盒环境 — 不会产生真实扣款 |
+| **生產密鑰** | `kyren_live_` | 生產環境 — 真實付款 |
+| **測試密鑰** | `kyren_test_` | 沙盒環境 — 不會產生真實扣款 |
 
-## 发送认证请求
+## 發送認證請求
 
-在每个请求的 `x-api-key` 请求头中包含你的 API 密钥：
+在每個請求的 `x-api-key` 請求標頭中包含你的 API 密鑰：
 
 ```bash
 curl https://api.kyren.top/v1/products \
@@ -26,39 +26,39 @@ curl https://api.kyren.top/v1/products \
 ```
 
 <Warning>
-  **请妥善保管你的 API 密钥。**
-  - 切勿在客户端代码（JavaScript、移动应用）中暴露 API 密钥
-  - 切勿将 API 密钥提交到版本控制系统
-  - 在服务器上使用环境变量存储密钥
-  - 如果密钥泄露，请立即重新生成
+  **請妥善保管你的 API 密鑰。**
+  - 切勿在客戶端程式碼（JavaScript、行動應用）中暴露 API 密鑰
+  - 切勿將 API 密鑰提交到版本控制系統
+  - 在伺服器上使用環境變數儲存密鑰
+  - 如果密鑰洩露，請立即重新產生
 </Warning>
 
-## 环境
+## 環境
 
-| 环境 | 接口地址 | API 密钥前缀 |
+| 環境 | 介面位址 | API 密鑰前綴 |
 | --- | --- | --- |
-| 生产环境 | `https://api.kyren.top` | `kyren_live_` |
-| 沙盒环境 | `https://test-api.kyren.top` | `kyren_test_` |
+| 生產環境 | `https://api.kyren.top` | `kyren_live_` |
+| 沙盒環境 | `https://test-api.kyren.top` | `kyren_test_` |
 
 <Info>
-  测试密钥和生产密钥完全隔离。使用测试密钥创建的数据在生产环境中不可见，反之亦然。
+  測試密鑰和生產密鑰完全隔離。使用測試密鑰建立的資料在生產環境中不可見，反之亦然。
 </Info>
 
-## 重新生成 API 密钥
+## 重新產生 API 密鑰
 
-如果你的 API 密钥泄露，可以在控制台中重新生成：
+如果你的 API 密鑰洩露，可以在控制台中重新產生：
 
-1. 前往 **控制台 > 开发者**
-2. 点击要替换的密钥旁边的**重新生成**
-3. 确认操作
+1. 前往 **控制台 > 開發者**
+2. 點擊要替換的密鑰旁邊的**重新產生**
+3. 確認操作
 
 <Warning>
-  重新生成密钥会立即使旧密钥失效。请确保更新所有集成中的密钥。
+  重新產生密鑰會立即使舊密鑰失效。請確保更新所有整合中的密鑰。
 </Warning>
 
-## 错误响应
+## 錯誤回應
 
-认证失败时，API 返回 `401 Unauthorized` 响应：
+認證失敗時，API 返回 `401 Unauthorized` 回應：
 
 ```json
 {
@@ -67,7 +67,7 @@ curl https://api.kyren.top/v1/products \
 }
 ```
 
-常见原因：
-- 缺少 `x-api-key` 请求头
-- API 密钥无效或已过期
-- 在生产环境 URL 上使用了测试密钥（或反之）
+常見原因：
+- 缺少 `x-api-key` 請求標頭
+- API 密鑰無效或已過期
+- 在生產環境 URL 上使用了測試密鑰（或反之）

@@ -64,10 +64,10 @@
         "language": "zh",
         "tabs": [
           {
-            "tab": "文档",
+            "tab": "文檔",
             "groups": [
               {
-                "group": "快速开始",
+                "group": "快速開始",
                 "pages": [
                   "zh/introduction",
                   "zh/quickstart",
@@ -84,7 +84,7 @@
                 ]
               },
               {
-                "group": "参考",
+                "group": "參考",
                 "pages": [
                   "zh/errors",
                   "zh/testing"
@@ -100,7 +100,7 @@
             ]
           },
           {
-            "tab": "API 参考",
+            "tab": "API 參考",
             "openapi": "openapi.yaml"
           }
         ]

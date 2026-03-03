@@ -347,9 +347,13 @@ paths:
                       customerName: null
                       amount: "9.99"
                       currency: "USD"
+                      platformFeeRate: "0.04"
                       platformFee: "0.40"
-                      paymentFee: "0.30"
-                      netAmount: "9.29"
+                      netAmount: "9.59"
+                      settledAmount: "9.59"
+                      settledCurrency: "USD"
+                      exchangeRate: null
+                      hkdExchangeRate: null
                       paymentMethod: "CREDIT_CARD"
                       status: "PAID"
                       paidAt: 1736932500000
@@ -391,9 +395,13 @@ paths:
                   customerName: null
                   amount: "9.99"
                   currency: "USD"
+                  platformFeeRate: "0.04"
                   platformFee: "0.40"
-                  paymentFee: "0.30"
-                  netAmount: "9.29"
+                  netAmount: "9.59"
+                  settledAmount: "9.59"
+                  settledCurrency: "USD"
+                  exchangeRate: null
+                  hkdExchangeRate: null
                   paymentMethod: "CREDIT_CARD"
                   paymentGateway: "allinpay"
                   gatewayOrderId: "gw_001"
@@ -604,13 +612,16 @@ components:
 
     OrderStatus:
       type: string
-      enum: [PENDING, PAID, SETTLED, REFUNDED, DISPUTED]
+      enum: [PENDING, PAID, SETTLED, REFUNDED, DISPUTED, FAILED, CLOSED, REVOKED]
       description: |
         - `PENDING` — Order created, awaiting payment confirmation
         - `PAID` — Payment confirmed
         - `SETTLED` — Funds settled to merchant balance
         - `REFUNDED` — Order has been refunded
         - `DISPUTED` — Order is under dispute
+        - `FAILED` — Payment failed
+        - `CLOSED` — Order closed (expired or unpaid)
+        - `REVOKED` — Order has been revoked
 
     PaymentMethod:
       type: string
@@ -783,12 +794,12 @@ components:
           type: string
         currency:
           type: string
+        platformFeeRate:
+          type: string
+          description: Platform fee rate (e.g. "0.04" for 4%)
         platformFee:
           type: string
           description: Platform fee charged by Kyren Pay
-        paymentFee:
-          type: string
-          description: Payment processing fee
         netAmount:
           type: string
           description: Net amount after fees (amount - platformFee - paymentFee)
@@ -803,6 +814,10 @@ components:
           type: string
           nullable: true
           description: Exchange rate used for currency conversion (null if payment currency is USD)
+        hkdExchangeRate:
+          type: string
+          nullable: true
+          description: Exchange rate from payment currency to HKD used by the payment gateway (null for HKD orders)
         paymentMethod:
           $ref: "#/components/schemas/PaymentMethod"
         status:
@@ -839,8 +854,10 @@ components:
               type: string
             gatewayTransactionId:
               type: string
+              nullable: true
             payerIp:
               type: string
+              nullable: true
             updatedAt:
               type: integer
               format: int64
