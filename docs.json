@@ -64,10 +64,10 @@
         "language": "zh",
         "tabs": [
           {
-            "tab": "文檔",
+            "tab": "文档",
             "groups": [
               {
-                "group": "快速開始",
+                "group": "快速开始",
                 "pages": [
                   "zh/introduction",
                   "zh/quickstart",
@@ -84,7 +84,7 @@
                 ]
               },
               {
-                "group": "參考",
+                "group": "参考",
                 "pages": [
                   "zh/errors",
                   "zh/testing"
@@ -95,6 +95,51 @@
                 "pages": [
                   "zh/guides/collect-first-payment",
                   "zh/guides/code-examples"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "API 参考",
+            "openapi": "openapi.yaml"
+          }
+        ]
+      },
+      {
+        "language": "zh-Hant",
+        "tabs": [
+          {
+            "tab": "文檔",
+            "groups": [
+              {
+                "group": "快速開始",
+                "pages": [
+                  "zh-Hant/introduction",
+                  "zh-Hant/quickstart",
+                  "zh-Hant/authentication"
+                ]
+              },
+              {
+                "group": "Webhook",
+                "pages": [
+                  "zh-Hant/webhooks/overview",
+                  "zh-Hant/webhooks/events",
+                  "zh-Hant/webhooks/signatures",
+                  "zh-Hant/webhooks/retries"
+                ]
+              },
+              {
+                "group": "參考",
+                "pages": [
+                  "zh-Hant/errors",
+                  "zh-Hant/testing"
+                ]
+              },
+              {
+                "group": "指南",
+                "pages": [
+                  "zh-Hant/guides/collect-first-payment",
+                  "zh-Hant/guides/code-examples"
                 ]
               }
             ]

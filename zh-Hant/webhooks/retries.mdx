@@ -1,0 +1,108 @@
+---
+title: Webhook 重試機制
+description: 啟潤支付如何重試失敗的 Webhook 投遞
+---
+
+如果你的 Webhook 端點未返回 `2xx` 狀態碼，啟潤支付將自動重試投遞。
+
+## 重試計畫
+
+啟潤支付最多重試 **7 次**：
+
+| 重試次數 | 失敗後等待時間 |
+| --- | --- |
+| 第 1 次重試 | 30 秒 |
+| 第 2 次重試 | 30 秒 |
+| 第 3 次重試 | 1 分鐘 |
+| 第 4 次重試 | 1 分鐘 |
+| 第 5 次重試 | 30 分鐘 |
+| 第 6 次重試 | 30 分鐘 |
+| 第 7 次重試 | 30 分鐘 |
+
+7 次重試失敗後，Webhook 將被標記為**失敗**，不再繼續重試。
+
+## 什麼算作失敗
+
+以下情況 Webhook 投遞被視為失敗：
+
+- 你的端點返回非 `2xx` HTTP 狀態碼（如 `400`、`500`）
+- 你的端點在 **30 秒**內未回應
+- 無法連接到你的伺服器（DNS 錯誤、連線被拒絕、逾時）
+
+<Info>
+  `2xx` 回應（如 `200`、`201`、`204`）即被視為投遞成功，不論回應本體內容如何。
+</Info>
+
+## 處理重試
+
+由於 Webhook 可能被重試，你的端點應該是**冪等的** — 多次處理同一事件應產生相同的結果。
+
+### 使用事件 ID 去重
+
+每個 Webhook 事件都有唯一的 `id` 欄位。儲存已處理的事件 ID 並跳過重複事件：
+
+```javascript
+const processedEvents = new Set(); // 生產環境請使用資料庫
+
+app.post('/webhooks/kyren', (req, res) => {
+  // ... 驗證簽名 ...
+
+  const event = JSON.parse(req.body.toString());
+
+  // 檢查是否已處理過此事件
+  if (processedEvents.has(event.id)) {
+    console.log(`重複事件 ${event.id}，跳過`);
+    return res.status(200).send('OK');
+  }
+
+  // 處理事件
+  processEvent(event);
+
+  // 標記為已處理
+  processedEvents.add(event.id);
+
+  res.status(200).send('OK');
+});
+```
+
+<Tip>
+  在生產環境中，將已處理的事件 ID 儲存在資料庫（如 Redis 或你的主資料庫）中，而不是記憶體中。
+</Tip>
+
+### 快速返回 200
+
+收到並驗證 Webhook 後立即返回 `200` 回應。如果處理需要較長時間，請非同步執行：
+
+```javascript
+app.post('/webhooks/kyren', (req, res) => {
+  // ... 驗證簽名 ...
+
+  const event = JSON.parse(req.body.toString());
+
+  // 立即回應
+  res.status(200).send('OK');
+
+  // 非同步處理
+  processEventAsync(event).catch(err => {
+    console.error('處理事件失敗:', err);
+  });
+});
+```
+
+## 監控 Webhook 投遞
+
+你可以在[商戶控制台](https://dashboard.kyren.top)的 **開發者 > Webhook 日誌** 中查看 Webhook 投遞狀態，包括：
+
+- 投遞狀態（已送達、重試中、失敗）
+- 你的端點的回應碼
+- 嘗試次數
+- 下次重試時間
+
+## 故障排除
+
+| 問題 | 解決方案 |
+| --- | --- |
+| 未收到 Webhook | 檢查 Webhook URL 是否正確且可公開存取 |
+| 簽名驗證失敗 | 確保使用原始請求本體（未解析的 JSON）進行驗證 |
+| 頻繁逾時 | 立即返回 `200`，非同步處理事件 |
+| 重複事件 | 使用事件 `id` 欄位實現冪等性 |

@@ -1,43 +1,43 @@
 ---
-title: Webhook 签名验证
-description: 验证 Webhook 请求的真实性
+title: Webhook 簽名驗證
+description: 驗證 Webhook 請求的真實性
 ---
 
-启润支付的每个 Webhook 请求都包含一个加密签名，你应该验证此签名以确保请求是真实的且未被篡改。
+啟潤支付的每個 Webhook 請求都包含一個加密簽名，你應該驗證此簽名以確保請求是真實的且未被篡改。
 
-## 签名算法
+## 簽名演算法
 
-启润支付使用 **HMAC-SHA256** 对 Webhook 载荷进行签名：
+啟潤支付使用 **HMAC-SHA256** 對 Webhook 載荷進行簽名：
 
 ```
 signature = "sha256=" + HMAC-SHA256(timestamp + "." + payload, webhook_secret)
 ```
 
-签名和时间戳通过 HTTP 请求头发送：
+簽名和時間戳透過 HTTP 請求標頭發送：
 
-| 请求头 | 示例 |
+| 請求標頭 | 範例 |
 | --- | --- |
 | `X-Kyren-Signature` | `sha256=5d2dc4f1a...` |
-| `X-Kyren-Timestamp` | `1704628800000`（Unix 毫秒时间戳） |
+| `X-Kyren-Timestamp` | `1704628800000`（Unix 毫秒時間戳） |
 
-## 验证步骤
+## 驗證步驟
 
 <Steps>
-  <Step title="提取请求头">
-    从请求头中读取 `X-Kyren-Signature` 和 `X-Kyren-Timestamp`。
+  <Step title="提取請求標頭">
+    從請求標頭中讀取 `X-Kyren-Signature` 和 `X-Kyren-Timestamp`。
   </Step>
-  <Step title="检查时间戳">
-    验证时间戳在当前时间的 5 分钟（300000 毫秒）以内。这可以防止重放攻击。
+  <Step title="檢查時間戳">
+    驗證時間戳在當前時間的 5 分鐘（300000 毫秒）以內。這可以防止重放攻擊。
   </Step>
-  <Step title="计算期望签名">
-    拼接 `timestamp + "." + 原始请求体`，然后使用你的 Webhook 密钥计算 HMAC-SHA256。
+  <Step title="計算預期簽名">
+    拼接 `timestamp + "." + 原始請求本體`，然後使用你的 Webhook 密鑰計算 HMAC-SHA256。
   </Step>
-  <Step title="比较签名">
-    将计算出的签名与请求头中的签名进行比较。使用常量时间比较以防止时序攻击。
+  <Step title="比較簽名">
+    將計算出的簽名與請求標頭中的簽名進行比較。使用常數時間比較以防止時序攻擊。
   </Step>
 </Steps>
 
-## 代码示例
+## 程式碼範例
 
 ### Node.js
 
@@ -45,20 +45,20 @@ signature = "sha256=" + HMAC-SHA256(timestamp + "." + payload, webhook_secret)
 const crypto = require('crypto');
 
 function verifyWebhookSignature(payload, signature, timestamp, secret) {
-  // 检查时间戳容差（5 分钟）
+  // 檢查時間戳容差（5 分鐘）
   const currentTime = Date.now();
   if (Math.abs(currentTime - parseInt(timestamp)) > 300000) {
     return false;
   }
 
-  // 计算期望签名
+  // 計算預期簽名
   const data = `${timestamp}.${payload}`;
   const expected = 'sha256=' + crypto
     .createHmac('sha256', secret)
     .update(data)
     .digest('hex');
 
-  // 常量时间比较
+  // 常數時間比較
   try {
     return crypto.timingSafeEqual(
       Buffer.from(expected),
@@ -84,7 +84,7 @@ app.post('/webhooks/kyren',
       return res.status(400).send('Invalid signature');
     }
 
-    // 处理事件...
+    // 處理事件...
     res.status(200).send('OK');
   }
 );
@@ -98,12 +98,12 @@ import hashlib
 import time
 
 def verify_webhook_signature(payload: str, signature: str, timestamp: str, secret: str) -> bool:
-    # 检查时间戳容差（5 分钟）
+    # 檢查時間戳容差（5 分鐘）
     current_time = int(time.time() * 1000)
     if abs(current_time - int(timestamp)) > 300000:
         return False
 
-    # 计算期望签名
+    # 計算預期簽名
     data = f"{timestamp}.{payload}"
     expected = "sha256=" + hmac.new(
         secret.encode("utf-8"),
@@ -111,7 +111,7 @@ def verify_webhook_signature(payload: str, signature: str, timestamp: str, secre
         hashlib.sha256
     ).hexdigest()
 
-    # 常量时间比较
+    # 常數時間比較
     return hmac.compare_digest(expected, signature)
 
 
@@ -130,7 +130,7 @@ def webhook():
         return "Invalid signature", 400
 
     event = request.get_json()
-    # 处理事件...
+    # 處理事件...
 
     return "OK", 200
 ```
@@ -153,7 +153,7 @@ import (
 )
 
 func verifyWebhookSignature(payload, signature, timestamp, secret string) bool {
-	// 检查时间戳容差（5 分钟）
+	// 檢查時間戳容差（5 分鐘）
 	ts, err := strconv.ParseInt(timestamp, 10, 64)
 	if err != nil {
 		return false
@@ -163,13 +163,13 @@ func verifyWebhookSignature(payload, signature, timestamp, secret string) bool {
 		return false
 	}
 
-	// 计算期望签名
+	// 計算預期簽名
 	data := fmt.Sprintf("%s.%s", timestamp, payload)
 	mac := hmac.New(sha256.New, []byte(secret))
 	mac.Write([]byte(data))
 	expected := "sha256=" + hex.EncodeToString(mac.Sum(nil))
 
-	// 常量时间比较
+	// 常數時間比較
 	return hmac.Equal([]byte(expected), []byte(signature))
 }
 
@@ -184,16 +184,16 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 处理事件...
+	// 處理事件...
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))
 }
 ```
 
 <Warning>
-  **重要安全注意事项：**
-  - 处理事件前必须先验证签名
-  - 使用常量时间比较函数以防止时序攻击
-  - 拒绝时间戳超过 5 分钟（300000 毫秒）的请求以防止重放攻击
-  - 使用原始请求体进行签名验证（JSON 解析之前）
+  **重要安全注意事項：**
+  - 處理事件前必須先驗證簽名
+  - 使用常數時間比較函數以防止時序攻擊
+  - 拒絕時間戳超過 5 分鐘（300000 毫秒）的請求以防止重放攻擊
+  - 使用原始請求本體進行簽名驗證（JSON 解析之前）
 </Warning>

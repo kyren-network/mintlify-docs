@@ -1,0 +1,131 @@
+---
+title: 錯誤處理
+description: 了解 API 錯誤回應
+---
+
+啟潤支付使用標準 HTTP 狀態碼來表示 API 請求的成功或失敗。
+
+## HTTP 狀態碼
+
+| 狀態碼 | 描述 |
+| --- | --- |
+| `200` | 成功 — 請求已成功處理 |
+| `201` | 已建立 — 資源建立成功 |
+| `400` | 錯誤請求 — 參數無效 |
+| `401` | 未認證 — 缺少或無效的 API 密鑰 |
+| `403` | 禁止存取 — 權限不足 |
+| `404` | 未找到 — 資源不存在 |
+| `429` | 請求過多 — 超出頻率限制 |
+| `500` | 伺服器內部錯誤 — 我們這邊出了問題 |
+
+## 錯誤回應格式
+
+發生錯誤時，回應本體包含以下 JSON 結構：
+
+```json
+{
+  "code": 400,
+  "message": "Bad Request",
+  "error": {
+    "field": "productId",
+    "reason": "Product ID is required"
+  }
+}
+```
+
+| 欄位 | 類型 | 描述 |
+| --- | --- | --- |
+| `code` | integer | HTTP 狀態碼 |
+| `message` | string | 人類可讀的錯誤訊息 |
+| `error.field` | string | 導致錯誤的參數（如適用） |
+| `error.reason` | string | 詳細的錯誤說明 |
+
+<Note>
+  `error` 物件僅在驗證錯誤（400）時出現。其他錯誤類型只包含 `code` 和 `message`。
+</Note>
+
+## 常見錯誤
+
+### 400 錯誤請求
+
+請求本體或參數無效時返回。
+
+```json
+{
+  "code": 400,
+  "message": "Bad Request",
+  "error": {
+    "field": "price",
+    "reason": "Price must be at least 0.01"
+  }
+}
+```
+
+### 401 未認證
+
+API 密鑰缺失或無效時返回。
+
+```json
+{
+  "code": 401,
+  "message": "Unauthorized"
+}
+```
+
+### 404 未找到
+
+請求的資源不存在時返回。
+
+```json
+{
+  "code": 404,
+  "message": "Not Found"
+}
+```
+
+### 429 請求過多
+
+超過 API 頻率限制（每分鐘 100 次請求）時返回。
+
+```json
+{
+  "code": 429,
+  "message": "Too Many Requests"
+}
+```
+
+<Tip>
+  在你的整合中實現指數退避策略，以優雅地處理頻率限制。
+</Tip>
+
+## 成功回應格式
+
+成功的回應始終包含 `code: 0` 和 `message: "success"`：
+
+```json
+{
+  "code": 0,
+  "message": "success",
+  "data": {
+    // 回應資料
+  }
+}
+```
+
+對於分頁介面，`data` 欄位包含 `items` 和 `pagination`：
+
+```json
+{
+  "code": 0,
+  "message": "success",
+  "data": {
+    "items": [...],
+    "pagination": {
+      "page": 1,
+      "size": 20,
+      "total": 42,
+      "totalPages": 3
+    }
+  }
+}
+```

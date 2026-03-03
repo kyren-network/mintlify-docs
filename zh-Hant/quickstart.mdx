@@ -1,0 +1,116 @@
+---
+title: 快速開始
+description: 5 分鐘內完成第一筆收款
+---
+
+按照以下步驟整合啟潤支付並收取你的第一筆付款。
+
+## 前提條件
+
+- 一個啟潤支付商戶帳號（[點此註冊](https://dashboard.kyren.top)）
+- 你的 API 密鑰（在控制台的「開發者」頁面取得）
+
+## 第一步：取得 API 密鑰
+
+註冊後，前往 **控制台 > 開發者**，複製你的 API 密鑰。
+
+- **測試密鑰**：`kyren_test_xxxxxxxxxxxx` — 用於開發測試
+- **生產密鑰**：`kyren_live_xxxxxxxxxxxx` — 用於正式收款
+
+<Warning>
+  請妥善保管你的 API 密鑰。切勿在客戶端程式碼或公開倉庫中暴露密鑰。
+</Warning>
+
+## 第二步：建立產品
+
+建立一個代表你所售商品的產品：
+
+```bash
+curl -X POST https://api.kyren.top/v1/products \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: kyren_test_xxxxxxxxxxxx" \
+  -d '{
+    "name": "1000 AI Credits",
+    "description": "充值 1000 個 AI API 額度",
+    "price": "9.99",
+    "currency": "USD"
+  }'
+```
+
+儲存回應中的 `id`，後續建立 Checkout Session 時需要用到。
+
+## 第三步：建立 Checkout Session
+
+當客戶要付款時，建立一個 Checkout Session：
+
+```bash
+curl -X POST https://api.kyren.top/v1/checkouts \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: kyren_test_xxxxxxxxxxxx" \
+  -d '{
+    "productId": "prod_abc123",
+    "successUrl": "https://yoursite.com/success",
+    "cancelUrl": "https://yoursite.com/cancel"
+  }'
+```
+
+回應中包含 `url` 欄位 — 將客戶重新導向到該 URL 即可完成付款。
+
+## 第四步：重新導向到收銀台
+
+將客戶重新導向到第三步返回的 Checkout URL。客戶會看到一個託管的支付頁面，可以選擇喜歡的支付方式。
+
+```javascript
+// 範例：在你的 Web 應用中重新導向
+window.location.href = checkoutResponse.data.url;
+```
+
+## 第五步：處理 Webhook
+
+付款完成後，啟潤支付會向你的伺服器發送 Webhook：
+
+```javascript
+// Express.js 範例
+app.post('/webhooks/kyren', express.raw({ type: 'application/json' }), (req, res) => {
+  const signature = req.headers['x-kyren-signature'];
+  const timestamp = req.headers['x-kyren-timestamp'];
+  const payload = req.body.toString();
+
+  // 驗證簽名（詳見 Webhook 簽名驗證章節）
+  if (!verifySignature(payload, signature, timestamp)) {
+    return res.status(400).send('Invalid signature');
+  }
+
+  const event = JSON.parse(payload);
+
+  if (event.type === 'order.paid') {
+    const orderId = event.data.order_id;
+    const amount = event.data.amount;
+    // 在你的系統中完成訂單
+    console.log(`收到付款: ${amount} ${event.data.currency}`);
+  }
+
+  res.status(200).send('OK');
+});
+```
+
+<Info>
+  在 **控制台 > 開發者 > Webhook 設定** 中配置你的 Webhook URL。
+</Info>
+
+## 下一步
+
+<CardGroup cols={2}>
+  <Card title="認證" icon="key" href="/zh-Hant/authentication">
+    了解 API 認證詳情
+  </Card>
+  <Card title="Webhook 簽名" icon="shield-check" href="/zh-Hant/webhooks/signatures">
+    實現安全的 Webhook 簽名驗證
+  </Card>
+  <Card title="測試" icon="flask" href="/zh-Hant/testing">
+    使用沙盒環境進行開發測試
+  </Card>
+  <Card title="程式碼範例" icon="code" href="/zh-Hant/guides/code-examples">
+    查看 Python、Node.js、Go 等語言的範例
+  </Card>
+</CardGroup>

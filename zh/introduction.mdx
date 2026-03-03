@@ -1,69 +1,69 @@
 ---
-title: 簡介
-description: 使用啟潤支付接收來自全球客戶的付款
+title: 简介
+description: 使用启润支付接收来自全球客户的付款
 ---
 
-## 什麼是啟潤支付？
+## 什么是启润支付？
 
-啟潤支付是專為**中國出海 AI Startup** 打造的收款平台。它提供標準化的方式來接收海外客戶的付款，讓你專注於產品開發，而非支付基礎設施。
+启润支付是专为**中国出海 AI Startup** 打造的收款平台。它提供标准化的方式来接收海外客户的付款，让你专注于产品开发，而非支付基础设施。
 
 <CardGroup cols={2}>
-  <Card title="快速整合" icon="bolt">
-    幾分鐘內即可上線。建立產品，產生收銀連結，開始接收付款。
+  <Card title="快速集成" icon="bolt">
+    几分钟内即可上线。创建产品，生成收银链接，开始接收付款。
   </Card>
-  <Card title="多種支付方式" icon="credit-card">
-    透過單一整合支援信用卡、微信支付、支付寶和 PayNow。
+  <Card title="多种支付方式" icon="credit-card">
+    通过单一集成支持信用卡、微信支付、支付宝和 PayNow。
   </Card>
   <Card title="安全 Webhook" icon="shield-check">
-    透過 HMAC-SHA256 簽名的 Webhook 接收即時支付通知，實現安全的伺服器間通訊。
+    通过 HMAC-SHA256 签名的 Webhook 接收实时支付通知，实现安全的服务器间通信。
   </Card>
-  <Card title="開發者友善" icon="code">
-    簡潔的 REST API，完善的文檔，多語言程式碼範例，以及沙盒測試環境。
+  <Card title="开发者友好" icon="code">
+    简洁的 REST API，完善的文档，多语言代码示例，以及沙盒测试环境。
   </Card>
 </CardGroup>
 
 ## 工作原理
 
-典型的整合流程包含四個步驟：
+典型的集成流程包含四个步骤：
 
 <Steps>
-  <Step title="建立產品">
-    使用產品 API 定義你的產品，包括名稱、價格和貨幣。
+  <Step title="创建产品">
+    使用产品 API 定义你的产品，包括名称、价格和货币。
   </Step>
-  <Step title="建立 Checkout Session">
-    當客戶要付款時，建立一個 Checkout Session 並將客戶重新導向到支付頁面。
+  <Step title="创建 Checkout Session">
+    当客户要付款时，创建一个 Checkout Session 并将客户重定向到支付页面。
   </Step>
-  <Step title="客戶完成支付">
-    客戶在託管的收銀頁面上選擇支付方式（信用卡、微信支付等）並完成付款。
+  <Step title="客户完成支付">
+    客户在托管的收银页面上选择支付方式（信用卡、微信支付等）并完成付款。
   </Step>
   <Step title="接收 Webhook 通知">
-    啟潤支付向你的伺服器發送 Webhook 確認付款。據此更新你的系統。
+    启润支付向你的服务器发送 Webhook 确认付款。据此更新你的系统。
   </Step>
 </Steps>
 
-## 支援的支付方式
+## 支持的支付方式
 
-| 方式 | 地區 | 貨幣 |
+| 方式 | 地区 | 货币 |
 | --- | --- | --- |
 | 信用卡（Visa、Mastercard） | 全球 | USD、EUR、GBP 等 |
-| 微信支付 | 中國、東南亞 | CNY、USD |
-| 支付寶 | 中國、東南亞 | CNY、USD |
+| 微信支付 | 中国、东南亚 | CNY、USD |
+| 支付宝 | 中国、东南亚 | CNY、USD |
 | PayNow | 新加坡 | SGD |
 
-## 介面位址
+## 接口地址
 
-| 環境 | URL |
+| 环境 | URL |
 | --- | --- |
-| 生產環境 | `https://api.kyren.top` |
-| 測試／沙盒環境 | `https://test-api.kyren.top` |
+| 生产环境 | `https://api.kyren.top` |
+| 测试/沙盒环境 | `https://test-api.kyren.top` |
 
 ## 下一步
 
 <CardGroup cols={2}>
-  <Card title="快速開始" icon="rocket" href="/zh/quickstart">
-    5 分鐘內完成第一筆收款
+  <Card title="快速开始" icon="rocket" href="/zh/quickstart">
+    5 分钟内完成第一笔收款
   </Card>
-  <Card title="API 參考" icon="book" href="/api-reference">
-    查看完整的 API 文檔
+  <Card title="API 参考" icon="book" href="/api-reference">
+    查看完整的 API 文档
   </Card>
 </CardGroup>

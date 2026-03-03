@@ -1,0 +1,93 @@
+---
+title: Webhook 事件
+description: 所有 Webhook 事件類型及其載荷
+---
+
+啟潤支付會為以下事件類型發送 Webhook 通知。
+
+## 事件類型
+
+| 事件 | 描述 | 觸發條件 |
+| --- | --- | --- |
+| `order.paid` | 付款已確認 | 客戶完成收銀台付款 |
+
+## 事件物件結構
+
+所有 Webhook 事件共享相同的頂層結構：
+
+```json
+{
+  "id": "evt_abc123",
+  "type": "order.paid",
+  "created_at": 1736932500000,
+  "data": {
+    // 事件特定資料
+  }
+}
+```
+
+| 欄位 | 類型 | 描述 |
+| --- | --- | --- |
+| `id` | string | 唯一事件識別碼（用於去重） |
+| `type` | string | 事件類型 |
+| `created_at` | integer | Unix 毫秒時間戳 |
+| `data` | object | 事件特定載荷 |
+
+## order.paid
+
+客戶成功完成付款時發送。
+
+```json
+{
+  "id": "evt_abc123",
+  "type": "order.paid",
+  "created_at": 1736932500000,
+  "data": {
+    "order_id": "order_def456",
+    "product_id": "prod_abc123",
+    "customer_email": "customer@example.com",
+    "amount": "9.99",
+    "currency": "USD",
+    "net_amount": "9.29",
+    "paid_at": 1736932500000,
+    "metadata": { "user_id": "u_123" }
+  }
+}
+```
+
+| 欄位 | 類型 | 描述 |
+| --- | --- | --- |
+| `order_id` | string | 訂單 ID |
+| `product_id` | string | 購買的產品 |
+| `customer_email` | string | 客戶電子郵件地址 |
+| `amount` | string | 總支付金額 |
+| `currency` | string | 三字母貨幣代碼 |
+| `net_amount` | string | 扣除手續費後的金額 |
+| `paid_at` | integer | 付款確認時間（Unix 毫秒時間戳） |
+| `metadata` | object \| null | 建立 Checkout Session 時傳入的 metadata |
+
+<Tip>
+  這是最重要的事件。用它來完成訂單處理 — 例如，為使用者的帳戶充值額度。
+</Tip>
+
+## 處理事件
+
+以下是在 Webhook 端點中處理事件的方式：
+
+```javascript
+app.post('/webhooks/kyren', (req, res) => {
+  // ... 先驗證簽名 ...
+
+  const event = JSON.parse(req.body.toString());
+
+  switch (event.type) {
+    case 'order.paid':
+      handleOrderPaid(event.data);
+      break;
+    default:
+      console.log(`未處理的事件類型: ${event.type}`);
+  }
+
+  res.status(200).send('OK');
+});
+```
