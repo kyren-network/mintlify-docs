@@ -37,6 +37,10 @@ tags:
     description: View and manage orders created from completed checkout sessions.
   - name: Balance
     description: View your account balance and transaction history.
+  - name: Epay Compatibility
+    description: |
+      Compatibility endpoints for existing integrations built on 易支付 API conventions.
+      These endpoints use form/query parameters with `pid + sign` verification (MD5), not `x-api-key` header auth.
 
 paths:
   /v1/config/currencies:
@@ -524,6 +528,191 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
+  /epay/submit.php:
+    post:
+      operationId: createEpaySubmit
+      tags: [Epay Compatibility]
+      summary: submit.php (redirect checkout compatibility endpoint)
+      description: |
+        Creates (or reuses) an Epay-compatible payment and returns HTTP 302 redirect to the hosted payment page.
+        This endpoint also accepts GET with the same parameters.
+
+        Signature algorithm:
+        1. Remove `sign` and `sign_type`, and drop empty values.
+        2. Sort parameters by key in ascending order.
+        3. Join as `k=v` with `&`, append merchant API key.
+        4. MD5 the final string and compare in lowercase.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/EpaySubmitRequest"
+            example:
+              pid: "merch_001"
+              type: "alipay"
+              out_trade_no: "order_20260409001"
+              notify_url: "https://merchant.example.com/pay/notify"
+              return_url: "https://merchant.example.com/pay/return"
+              name: "Pro Plan Subscription"
+              money: "99.00"
+              money_type: "CNY"
+              param: "user_42"
+              sign: "fb7f5f742f89eb1f137fbc293f2bf42a"
+              sign_type: "MD5"
+      responses:
+        "302":
+          description: Redirect to checkout/payment page
+          headers:
+            Location:
+              description: Redirect target URL
+              schema:
+                type: string
+                format: uri
+        "200":
+          description: Request rejected (returns compatibility error body)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EpaySimpleResponse"
+              example:
+                code: 0
+                msg: "签名验证失败"
+
+  /epay/mapi.php:
+    post:
+      operationId: createEpayMapi
+      tags: [Epay Compatibility]
+      summary: mapi.php (direct create payment compatibility endpoint)
+      description: |
+        Creates (or reuses) an order directly and returns Epay-style response fields.
+        For QR-style channels, response includes `qrcode` and `img`.
+        For redirect-style channels, response includes `payurl`.
+
+        Signature algorithm:
+        1. Remove `sign` and `sign_type`, and drop empty values.
+        2. Sort parameters by key in ascending order.
+        3. Join as `k=v` with `&`, append merchant API key.
+        4. MD5 the final string and compare in lowercase.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/EpayMapiRequest"
+            example:
+              pid: "merch_001"
+              type: "wxpay"
+              out_trade_no: "order_20260409002"
+              notify_url: "https://merchant.example.com/pay/notify"
+              return_url: "https://merchant.example.com/pay/return"
+              name: "AI Credits 1000"
+              money: "9.99"
+              money_type: "CNY"
+              param: "user_42"
+              clientip: "203.0.113.9"
+              device: "pc"
+              sign: "1ce4f4f5294ec4c95f6b79ff79dbb57b"
+              sign_type: "MD5"
+      responses:
+        "200":
+          description: Epay-compatible create payment result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EpayMapiResponse"
+              examples:
+                successQr:
+                  summary: QR payment response
+                  value:
+                    code: 1
+                    trade_no: "order_epay_001"
+                    out_trade_no: "order_20260409002"
+                    qrcode: "weixin://wxpay/bizpayurl?pr=xxxx"
+                    img: "https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=weixin%3A%2F%2Fwxpay%2Fbizpayurl%3Fpr%3Dxxxx"
+                successRedirect:
+                  summary: Redirect payment response
+                  value:
+                    code: 1
+                    trade_no: "order_epay_002"
+                    out_trade_no: "order_20260409003"
+                    payurl: "https://payment.kyren.io/epay/redirect/order_epay_002"
+                error:
+                  summary: Error response
+                  value:
+                    code: 0
+                    msg: "订单 order_20260409002 正在创建中，请稍后重试"
+
+  /epay/api.php:
+    post:
+      operationId: callEpayApi
+      tags: [Epay Compatibility]
+      summary: api.php (order query/refund compatibility endpoint)
+      description: |
+        Executes compatibility operations with `act`.
+        - `act=order`: query order status/result.
+        - `act=refund`: currently not supported; returns compatibility error message.
+
+        This endpoint also accepts GET with the same parameters.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/EpayApiRequest"
+            examples:
+              queryOrder:
+                summary: Query by out_trade_no
+                value:
+                  act: "order"
+                  pid: "merch_001"
+                  key: "merchant_raw_api_key"
+                  out_trade_no: "order_20260409002"
+              refund:
+                summary: Refund (unsupported currently)
+                value:
+                  act: "refund"
+                  pid: "merch_001"
+                  key: "merchant_raw_api_key"
+                  trade_no: "order_epay_001"
+      responses:
+        "200":
+          description: Epay-compatible operation result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EpayApiResponse"
+              examples:
+                orderSuccess:
+                  summary: Successful order query
+                  value:
+                    code: 1
+                    msg: "查询订单号成功！"
+                    trade_no: "order_epay_001"
+                    out_trade_no: "order_20260409002"
+                    type: "wxpay"
+                    pid: "merch_001"
+                    addtime: "2026-04-09 06:10:20"
+                    endtime: "2026-04-09 06:11:08"
+                    name: "AI Credits 1000"
+                    money: "9.99"
+                    status: 1
+                    param: "user_42"
+                    buyer: ""
+                refundUnsupported:
+                  summary: Refund not supported
+                  value:
+                    code: 0
+                    msg: "退款功能暂不支持，请联系客服"
+                error:
+                  summary: Generic error
+                  value:
+                    code: 0
+                    msg: "订单不存在"
+
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -718,6 +907,210 @@ components:
           additionalProperties:
             type: string
           description: Arbitrary key-value pairs attached to the checkout and resulting order
+
+    EpaySignType:
+      type: string
+      enum: [MD5]
+      description: Signature type. Current compatibility implementation only supports MD5.
+
+    EpayPaymentType:
+      type: string
+      enum: [alipay, wxpay, creditcard, crypto, paynow]
+      description: Payment channel type in Epay compatibility mode.
+
+    EpaySubmitRequest:
+      type: object
+      required: [pid, type, out_trade_no, notify_url, return_url, name, money, sign, sign_type]
+      properties:
+        pid:
+          type: string
+          description: Merchant ID
+        type:
+          $ref: "#/components/schemas/EpayPaymentType"
+        out_trade_no:
+          type: string
+          description: Merchant order number (must be unique under one merchant)
+        notify_url:
+          type: string
+          format: uri
+          description: Merchant async callback URL
+        return_url:
+          type: string
+          format: uri
+          description: Merchant sync return URL
+        name:
+          type: string
+          description: Product name
+        money:
+          type: string
+          description: Order amount, decimal string, must be greater than 0
+        money_type:
+          type: string
+          default: CNY
+          description: Currency code. Defaults to CNY when omitted.
+        param:
+          type: string
+          description: Pass-through parameter returned in callbacks and order queries
+        sign:
+          type: string
+          description: Lowercase MD5 signature
+        sign_type:
+          $ref: "#/components/schemas/EpaySignType"
+
+    EpayMapiRequest:
+      type: object
+      required: [pid, type, out_trade_no, notify_url, name, money, clientip, sign, sign_type]
+      properties:
+        pid:
+          type: string
+          description: Merchant ID
+        type:
+          $ref: "#/components/schemas/EpayPaymentType"
+        out_trade_no:
+          type: string
+          description: Merchant order number (must be unique under one merchant)
+        notify_url:
+          type: string
+          format: uri
+          description: Merchant async callback URL
+        return_url:
+          type: string
+          format: uri
+          description: Merchant sync return URL
+        name:
+          type: string
+          description: Product name
+        money:
+          type: string
+          description: Order amount, decimal string, must be greater than 0
+        money_type:
+          type: string
+          default: CNY
+          description: Currency code. Defaults to CNY when omitted.
+        param:
+          type: string
+          description: Pass-through parameter returned in callbacks and order queries
+        clientip:
+          type: string
+          description: Client IP address
+        device:
+          type: string
+          default: pc
+          description: Device identifier passed to gateway (e.g. pc)
+        channel_param:
+          type: string
+          description: |
+            Optional JSON string for channel-specific fields.
+            Credit card mode supports fields such as:
+            `cardNo`, `cardExpireMonth`, `cardExpireYear`, `cardSecurityCode`,
+            `billFirstName`, `billLastName`, `billPhone`, `billAddress`,
+            `billCountry`, `billState`, `billCity`, `billZip`, `email`.
+        sign:
+          type: string
+          description: Lowercase MD5 signature
+        sign_type:
+          $ref: "#/components/schemas/EpaySignType"
+
+    EpayApiRequest:
+      type: object
+      required: [act, pid, key]
+      properties:
+        act:
+          type: string
+          enum: [order, refund]
+          description: API action. `refund` currently returns unsupported message.
+        pid:
+          type: string
+          description: Merchant ID
+        key:
+          type: string
+          description: Merchant raw API key (not encrypted key)
+        out_trade_no:
+          type: string
+          description: Merchant order number. Required when `trade_no` is not provided.
+        trade_no:
+          type: string
+          description: Platform order ID. Required when `out_trade_no` is not provided.
+
+    EpaySimpleResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          enum: [0]
+        msg:
+          type: string
+
+    EpayMapiSuccessResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          enum: [1]
+        trade_no:
+          type: string
+          description: Platform order ID
+        out_trade_no:
+          type: string
+          description: Merchant order number
+        payurl:
+          type: string
+          nullable: true
+          description: Redirect URL for browser/app payment flows
+        qrcode:
+          type: string
+          nullable: true
+          description: QR code payload or H5 payment URL depending on channel
+        img:
+          type: string
+          nullable: true
+          description: QR image URL generated from `qrcode`
+
+    EpayMapiResponse:
+      oneOf:
+        - $ref: "#/components/schemas/EpayMapiSuccessResponse"
+        - $ref: "#/components/schemas/EpaySimpleResponse"
+
+    EpayOrderQuerySuccessResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          enum: [1]
+        msg:
+          type: string
+        trade_no:
+          type: string
+        out_trade_no:
+          type: string
+        type:
+          $ref: "#/components/schemas/EpayPaymentType"
+        pid:
+          type: string
+        addtime:
+          type: string
+          description: UTC datetime string, format `yyyy-MM-dd HH:mm:ss`
+        endtime:
+          type: string
+          description: UTC datetime string, empty when unpaid
+        name:
+          type: string
+        money:
+          type: string
+        status:
+          type: integer
+          enum: [0, 1]
+          description: 1 means paid/settled; 0 means not paid
+        param:
+          type: string
+        buyer:
+          type: string
+          description: Reserved field, currently empty string
+
+    EpayApiResponse:
+      oneOf:
+        - $ref: "#/components/schemas/EpayOrderQuerySuccessResponse"
+        - $ref: "#/components/schemas/EpaySimpleResponse"
 
     # --- Response Schemas ---
     Product:
