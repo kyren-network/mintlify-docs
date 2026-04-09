@@ -20,7 +20,7 @@ info:
 servers:
   - url: https://api.kyren.top
     description: Production
-  - url: https://test-api.kyren.top
+  - url: https://staging-api.kyren.top
     description: Test / Sandbox
 
 security:
