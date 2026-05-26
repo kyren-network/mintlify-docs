@@ -3,18 +3,22 @@ title: 快速開始
 description: 5 分鐘內完成第一筆收款
 ---
 
-按照以下步驟整合啟潤支付並收取你的第一筆付款。
+當你希望服務端透過 API 建立 Kyren Pay Checkout Session 時，請使用本指南。
+
+如果你想先了解控制台，請從 [控制台總覽](/zh-Hant/dashboard/overview) 開始。
 
 ## 前提條件
 
 - 一個啟潤支付商戶帳號（[點此註冊](https://dashboard.kyren.top)）
 - 你的 API 密鑰（在控制台的「開發者」頁面取得）
+- 已在控制台或透過 Products API 建立產品
+- 一個可以安全保存 API 密鑰的服務端環境
+- 上線前用於接收付款通知的 Webhook 端點
 
 ## 第一步：取得 API 密鑰
 
 註冊後，前往 **控制台 > 開發者**，複製你的 API 密鑰。
 
-- **測試密鑰**：`kyren_test_xxxxxxxxxxxx` — 用於開發測試
 - **生產密鑰**：`kyren_live_xxxxxxxxxxxx` — 用於正式收款
 
 <Warning>
@@ -28,7 +32,7 @@ description: 5 分鐘內完成第一筆收款
 ```bash
 curl -X POST https://api.kyren.top/v1/products \
   -H "Content-Type: application/json" \
-  -H "x-api-key: kyren_test_xxxxxxxxxxxx" \
+  -H "x-api-key: kyren_live_xxxxxxxxxxxx" \
   -d '{
     "name": "1000 AI Credits",
     "description": "充值 1000 個 AI API 額度",
@@ -46,7 +50,7 @@ curl -X POST https://api.kyren.top/v1/products \
 ```bash
 curl -X POST https://api.kyren.top/v1/checkouts \
   -H "Content-Type: application/json" \
-  -H "x-api-key: kyren_test_xxxxxxxxxxxx" \
+  -H "x-api-key: kyren_live_xxxxxxxxxxxx" \
   -d '{
     "productId": "prod_abc123",
     "successUrl": "https://yoursite.com/success",
@@ -108,7 +112,7 @@ app.post('/webhooks/kyren', express.raw({ type: 'application/json' }), (req, res
     實現安全的 Webhook 簽名驗證
   </Card>
   <Card title="測試" icon="flask" href="/zh-Hant/testing">
-    使用沙盒環境進行開發測試
+    使用 staging 憑證和 Mock 場景測試
   </Card>
   <Card title="程式碼範例" icon="code" href="/zh-Hant/guides/code-examples">
     查看 Python、Node.js、Go 等語言的範例

@@ -3,18 +3,22 @@ title: Quickstart
 description: Accept your first payment in 5 minutes
 ---
 
-Follow these steps to integrate Kyren Pay and collect your first payment.
+Follow this guide when you want your server to create Kyren Pay checkout sessions through the API.
+
+If you want to learn the dashboard first, start with [Dashboard overview](/dashboard/overview).
 
 ## Prerequisites
 
 - A Kyren Pay merchant account ([sign up here](https://dashboard.kyren.top))
 - Your API key (found in the Developer section of your dashboard)
+- A product created in the dashboard or through the Products API
+- A server-side environment where your API key can be stored securely
+- A Webhook endpoint for payment notifications before you go live
 
 ## Step 1: Get your API Key
 
 After signing up, navigate to **Dashboard > Developer** and copy your API key.
 
-- **Test key**: `kyren_test_xxxxxxxxxxxx` — use this for development
 - **Live key**: `kyren_live_xxxxxxxxxxxx` — use this for production
 
 <Warning>
@@ -28,7 +32,7 @@ Create a product that represents what you're selling:
 ```bash
 curl -X POST https://api.kyren.top/v1/products \
   -H "Content-Type: application/json" \
-  -H "x-api-key: kyren_test_xxxxxxxxxxxx" \
+  -H "x-api-key: kyren_live_xxxxxxxxxxxx" \
   -d '{
     "name": "1000 AI Credits",
     "description": "Top up 1000 credits for AI API usage",
@@ -46,7 +50,7 @@ When a customer wants to pay, create a checkout session:
 ```bash
 curl -X POST https://api.kyren.top/v1/checkouts \
   -H "Content-Type: application/json" \
-  -H "x-api-key: kyren_test_xxxxxxxxxxxx" \
+  -H "x-api-key: kyren_live_xxxxxxxxxxxx" \
   -d '{
     "productId": "prod_abc123",
     "successUrl": "https://yoursite.com/success",
@@ -108,7 +112,7 @@ app.post('/webhooks/kyren', express.raw({ type: 'application/json' }), (req, res
     Implement secure webhook verification
   </Card>
   <Card title="Testing" icon="flask" href="/testing">
-    Use the sandbox environment for development
+    Test with staging credentials and mock scenarios
   </Card>
   <Card title="Code Examples" icon="code" href="/guides/code-examples">
     See examples in Python, Node.js, Go, and more

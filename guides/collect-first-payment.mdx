@@ -5,6 +5,18 @@ description: End-to-end guide to accepting a payment with Kyren Pay
 
 This guide walks you through a complete payment integration using a Node.js backend as an example. The same concepts apply to any programming language.
 
+## Choose your setup path
+
+- Use the dashboard guide if you want to create products and review orders manually first.
+- Use the API guide if your application should create checkout sessions from your server.
+
+Related pages:
+
+- [Products dashboard](/dashboard/products)
+- [Orders dashboard](/dashboard/orders)
+- [Quickstart](/quickstart)
+- [Webhook overview](/webhooks/overview)
+
 ## Overview
 
 ```mermaid
@@ -187,7 +199,7 @@ app.listen(3000, () => {
 Run your server:
 
 ```bash
-KYREN_API_KEY=kyren_test_xxx KYREN_WEBHOOK_SECRET=whsec_xxx node server.js
+KYREN_API_KEY=kyren_live_xxx KYREN_WEBHOOK_SECRET=whsec_xxx node server.js
 ```
 
 ## 7. Test the Flow

@@ -5,6 +5,18 @@ description: 使用启润支付完成端到端收款的完整指南
 
 本指南以 Node.js 后端为例，带你完成完整的支付集成。相同的概念适用于任何编程语言。
 
+## 选择设置路径
+
+- 如果你想先手动创建产品并查看订单，请使用控制台指南。
+- 如果你的应用需要从服务端创建 Checkout Session，请使用 API 指南。
+
+相关页面：
+
+- [产品控制台](/zh/dashboard/products)
+- [订单控制台](/zh/dashboard/orders)
+- [快速开始](/zh/quickstart)
+- [Webhook 总览](/zh/webhooks/overview)
+
 ## 概览
 
 ```mermaid
@@ -182,7 +194,7 @@ app.listen(3000, () => {
 运行：
 
 ```bash
-KYREN_API_KEY=kyren_test_xxx KYREN_WEBHOOK_SECRET=whsec_xxx node server.js
+KYREN_API_KEY=kyren_live_xxx KYREN_WEBHOOK_SECRET=whsec_xxx node server.js
 ```
 
 ## 7. 测试流程
