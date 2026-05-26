@@ -204,14 +204,14 @@ KYREN_API_KEY=kyren_live_xxx KYREN_WEBHOOK_SECRET=whsec_xxx node server.js
 
 ## 7. Test the Flow
 
-1. Open your app and click "Buy 1000 Credits"
-2. You'll be redirected to the Kyren Pay checkout page
-3. Enter test card number `4242 4242 4242 4242`
-4. Complete the payment
-5. Check your server logs — you should see the webhook arrive
+1. If Kyren has issued staging credentials or enabled a test-capable gateway for your merchant account, run the flow with those credentials and the payment scenarios Kyren provides.
+2. If you only have live credentials, verify the flow with a low-risk real payment in production.
+3. Confirm your customer is redirected to the Kyren Pay checkout page.
+4. Confirm your server receives the payment Webhook and that your fulfillment logic handles the event correctly.
+5. If you used a real payment for verification, refund or handle it operationally according to Kyren support guidance if needed.
 
 <Check>
-  Congratulations! You've successfully integrated Kyren Pay. When you're ready, switch to your live API key and start accepting real payments.
+  Your integration is ready when checkout creation, redirect handling, Webhook receipt, and fulfillment have all been verified with the credentials and gateway Kyren has enabled for your account.
 </Check>
 
 ## Next Steps
