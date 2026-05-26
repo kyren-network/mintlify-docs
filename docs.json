@@ -51,6 +51,30 @@
                 ]
               },
               {
+                "group": "Troubleshooting",
+                "pages": [
+                  "troubleshooting/api-401",
+                  "troubleshooting/checkout-session-fails",
+                  "troubleshooting/paid-but-not-credited",
+                  "troubleshooting/webhook-not-received",
+                  "troubleshooting/webhook-signature-fails",
+                  "troubleshooting/order-status",
+                  "troubleshooting/amount-currency-timestamp",
+                  "troubleshooting/settlement-eligibility"
+                ]
+              },
+              {
+                "group": "Epay Migration",
+                "pages": [
+                  "epay-migration/overview",
+                  "epay-migration/signature",
+                  "epay-migration/submit-php",
+                  "epay-migration/mapi-php",
+                  "epay-migration/api-php",
+                  "epay-migration/migration-checklist"
+                ]
+              },
+              {
                 "group": "References",
                 "pages": [
                   "authentication",
@@ -103,6 +127,30 @@
                 ]
               },
               {
+                "group": "故障排除",
+                "pages": [
+                  "zh/troubleshooting/api-401",
+                  "zh/troubleshooting/checkout-session-fails",
+                  "zh/troubleshooting/paid-but-not-credited",
+                  "zh/troubleshooting/webhook-not-received",
+                  "zh/troubleshooting/webhook-signature-fails",
+                  "zh/troubleshooting/order-status",
+                  "zh/troubleshooting/amount-currency-timestamp",
+                  "zh/troubleshooting/settlement-eligibility"
+                ]
+              },
+              {
+                "group": "易支付迁移",
+                "pages": [
+                  "zh/epay-migration/overview",
+                  "zh/epay-migration/signature",
+                  "zh/epay-migration/submit-php",
+                  "zh/epay-migration/mapi-php",
+                  "zh/epay-migration/api-php",
+                  "zh/epay-migration/migration-checklist"
+                ]
+              },
+              {
                 "group": "参考",
                 "pages": [
                   "zh/authentication",
@@ -152,6 +200,30 @@
                   "zh-Hant/webhooks/events",
                   "zh-Hant/webhooks/signatures",
                   "zh-Hant/webhooks/retries"
+                ]
+              },
+              {
+                "group": "故障排除",
+                "pages": [
+                  "zh-Hant/troubleshooting/api-401",
+                  "zh-Hant/troubleshooting/checkout-session-fails",
+                  "zh-Hant/troubleshooting/paid-but-not-credited",
+                  "zh-Hant/troubleshooting/webhook-not-received",
+                  "zh-Hant/troubleshooting/webhook-signature-fails",
+                  "zh-Hant/troubleshooting/order-status",
+                  "zh-Hant/troubleshooting/amount-currency-timestamp",
+                  "zh-Hant/troubleshooting/settlement-eligibility"
+                ]
+              },
+              {
+                "group": "易支付遷移",
+                "pages": [
+                  "zh-Hant/epay-migration/overview",
+                  "zh-Hant/epay-migration/signature",
+                  "zh-Hant/epay-migration/submit-php",
+                  "zh-Hant/epay-migration/mapi-php",
+                  "zh-Hant/epay-migration/api-php",
+                  "zh-Hant/epay-migration/migration-checklist"
                 ]
               },
               {
