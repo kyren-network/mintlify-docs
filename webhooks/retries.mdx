@@ -91,12 +91,14 @@ app.post('/webhooks/kyren', (req, res) => {
 
 ## Monitoring Webhook Deliveries
 
-You can view webhook delivery status in the [Merchant Dashboard](https://dashboard.kyren.top) under **Developer > Webhook Logs**, including:
+When troubleshooting delivery, compare Kyren Webhook events with your own server logs. Record:
 
-- Delivery status (delivered, retrying, failed)
-- Response code from your endpoint
-- Number of attempts
-- Next retry time
+- Your configured Webhook URL
+- The event type and order number
+- The timestamp when your server received the request
+- The response code or error your server returned
+
+If you need Kyren to check delivery attempts, contact support with those details.
 
 ## Troubleshooting
 
