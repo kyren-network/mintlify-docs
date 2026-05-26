@@ -1,0 +1,37 @@
+---
+title: 產品
+description: 在 Kyren Pay 控制台建立和管理產品
+language: zh-Hant
+audience: merchant
+product_area: product
+intent: how-to
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: product
+---
+
+產品代表客戶購買的內容，例如 AI Credits、預付費包或一次性數位服務。
+
+## 開始前
+
+確認產品名稱、描述、金額和幣種。Kyren API 範例使用 `"9.99"` 這樣的金額字串，避免浮點精度問題。
+
+## 操作步驟
+
+1. 打開商戶控制台。
+2. 進入產品。
+3. 建立新產品。
+4. 填寫產品名稱、描述、金額和幣種。
+5. 保存產品。
+6. 建立 Checkout Session 時使用該產品。
+
+## 常見錯誤
+
+- 產品名稱過於模糊，客戶在 Checkout 頁面無法識別。
+- 你自己的系統把金額作為浮點數傳送，而不是十進位字串。
+- 封存了仍在 Checkout 整合中使用的產品。
+
+## 相關頁面
+
+- [建立產品 API 參考](/zh-Hant/api-reference/products/create-a-product)
+- [收第一筆款](/zh-Hant/guides/collect-first-payment)

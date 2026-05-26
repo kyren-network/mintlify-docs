@@ -1,0 +1,34 @@
+---
+title: 开发者设置
+description: 管理 API 密钥、Webhook 和集成设置
+language: zh
+audience: developer
+product_area: api
+intent: how-to
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: engineering
+---
+
+使用开发者设置把你的服务端接入 Kyren Pay。
+
+## API 密钥
+
+API 密钥只能在服务端使用。不要把密钥暴露在前端 JavaScript、移动端应用、日志、截图或公开仓库中。
+
+如果重新生成 API 密钥，需要更新所有调用 Kyren Pay 的服务端环境。旧密钥会在重新生成后失效。
+
+## Webhook
+
+配置一个 Kyren Pay 可以通过 HTTPS 访问的 Webhook URL。你的服务端应在信任事件内容前验证 Webhook 签名。
+
+## IP 白名单
+
+如果你的商户账户启用了 IP 白名单，确保所有调用 Kyren Pay 的服务器 IP 都已加入。缺少服务器 IP 可能导致认证或授权失败。
+
+## 相关页面
+
+- [认证](/zh/authentication)
+- [Webhook 总览](/zh/webhooks/overview)
+- [Webhook 签名](/zh/webhooks/signatures)
+- [测试](/zh/testing)

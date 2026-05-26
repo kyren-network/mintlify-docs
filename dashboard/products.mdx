@@ -1,0 +1,37 @@
+---
+title: Products
+description: Create and manage products in the Kyren Pay dashboard
+language: en
+audience: merchant
+product_area: product
+intent: how-to
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: product
+---
+
+Products represent what your customers pay for, such as AI credits, prepaid packages, or one-time digital services.
+
+## Before you start
+
+Decide the product name, description, amount, and currency. Kyren API examples use amount strings such as `"9.99"` to avoid floating-point precision issues.
+
+## Steps
+
+1. Open the merchant dashboard.
+2. Go to Products.
+3. Create a new product.
+4. Enter the product name, description, amount, and currency.
+5. Save the product.
+6. Use the product when creating checkout sessions.
+
+## Common mistakes
+
+- Using a vague product name that customers cannot recognize on checkout.
+- Sending amount values from your own system as floating-point numbers instead of decimal strings.
+- Archiving a product that is still used by your checkout integration.
+
+## Related pages
+
+- [Create a product API reference](/api-reference/products/create-a-product)
+- [Collect your first payment](/guides/collect-first-payment)

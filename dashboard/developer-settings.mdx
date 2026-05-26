@@ -1,0 +1,34 @@
+---
+title: Developer settings
+description: Manage API keys, Webhooks, and integration settings
+language: en
+audience: developer
+product_area: api
+intent: how-to
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: engineering
+---
+
+Use Developer settings to connect your server to Kyren Pay.
+
+## API keys
+
+Use API keys only from your server. Do not expose them in frontend JavaScript, mobile apps, logs, screenshots, or public repositories.
+
+If you regenerate an API key, update every server environment that calls Kyren Pay. The previous key stops working after regeneration.
+
+## Webhooks
+
+Configure a Webhook URL that Kyren Pay can reach over HTTPS. Your server should verify the Webhook signature before trusting the event body.
+
+## IP allowlist
+
+If IP allowlist is enabled for your merchant account, make sure every server that calls Kyren Pay is included. Missing server IPs can cause authentication or authorization failures.
+
+## Related pages
+
+- [Authentication](/authentication)
+- [Webhook overview](/webhooks/overview)
+- [Webhook signatures](/webhooks/signatures)
+- [Testing](/testing)

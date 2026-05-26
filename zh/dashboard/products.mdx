@@ -1,0 +1,37 @@
+---
+title: 产品
+description: 在 Kyren Pay 控制台创建和管理产品
+language: zh
+audience: merchant
+product_area: product
+intent: how-to
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: product
+---
+
+产品代表客户购买的内容，例如 AI Credits、预付费包或一次性数字服务。
+
+## 开始前
+
+确认产品名称、描述、金额和币种。Kyren API 示例使用 `"9.99"` 这样的金额字符串，避免浮点精度问题。
+
+## 操作步骤
+
+1. 打开商户控制台。
+2. 进入产品。
+3. 创建新产品。
+4. 填写产品名称、描述、金额和币种。
+5. 保存产品。
+6. 创建 Checkout Session 时使用该产品。
+
+## 常见错误
+
+- 产品名称过于模糊，客户在 Checkout 页面无法识别。
+- 你自己的系统把金额作为浮点数发送，而不是十进制字符串。
+- 归档了仍在 Checkout 集成中使用的产品。
+
+## 相关页面
+
+- [创建产品 API 参考](/zh/api-reference/products/create-a-product)
+- [收第一笔款](/zh/guides/collect-first-payment)

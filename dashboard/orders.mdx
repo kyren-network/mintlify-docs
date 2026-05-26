@@ -1,0 +1,36 @@
+---
+title: Orders
+description: Review Kyren Pay orders and reconcile payment status
+language: en
+audience: merchant
+product_area: order
+intent: how-to
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: product
+---
+
+Use Orders to review payment status, find order identifiers, and reconcile Kyren Pay records with your own system.
+
+## What to check
+
+| Field | How to use it |
+| --- | --- |
+| Order number | Share this with Kyren support when asking about a payment. |
+| Status | Decide whether your system should fulfill or wait. |
+| Amount and currency | Compare with the product or checkout session amount. |
+| Created and paid times | Compare with your server logs. Times in the API use millisecond timestamps. |
+| Payment channel | Identify the payment method used by the customer. |
+
+## Reconciliation workflow
+
+1. Search for the order in the dashboard.
+2. Compare status, amount, currency, and timestamps with your internal record.
+3. Check whether your Webhook endpoint received the corresponding event.
+4. Use the Orders API when your system needs automated reconciliation.
+
+## Related pages
+
+- [List all orders API reference](/api-reference/orders/list-all-orders)
+- [Retrieve an order API reference](/api-reference/orders/retrieve-an-order)
+- [Webhook events](/webhooks/events)

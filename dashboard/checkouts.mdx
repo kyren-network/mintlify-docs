@@ -1,0 +1,38 @@
+---
+title: Checkout links and hosted checkout
+description: Understand how customers complete payment through Kyren Pay checkout
+language: en
+audience: merchant
+product_area: checkout
+intent: how-to
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: product
+---
+
+Kyren Pay checkout lets your customer complete payment on a hosted payment page.
+
+## Before you start
+
+Create a product and prepare your success and cancel URLs. If your integration uses the API, your server creates a checkout session and redirects the customer to the returned checkout URL.
+
+## API checkout flow
+
+1. Your server creates a checkout session.
+2. Kyren returns a hosted checkout URL.
+3. Your frontend redirects the customer to that URL.
+4. The customer completes payment.
+5. Kyren sends a Webhook event to your server.
+6. Your system fulfills the order after confirming payment success.
+
+## Common mistakes
+
+- Creating checkout sessions from browser JavaScript with an API key.
+- Fulfilling the order before a paid status or payment-success Webhook.
+- Not storing your internal user or order ID in metadata when you need reconciliation.
+
+## Related pages
+
+- [Quickstart](/quickstart)
+- [Create a checkout session API reference](/api-reference/checkouts/create-a-checkout-session)
+- [Webhook overview](/webhooks/overview)

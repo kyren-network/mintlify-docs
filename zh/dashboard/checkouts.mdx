@@ -1,0 +1,38 @@
+---
+title: Checkout 和托管付款页
+description: 了解客户如何通过 Kyren Pay Checkout 完成付款
+language: zh
+audience: merchant
+product_area: checkout
+intent: how-to
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: product
+---
+
+Kyren Pay Checkout 让客户在托管付款页完成付款。
+
+## 开始前
+
+先创建产品，并准备成功 URL 和取消 URL。如果你的集成使用 API，你的服务端会创建 Checkout Session，并把客户重定向到返回的 Checkout URL。
+
+## API Checkout 流程
+
+1. 你的服务端创建 Checkout Session。
+2. Kyren 返回托管 Checkout URL。
+3. 你的前端把客户重定向到该 URL。
+4. 客户完成付款。
+5. Kyren 向你的服务端发送 Webhook 事件。
+6. 你的系统确认支付成功后履约。
+
+## 常见错误
+
+- 在浏览器 JavaScript 中使用 API 密钥创建 Checkout Session。
+- 在订单已支付或收到支付成功 Webhook 前履约。
+- 需要对账时，没有在 metadata 中保存内部用户 ID 或订单 ID。
+
+## 相关页面
+
+- [快速开始](/zh/quickstart)
+- [创建 Checkout Session API 参考](/zh/api-reference/checkouts/create-a-checkout-session)
+- [Webhook 总览](/zh/webhooks/overview)

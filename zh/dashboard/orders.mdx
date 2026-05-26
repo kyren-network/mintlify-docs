@@ -1,0 +1,36 @@
+---
+title: 订单
+description: 查看 Kyren Pay 订单并核对付款状态
+language: zh
+audience: merchant
+product_area: order
+intent: how-to
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: product
+---
+
+使用订单页面查看付款状态、查找订单标识，并将 Kyren Pay 记录与你自己的系统对账。
+
+## 需要检查的字段
+
+| 字段 | 用法 |
+| --- | --- |
+| 订单号 | 咨询 Kyren 支持时提供该信息。 |
+| 状态 | 判断你的系统应该履约还是继续等待。 |
+| 金额和币种 | 与产品或 Checkout Session 金额核对。 |
+| 创建和支付时间 | 与你的服务端日志核对。API 中的时间使用毫秒级时间戳。 |
+| 支付渠道 | 识别客户使用的支付方式。 |
+
+## 对账流程
+
+1. 在控制台搜索订单。
+2. 将状态、金额、币种和时间戳与你的内部记录核对。
+3. 检查你的 Webhook 端点是否收到对应事件。
+4. 如果系统需要自动对账，使用 Orders API。
+
+## 相关页面
+
+- [订单列表 API 参考](/zh/api-reference/orders/list-all-orders)
+- [获取订单 API 参考](/zh/api-reference/orders/retrieve-an-order)
+- [Webhook 事件](/zh/webhooks/events)
