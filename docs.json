@@ -22,11 +22,23 @@
             "tab": "Documentation",
             "groups": [
               {
-                "group": "Getting Started",
+                "group": "Start Here",
                 "pages": [
                   "introduction",
+                  "start-here",
                   "quickstart",
-                  "authentication"
+                  "guides/collect-first-payment",
+                  "go-live-checklist"
+                ]
+              },
+              {
+                "group": "Dashboard Guide",
+                "pages": [
+                  "dashboard/overview",
+                  "dashboard/products",
+                  "dashboard/checkouts",
+                  "dashboard/orders",
+                  "dashboard/developer-settings"
                 ]
               },
               {
@@ -41,14 +53,9 @@
               {
                 "group": "References",
                 "pages": [
+                  "authentication",
                   "errors",
-                  "testing"
-                ]
-              },
-              {
-                "group": "Guides",
-                "pages": [
-                  "guides/collect-first-payment",
+                  "testing",
                   "guides/code-examples"
                 ]
               }
@@ -67,11 +74,23 @@
             "tab": "文档",
             "groups": [
               {
-                "group": "快速开始",
+                "group": "开始使用",
                 "pages": [
                   "zh/introduction",
+                  "zh/start-here",
                   "zh/quickstart",
-                  "zh/authentication"
+                  "zh/guides/collect-first-payment",
+                  "zh/go-live-checklist"
+                ]
+              },
+              {
+                "group": "控制台指南",
+                "pages": [
+                  "zh/dashboard/overview",
+                  "zh/dashboard/products",
+                  "zh/dashboard/checkouts",
+                  "zh/dashboard/orders",
+                  "zh/dashboard/developer-settings"
                 ]
               },
               {
@@ -86,14 +105,9 @@
               {
                 "group": "参考",
                 "pages": [
+                  "zh/authentication",
                   "zh/errors",
-                  "zh/testing"
-                ]
-              },
-              {
-                "group": "指南",
-                "pages": [
-                  "zh/guides/collect-first-payment",
+                  "zh/testing",
                   "zh/guides/code-examples"
                 ]
               }
@@ -112,11 +126,23 @@
             "tab": "文檔",
             "groups": [
               {
-                "group": "快速開始",
+                "group": "開始使用",
                 "pages": [
                   "zh-Hant/introduction",
+                  "zh-Hant/start-here",
                   "zh-Hant/quickstart",
-                  "zh-Hant/authentication"
+                  "zh-Hant/guides/collect-first-payment",
+                  "zh-Hant/go-live-checklist"
+                ]
+              },
+              {
+                "group": "控制台指南",
+                "pages": [
+                  "zh-Hant/dashboard/overview",
+                  "zh-Hant/dashboard/products",
+                  "zh-Hant/dashboard/checkouts",
+                  "zh-Hant/dashboard/orders",
+                  "zh-Hant/dashboard/developer-settings"
                 ]
               },
               {
@@ -131,14 +157,9 @@
               {
                 "group": "參考",
                 "pages": [
+                  "zh-Hant/authentication",
                   "zh-Hant/errors",
-                  "zh-Hant/testing"
-                ]
-              },
-              {
-                "group": "指南",
-                "pages": [
-                  "zh-Hant/guides/collect-first-payment",
+                  "zh-Hant/testing",
                   "zh-Hant/guides/code-examples"
                 ]
               }
