@@ -1,0 +1,50 @@
+---
+title: 上线清单
+description: 在接受生产流量前检查 Kyren Pay 设置
+language: zh
+audience: merchant
+product_area: checkout
+intent: checklist
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: product
+---
+
+在把真实客户发送到 Kyren Pay Checkout 前，使用本清单检查你的设置。
+
+## 账户和产品设置
+
+- 商户资料已经填写完整。
+- 产品名称、描述、金额和币种正确。
+- 你自己的系统用十进制字符串保存和发送金额，例如 `"9.99"`。
+- 成功和取消 URL 指向生产页面。
+
+## API 密钥
+
+- API 密钥只保存在服务端。
+- API 密钥没有出现在浏览器 JavaScript、移动端应用、日志、截图或公开仓库中。
+- 部署环境使用正确的 Kyren API Base URL。
+
+## Webhook
+
+- 已在控制台配置 Webhook URL。
+- 你的服务端会验证 Kyren Webhook 签名。
+- 你的服务端在处理合法事件后返回 2xx 响应。
+- 你的履约逻辑是幂等的，可以处理重复投递。
+
+## 订单和履约
+
+- 你的系统只在订单已支付或收到支付成功 Webhook 后履约。
+- 需要对账时，你会在 metadata 中保存内部订单 ID 或用户 ID。
+- 团队知道如何在 Kyren 控制台查找订单。
+
+## 支持准备
+
+- 支持团队知道在哪里找到订单号。
+- 联系 Kyren 支持时，团队可以提供 Checkout Session ID、订单号、时间戳和 Webhook 投递状态。
+
+## 相关页面
+
+- [认证](/zh/authentication)
+- [Webhook 签名](/zh/webhooks/signatures)
+- [订单控制台](/zh/dashboard/orders)

@@ -7,6 +7,10 @@ description: Accept payments from customers worldwide with Kyren Pay
 
 Kyren Pay is a payment platform designed for **Chinese AI startups going global**. It provides a standardized way to accept payments from international customers, so you can focus on building your product instead of dealing with payment infrastructure.
 
+<Card title="Start with your setup path" icon="arrow-right" href="/start-here">
+  Choose whether you want to use the dashboard, integrate the API, collect your first payment, or prepare for production.
+</Card>
+
 <CardGroup cols={2}>
   <Card title="Quick Integration" icon="bolt">
     Get up and running in minutes with our simple API. Create a product, generate a checkout link, and start accepting payments.
@@ -18,7 +22,7 @@ Kyren Pay is a payment platform designed for **Chinese AI startups going global*
     Receive real-time payment notifications with HMAC-SHA256 signed webhooks for secure server-to-server communication.
   </Card>
   <Card title="Developer Friendly" icon="code">
-    Clean REST API with comprehensive documentation, code examples in multiple languages, and a sandbox environment for testing.
+    Clean REST API with comprehensive documentation and code examples in multiple languages.
   </Card>
 </CardGroup>
 
@@ -45,17 +49,17 @@ The typical integration flow involves four steps:
 
 | Method | Regions | Currency |
 | --- | --- | --- |
-| Credit Card (Visa, Mastercard) | Global | USD, EUR, GBP, and more |
-| WeChat Pay | China, Southeast Asia | CNY, USD |
-| Alipay | China, Southeast Asia | CNY, USD |
-| PayNow | Singapore | SGD |
+| Credit Card / Apple Pay / Google Pay | Global | USD, CNY, HKD |
+| WeChat Pay | China, Southeast Asia | CNY, USD, HKD |
+| Alipay | China, Southeast Asia | CNY, USD, HKD |
+| PayNow | Singapore | USD, HKD |
+| Crypto (USDT / USDC) | Global | USD |
 
 ## Base URLs
 
 | Environment | URL |
 | --- | --- |
 | Production | `https://api.kyren.top` |
-| Test / Sandbox | `https://test-api.kyren.top` |
 
 ## Next Steps
 

@@ -1,0 +1,50 @@
+---
+title: Go-live checklist
+description: Review your Kyren Pay setup before accepting production traffic
+language: en
+audience: merchant
+product_area: checkout
+intent: checklist
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: product
+---
+
+Use this checklist before sending real customers to Kyren Pay checkout.
+
+## Account and product setup
+
+- Your merchant profile is complete.
+- Your product name, description, amount, and currency are correct.
+- Amount values in your own system are stored and sent as decimal strings, such as `"9.99"`.
+- Your success and cancel URLs point to production pages.
+
+## API keys
+
+- Your API key is stored only on your server.
+- Your API key is not included in browser JavaScript, mobile apps, or public repositories.
+- Your deployment environment uses the correct Kyren API base URL.
+
+## Webhooks
+
+- Your Webhook URL is configured in the dashboard.
+- Your server verifies the Kyren Webhook signature.
+- Your server returns a 2xx response after processing a valid event.
+- Your fulfillment logic is idempotent and can handle repeated delivery.
+
+## Orders and fulfillment
+
+- Your system fulfills only after a paid order or payment-success Webhook event.
+- Your internal order or user ID is stored in metadata when needed.
+- Your team knows how to find an order in the Kyren dashboard.
+
+## Support readiness
+
+- Your support team knows where to find order numbers.
+- Your team can provide the checkout session ID, order number, timestamp, and Webhook delivery status when contacting Kyren support.
+
+## Related pages
+
+- [Authentication](/authentication)
+- [Webhook signatures](/webhooks/signatures)
+- [Orders dashboard](/dashboard/orders)

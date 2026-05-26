@@ -1,0 +1,50 @@
+---
+title: 上線清單
+description: 在接受生產流量前檢查 Kyren Pay 設定
+language: zh-Hant
+audience: merchant
+product_area: checkout
+intent: checklist
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: product
+---
+
+在把真實客戶送到 Kyren Pay Checkout 前，使用本清單檢查你的設定。
+
+## 帳戶和產品設定
+
+- 商戶資料已經填寫完整。
+- 產品名稱、描述、金額和幣種正確。
+- 你自己的系統用十進位字串保存和傳送金額，例如 `"9.99"`。
+- 成功和取消 URL 指向生產頁面。
+
+## API 密鑰
+
+- API 密鑰只保存在服務端。
+- API 密鑰沒有出現在瀏覽器 JavaScript、行動端應用、日誌、截圖或公開倉庫中。
+- 部署環境使用正確的 Kyren API Base URL。
+
+## Webhook
+
+- 已在控制台設定 Webhook URL。
+- 你的服務端會驗證 Kyren Webhook 簽名。
+- 你的服務端在處理合法事件後返回 2xx 回應。
+- 你的履約邏輯是冪等的，可以處理重複投遞。
+
+## 訂單和履約
+
+- 你的系統只在訂單已支付或收到支付成功 Webhook 後履約。
+- 需要對帳時，你會在 metadata 中保存內部訂單 ID 或使用者 ID。
+- 團隊知道如何在 Kyren 控制台查找訂單。
+
+## 支援準備
+
+- 支援團隊知道在哪裡找到訂單號。
+- 聯絡 Kyren 支援時，團隊可以提供 Checkout Session ID、訂單號、時間戳和 Webhook 投遞狀態。
+
+## 相關頁面
+
+- [認證](/zh-Hant/authentication)
+- [Webhook 簽名](/zh-Hant/webhooks/signatures)
+- [訂單控制台](/zh-Hant/dashboard/orders)
