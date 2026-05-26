@@ -1,0 +1,54 @@
+---
+title: "API request returns 401"
+description: "Diagnose Kyren Pay API authentication failures."
+language: en
+audience: merchant
+product_area: troubleshooting
+intent: troubleshooting
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: support
+---
+
+## Symptom
+
+Your server calls a Kyren Pay API endpoint and receives `401 Unauthorized`.
+
+## Likely causes
+
+- The `x-api-key` header is missing or empty.
+- The API key is invalid, expired, or was rotated.
+- The request uses a key from the wrong environment.
+- IP allowlisting is enabled and the request comes from an unlisted server IP.
+- The key was exposed and should no longer be trusted.
+
+## Check this in Kyren
+
+- Open **Dashboard > Developer settings** and confirm the active API key.
+- If IP allowlisting is enabled, confirm your outbound server IP is listed.
+- If the key may have been exposed, rotate it and update your server configuration.
+
+## Check this in your server
+
+- Confirm the request sends `x-api-key` exactly as an HTTP header.
+- Check that secrets were loaded into the running process after deployment.
+- Verify the request is going to the intended Kyren Pay API base URL.
+- Search recent deploys for key rotation, secret name, or configuration changes.
+
+## Fix
+
+1. Add or correct the `x-api-key` header.
+2. Replace stale keys with the current key from Developer settings.
+3. Update the IP allowlist when your hosting provider changes outbound IPs.
+4. Rotate any key that was committed, logged, or shared outside trusted systems.
+
+## Contact support if unresolved
+
+Contact Kyren support with the request time, endpoint path, response status, and merchant account. Do not send your full API key.
+
+## Related pages
+
+- [Authentication](/authentication)
+- [Developer settings](/dashboard/developer-settings)
+- [Testing](/testing)
+

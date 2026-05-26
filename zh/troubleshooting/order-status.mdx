@@ -1,0 +1,54 @@
+---
+title: "订单状态不符合预期"
+description: "理解 Kyren Pay 订单状态并进行对账检查。"
+language: zh
+audience: merchant
+product_area: troubleshooting
+intent: troubleshooting
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: support
+---
+
+## 现象
+
+Kyren Pay 中的订单状态与你的系统或客户预期不一致。
+
+## 常见原因
+
+| 状态 | 通常含义 |
+| --- | --- |
+| `pending` | 支付尚未完成，或网关尚未确认最终结果。 |
+| `paid` | 支付成功；如果其他检查通过，你的系统可以履约。 |
+| `failed` | 支付被拒绝、取消，或在支付网关失败。 |
+| `closed` / `expired` | Checkout 或支付窗口在成功支付前结束。 |
+| `refunded` | 在可用场景中，已记录退款状态。 |
+
+网关延迟可能造成客户支付页面、Kyren 订单状态和你的内部系统之间短时间不一致。Epay 来源订单也可能需要使用来源订单标识额外核对。
+
+## 在 Kyren 中检查
+
+- 打开 **控制台 > 订单** 并搜索订单。
+- 核对状态、金额、币种、创建时间和支付时间。
+- 检查订单是否包含 Epay 来源订单标识。
+
+## 在你的服务端检查
+
+- 将 Kyren 订单 ID 与你的内部订单 ID 核对。
+- 确认你的系统依赖 Webhook、轮询，还是两者结合。
+- 检查是否缓存了较早的 `pending` 状态，而订单后来已变化。
+- 对比 API 数据时使用毫秒级时间戳，例如 `1736932200000`。
+
+## 修复
+
+使用 `paid` 作为履约信号，保持履约幂等，并在人工对账前刷新订单状态。除非你的业务规则明确关闭内部订单，否则将 `pending` 视为等待状态。
+
+## 仍未解决时联系支持
+
+联系 Kyren 支持时，请提供 Kyren 订单号、来源订单标识（如有）、预期状态、观察到的状态和时间戳。
+
+## 相关页面
+
+- [控制台订单](/zh/dashboard/orders)
+- [获取订单 API 参考](/api-reference/orders/retrieve-an-order)
+

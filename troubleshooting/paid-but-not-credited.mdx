@@ -1,0 +1,51 @@
+---
+title: "Customer paid but was not credited"
+description: "Reconcile paid orders that were not fulfilled in your system."
+language: en
+audience: merchant
+product_area: troubleshooting
+intent: troubleshooting
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: support
+---
+
+## Symptom
+
+The customer completed payment, but your application did not grant access, credits, or the purchased item.
+
+## Likely causes
+
+- Your server is still waiting for the `order.paid` Webhook event.
+- Your fulfillment worker received the event but failed before updating the user.
+- Idempotency logic marked a duplicate event as processed too early.
+- The checkout metadata did not include your internal user ID or order ID.
+- Your system checked order status before payment processing finished.
+
+## Check this in Kyren
+
+- Open **Dashboard > Orders** and search by order number, customer email, or time range.
+- Confirm the Kyren order status is `paid`.
+- Compare the order amount, currency, and paid time with your internal record.
+
+## Check this in your server
+
+- Search your Webhook endpoint logs for the event time and Kyren order ID.
+- Confirm the event handler maps `metadata` to the correct internal user or order.
+- Check fulfillment retries, queue failures, and database write errors.
+- Make fulfillment idempotent by Kyren order ID or event ID.
+
+## Fix
+
+If the Kyren order is paid, reconcile it against your internal order and re-run fulfillment using your own recovery process. Store internal user IDs in checkout metadata so future events can be matched reliably.
+
+## Contact support if unresolved
+
+Contact Kyren support with the Kyren order number, paid time, amount, currency, and your server log timestamps.
+
+## Related pages
+
+- [Dashboard orders](/dashboard/orders)
+- [Webhook events](/webhooks/events)
+- [Webhook retries](/webhooks/retries)
+

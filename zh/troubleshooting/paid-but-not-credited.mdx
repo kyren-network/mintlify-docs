@@ -1,0 +1,51 @@
+---
+title: "客户已付款但未到账"
+description: "对账客户已付款但你的系统未履约的问题。"
+language: zh
+audience: merchant
+product_area: troubleshooting
+intent: troubleshooting
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: support
+---
+
+## 现象
+
+客户已完成付款，但你的应用没有发放权益、积分或商品。
+
+## 常见原因
+
+- 你的服务端仍在等待 `order.paid` Webhook 事件。
+- 履约任务收到了事件，但在更新用户前失败。
+- 幂等逻辑过早把重复事件标记为已处理。
+- Checkout metadata 中没有包含你的内部用户 ID 或订单 ID。
+- 你的系统在付款处理完成前查询了订单状态。
+
+## 在 Kyren 中检查
+
+- 在 **控制台 > 订单** 按订单号、客户邮箱或时间范围搜索。
+- 确认 Kyren 订单状态为 `paid`。
+- 将订单金额、币种和支付时间与你的内部记录核对。
+
+## 在你的服务端检查
+
+- 按事件时间和 Kyren 订单 ID 搜索 Webhook 端点日志。
+- 确认事件处理器能将 `metadata` 映射到正确的内部用户或订单。
+- 检查履约重试、队列失败和数据库写入错误。
+- 使用 Kyren 订单 ID 或事件 ID 做幂等处理。
+
+## 修复
+
+如果 Kyren 订单已支付，请与你的内部订单对账，并通过你的恢复流程重新执行履约。后续创建 Checkout 时，将内部用户 ID 写入 metadata，方便事件可靠匹配。
+
+## 仍未解决时联系支持
+
+联系 Kyren 支持时，请提供 Kyren 订单号、支付时间、金额、币种和你的服务端日志时间点。
+
+## 相关页面
+
+- [控制台订单](/zh/dashboard/orders)
+- [Webhook 事件](/zh/webhooks/events)
+- [Webhook 重试](/zh/webhooks/retries)
+

@@ -1,0 +1,53 @@
+---
+title: "Checkout Session 建立失敗"
+description: "修復建立 Checkout Session 時的驗證和設定錯誤。"
+language: zh-Hant
+audience: merchant
+product_area: troubleshooting
+intent: troubleshooting
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: support
+---
+
+## 現象
+
+建立 Checkout Session 返回錯誤，或未產生託管收銀台 URL。
+
+## 常見原因
+
+- `product_id` 不存在，或屬於其他商戶。
+- 產品已封存，不能用於新的 Session。
+- 請求的幣種不受支援。
+- 金額或價格欄位以數字傳入，而不是十進位字串。
+- 缺少 `success_url` 或 `cancel_url`，或 URL 無效。
+- 驗證失敗，請求未進入 Checkout 處理。
+
+## 在 Kyren 中檢查
+
+- 在 **控制台 > 產品** 確認產品處於啟用狀態。
+- 檢查產品價格和幣種。
+- 確認 Checkout 使用有效的跳轉 URL。
+- 如果 API 回應提示驗證失敗，請檢查開發者設定。
+
+## 在你的伺服器檢查
+
+- 金額和價格值必須使用十進位字串，例如 `"9.99"`。
+- 使用受支援的三位幣種代碼，例如 `USD`。
+- 確認 `success_url` 和 `cancel_url` 是完整 HTTPS URL。
+- 記錄請求體和 Kyren 回應狀態，但不要記錄密鑰。
+
+## 修復
+
+更新請求，使用啟用中的產品、受支援幣種、十進位字串金額、有效跳轉 URL 和有效的 `x-api-key`。
+
+## 仍未解決時聯絡支援
+
+聯絡 Kyren 支援時，請提供請求時間、產品 ID、幣種、回應狀態和錯誤訊息。不要傳送 API Key。
+
+## 相關頁面
+
+- [快速開始](/zh-Hant/quickstart)
+- [控制台 Checkout](/zh-Hant/dashboard/checkouts)
+- [建立 Checkout Session API 參考](/api-reference/checkouts/create-a-checkout-session)
+

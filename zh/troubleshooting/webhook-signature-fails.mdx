@@ -1,0 +1,51 @@
+---
+title: "Webhook 签名验证失败"
+description: "修复常见 Kyren Pay Webhook 签名验证错误。"
+language: zh
+audience: merchant
+product_area: troubleshooting
+intent: troubleshooting
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: support
+---
+
+## 现象
+
+你的 Webhook 端点收到了请求，但签名验证失败。
+
+## 常见原因
+
+- 框架在验签前解析或重新格式化了 JSON。
+- 验签代码使用了错误的 Webhook 密钥。
+- 中间件修改了请求体的空格、编码或字段顺序。
+- 时间戳被当成秒处理，而不是 Unix 毫秒。
+- 待签名字符串拼接格式错误。
+- 签名比较没有使用恒定时间比较函数。
+
+## 在 Kyren 中检查
+
+- 从开发者设置复制当前 Webhook 密钥。
+- 确认请求头包含 `X-Kyren-Signature` 和 `X-Kyren-Timestamp`。
+- 确认时间戳是毫秒级时间戳，例如 `1736932200000`。
+
+## 在你的服务端检查
+
+- 在 JSON 解析前，使用原始请求体字节进行验签。
+- 按 `timestamp + "." + raw_body` 构造待签名字符串。
+- 使用 Webhook 密钥计算 `sha256=` 加 HMAC-SHA256 摘要。
+- 使用恒定时间函数比较预期签名和收到的签名。
+
+## 修复
+
+调整路由，让 Kyren Webhook 使用原始请求体；使用当前 Webhook 密钥；将时间戳按 Unix 毫秒处理；并严格匹配文档中的签名格式。
+
+## 仍未解决时联系支持
+
+联系 Kyren 支持时，请提供事件时间、订单号、时间戳请求头，以及脱敏后的验签代码说明。不要发送 Webhook 密钥。
+
+## 相关页面
+
+- [Webhook 签名](/zh/webhooks/signatures)
+- [收取第一笔付款](/zh/guides/collect-first-payment)
+

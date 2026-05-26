@@ -1,0 +1,51 @@
+---
+title: "客戶已付款但未入帳"
+description: "對帳客戶已付款但你的系統未履約的問題。"
+language: zh-Hant
+audience: merchant
+product_area: troubleshooting
+intent: troubleshooting
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: support
+---
+
+## 現象
+
+客戶已完成付款，但你的應用沒有發放權益、點數或商品。
+
+## 常見原因
+
+- 你的伺服器仍在等待 `order.paid` Webhook 事件。
+- 履約任務收到了事件，但在更新使用者前失敗。
+- 冪等邏輯過早把重複事件標記為已處理。
+- Checkout metadata 中沒有包含你的內部使用者 ID 或訂單 ID。
+- 你的系統在付款處理完成前查詢了訂單狀態。
+
+## 在 Kyren 中檢查
+
+- 在 **控制台 > 訂單** 按訂單號、客戶電郵或時間範圍搜尋。
+- 確認 Kyren 訂單狀態為 `paid`。
+- 將訂單金額、幣種和支付時間與你的內部記錄核對。
+
+## 在你的伺服器檢查
+
+- 按事件時間和 Kyren 訂單 ID 搜尋 Webhook 端點日誌。
+- 確認事件處理器能將 `metadata` 映射到正確的內部使用者或訂單。
+- 檢查履約重試、佇列失敗和資料庫寫入錯誤。
+- 使用 Kyren 訂單 ID 或事件 ID 做冪等處理。
+
+## 修復
+
+如果 Kyren 訂單已支付，請與你的內部訂單對帳，並透過你的復原流程重新執行履約。後續建立 Checkout 時，將內部使用者 ID 寫入 metadata，方便事件可靠匹配。
+
+## 仍未解決時聯絡支援
+
+聯絡 Kyren 支援時，請提供 Kyren 訂單號、支付時間、金額、幣種和你的伺服器日誌時間點。
+
+## 相關頁面
+
+- [控制台訂單](/zh-Hant/dashboard/orders)
+- [Webhook 事件](/zh-Hant/webhooks/events)
+- [Webhook 重試](/zh-Hant/webhooks/retries)
+

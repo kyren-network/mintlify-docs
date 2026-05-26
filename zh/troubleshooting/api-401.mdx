@@ -1,0 +1,54 @@
+---
+title: "API 请求返回 401"
+description: "排查 Kyren Pay API 鉴权失败问题。"
+language: zh
+audience: merchant
+product_area: troubleshooting
+intent: troubleshooting
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: support
+---
+
+## 现象
+
+你的服务端调用 Kyren Pay API 时收到 `401 Unauthorized`。
+
+## 常见原因
+
+- 缺少 `x-api-key` 请求头，或请求头为空。
+- API Key 无效、已过期，或已轮换。
+- 请求使用了错误环境的 Key。
+- 已启用 IP 白名单，但请求来自未加入白名单的服务器 IP。
+- Key 已泄露，不应继续信任。
+
+## 在 Kyren 中检查
+
+- 打开 **控制台 > 开发者设置**，确认当前有效的 API Key。
+- 如果启用了 IP 白名单，确认你的服务端出口 IP 已加入白名单。
+- 如果 Key 可能泄露，请轮换 Key，并更新服务端配置。
+
+## 在你的服务端检查
+
+- 确认请求以 HTTP Header 形式发送 `x-api-key`。
+- 检查部署后运行中的进程是否正确加载了密钥。
+- 确认请求发送到预期的 Kyren Pay API Base URL。
+- 排查最近部署中是否修改了 Key、密钥名称或配置。
+
+## 修复
+
+1. 添加或修正 `x-api-key` 请求头。
+2. 使用开发者设置中的当前 Key 替换过期 Key。
+3. 当托管服务商变更出口 IP 时，更新 IP 白名单。
+4. 对已提交到代码、写入日志或被外部共享的 Key 进行轮换。
+
+## 仍未解决时联系支持
+
+联系 Kyren 支持时，请提供请求时间、接口路径、响应状态和商户账号。不要发送完整 API Key。
+
+## 相关页面
+
+- [认证](/zh/authentication)
+- [开发者设置](/zh/dashboard/developer-settings)
+- [测试](/zh/testing)
+

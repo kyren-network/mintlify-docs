@@ -1,0 +1,54 @@
+---
+title: "Webhook not received"
+description: "Find why your server did not receive a Kyren Pay Webhook event."
+language: en
+audience: merchant
+product_area: troubleshooting
+intent: troubleshooting
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: support
+---
+
+## Symptom
+
+An expected payment event occurred, but your Webhook endpoint did not receive a request.
+
+## Likely causes
+
+- The configured Webhook URL is wrong or points to an old endpoint.
+- The URL is not public or cannot be reached from the internet.
+- Your endpoint returns a non-`2xx` response.
+- Your endpoint times out before responding.
+- A firewall, WAF, or reverse proxy blocks the request.
+- Local development uses no tunnel or a stale tunnel URL.
+- The expected event type does not match the action that occurred.
+
+## Check this in Kyren
+
+- Compare the Webhook URL configured in the dashboard with your current endpoint.
+- Confirm the URL includes the correct scheme, host, path, and trailing slash behavior.
+- Confirm you are expecting an event type that Kyren sends for that payment state.
+
+## Check this in your server
+
+- Compare your access logs with the configured Webhook URL and event time.
+- Confirm the endpoint is public and accepts HTTPS `POST` requests.
+- Return `2xx` quickly, then process the event asynchronously if needed.
+- Check firewall, WAF, CDN, and load balancer rules.
+- For local development, verify the active tunnel URL matches the dashboard setting.
+
+## Fix
+
+Update the configured Webhook URL, make the endpoint publicly reachable, and return a fast `2xx` response. Remove network rules that block Kyren requests.
+
+## Contact support if unresolved
+
+Contact Kyren support with the order number, expected event type, configured Webhook URL host and path, and your server log timestamps.
+
+## Related pages
+
+- [Webhook overview](/webhooks/overview)
+- [Webhook retries](/webhooks/retries)
+- [Testing](/testing)
+

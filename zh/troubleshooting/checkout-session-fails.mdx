@@ -1,0 +1,53 @@
+---
+title: "Checkout Session 创建失败"
+description: "修复创建 Checkout Session 时的校验和配置错误。"
+language: zh
+audience: merchant
+product_area: troubleshooting
+intent: troubleshooting
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: support
+---
+
+## 现象
+
+创建 Checkout Session 返回错误，或未生成托管收银台 URL。
+
+## 常见原因
+
+- `product_id` 不存在，或属于其他商户。
+- 产品已归档，不能用于新的 Session。
+- 请求的币种不受支持。
+- 金额或价格字段以数字传入，而不是十进制字符串。
+- 缺少 `success_url` 或 `cancel_url`，或 URL 无效。
+- 鉴权失败，请求未进入 Checkout 处理。
+
+## 在 Kyren 中检查
+
+- 在 **控制台 > 产品** 确认产品处于启用状态。
+- 检查产品价格和币种。
+- 确认 Checkout 使用有效的跳转 URL。
+- 如果 API 响应提示鉴权失败，请检查开发者设置。
+
+## 在你的服务端检查
+
+- 金额和价格值必须使用十进制字符串，例如 `"9.99"`。
+- 使用受支持的三位币种代码，例如 `USD`。
+- 确认 `success_url` 和 `cancel_url` 是完整 HTTPS URL。
+- 记录请求体和 Kyren 响应状态，但不要记录密钥。
+
+## 修复
+
+更新请求，使用启用中的产品、受支持币种、十进制字符串金额、有效跳转 URL 和有效的 `x-api-key`。
+
+## 仍未解决时联系支持
+
+联系 Kyren 支持时，请提供请求时间、产品 ID、币种、响应状态和错误信息。不要发送 API Key。
+
+## 相关页面
+
+- [快速开始](/zh/quickstart)
+- [控制台 Checkout](/zh/dashboard/checkouts)
+- [创建 Checkout Session API 参考](/api-reference/checkouts/create-a-checkout-session)
+

@@ -1,0 +1,54 @@
+---
+title: "訂單狀態不符合預期"
+description: "理解 Kyren Pay 訂單狀態並進行對帳檢查。"
+language: zh-Hant
+audience: merchant
+product_area: troubleshooting
+intent: troubleshooting
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: support
+---
+
+## 現象
+
+Kyren Pay 中的訂單狀態與你的系統或客戶預期不一致。
+
+## 常見原因
+
+| 狀態 | 通常含義 |
+| --- | --- |
+| `pending` | 支付尚未完成，或閘道尚未確認最終結果。 |
+| `paid` | 支付成功；如果其他檢查通過，你的系統可以履約。 |
+| `failed` | 支付被拒絕、取消，或在支付閘道失敗。 |
+| `closed` / `expired` | Checkout 或支付視窗在成功支付前結束。 |
+| `refunded` | 在可用場景中，已記錄退款狀態。 |
+
+閘道延遲可能造成客戶支付頁面、Kyren 訂單狀態和你的內部系統之間短時間不一致。Epay 來源訂單也可能需要使用來源訂單標識額外核對。
+
+## 在 Kyren 中檢查
+
+- 開啟 **控制台 > 訂單** 並搜尋訂單。
+- 核對狀態、金額、幣種、建立時間和支付時間。
+- 檢查訂單是否包含 Epay 來源訂單標識。
+
+## 在你的伺服器檢查
+
+- 將 Kyren 訂單 ID 與你的內部訂單 ID 核對。
+- 確認你的系統依賴 Webhook、輪詢，還是兩者結合。
+- 檢查是否快取了較早的 `pending` 狀態，而訂單後來已變化。
+- 比對 API 資料時使用毫秒級時間戳，例如 `1736932200000`。
+
+## 修復
+
+使用 `paid` 作為履約信號，保持履約冪等，並在人工對帳前重新整理訂單狀態。除非你的業務規則明確關閉內部訂單，否則將 `pending` 視為等待狀態。
+
+## 仍未解決時聯絡支援
+
+聯絡 Kyren 支援時，請提供 Kyren 訂單號、來源訂單標識（如有）、預期狀態、觀察到的狀態和時間戳。
+
+## 相關頁面
+
+- [控制台訂單](/zh-Hant/dashboard/orders)
+- [取得訂單 API 參考](/api-reference/orders/retrieve-an-order)
+

@@ -1,0 +1,54 @@
+---
+title: "未收到 Webhook"
+description: "排查你的服务端未收到 Kyren Pay Webhook 事件的原因。"
+language: zh
+audience: merchant
+product_area: troubleshooting
+intent: troubleshooting
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: support
+---
+
+## 现象
+
+预期的支付事件已发生，但你的 Webhook 端点没有收到请求。
+
+## 常见原因
+
+- 配置的 Webhook URL 错误，或指向旧端点。
+- URL 不是公网可访问地址。
+- 你的端点返回非 `2xx` 响应。
+- 端点在响应前超时。
+- 防火墙、WAF 或反向代理拦截了请求。
+- 本地开发未使用隧道，或隧道 URL 已失效。
+- 预期事件类型与实际发生的动作不匹配。
+
+## 在 Kyren 中检查
+
+- 将控制台配置的 Webhook URL 与当前端点逐字核对。
+- 确认 URL 的协议、域名、路径和尾部斜杠行为正确。
+- 确认你等待的是该支付状态会发送的事件类型。
+
+## 在你的服务端检查
+
+- 将访问日志与配置的 Webhook URL 和事件时间进行对比。
+- 确认端点公网可访问，并接受 HTTPS `POST` 请求。
+- 快速返回 `2xx`，需要较长处理时使用异步任务。
+- 检查防火墙、WAF、CDN 和负载均衡规则。
+- 本地开发时，确认当前隧道 URL 与控制台配置一致。
+
+## 修复
+
+更新配置的 Webhook URL，确保端点公网可访问，并快速返回 `2xx` 响应。移除会拦截 Kyren 请求的网络规则。
+
+## 仍未解决时联系支持
+
+联系 Kyren 支持时，请提供订单号、预期事件类型、Webhook URL 的域名和路径，以及你的服务端日志时间点。
+
+## 相关页面
+
+- [Webhook 概述](/zh/webhooks/overview)
+- [Webhook 重试](/zh/webhooks/retries)
+- [测试](/zh/testing)
+

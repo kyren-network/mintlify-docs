@@ -1,0 +1,51 @@
+---
+title: "金额、币种或时间戳校验失败"
+description: "修复金额、币种和时间戳的常见格式错误。"
+language: zh
+audience: merchant
+product_area: troubleshooting
+intent: troubleshooting
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: support
+---
+
+## 现象
+
+Kyren Pay 因金额、币种或时间戳字段无效而拒绝请求。
+
+## 常见原因
+
+- 金额以 JSON 数字传入，而不是字符串。
+- 金额字符串包含逗号、币种符号或不支持的小数精度。
+- 币种不支持当前产品或支付方式。
+- 币种代码不是 `USD` 这样的三位代码。
+- 时间戳以秒或日期字符串传入，而不是 Unix 毫秒。
+- 日期范围查询使用了错误时区，或开始和结束时间戳顺序反了。
+
+## 在 Kyren 中检查
+
+- 创建 Checkout Session 前确认支持的币种。
+- 将产品币种与请求币种核对。
+- 查看 API 参考中的时间戳字段示例。
+
+## 在你的服务端检查
+
+- 金额值使用字符串，例如 `"9.99"`。
+- 使用大写三位币种代码。
+- 使用 Unix 毫秒时间戳，例如 `1736932200000`。
+- 日期范围中，确保 `start_time` 早于 `end_time`。
+
+## 修复
+
+调用 Kyren 前标准化请求数据：将十进制金额转为字符串，根据支持币种校验币种代码，并将日期转换为 Unix 毫秒。
+
+## 仍未解决时联系支持
+
+联系 Kyren 支持时，请提供接口路径、响应错误、请求中的金额字符串、币种代码和时间戳值。
+
+## 相关页面
+
+- [获取支持币种 API 参考](/api-reference/config/get-supported-currencies)
+- [测试](/zh/testing)
+

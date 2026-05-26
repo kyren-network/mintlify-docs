@@ -1,0 +1,54 @@
+---
+title: "未收到 Webhook"
+description: "排查你的伺服器未收到 Kyren Pay Webhook 事件的原因。"
+language: zh-Hant
+audience: merchant
+product_area: troubleshooting
+intent: troubleshooting
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: support
+---
+
+## 現象
+
+預期的支付事件已發生，但你的 Webhook 端點沒有收到請求。
+
+## 常見原因
+
+- 設定的 Webhook URL 錯誤，或指向舊端點。
+- URL 不是公開可存取地址。
+- 你的端點返回非 `2xx` 回應。
+- 端點在回應前逾時。
+- 防火牆、WAF 或反向代理攔截了請求。
+- 本地開發未使用通道，或通道 URL 已失效。
+- 預期事件類型與實際發生的動作不匹配。
+
+## 在 Kyren 中檢查
+
+- 將控制台設定的 Webhook URL 與目前端點逐字核對。
+- 確認 URL 的協定、網域、路徑和尾部斜線行為正確。
+- 確認你等待的是該支付狀態會傳送的事件類型。
+
+## 在你的伺服器檢查
+
+- 將存取日誌與設定的 Webhook URL 和事件時間進行比對。
+- 確認端點公開可存取，並接受 HTTPS `POST` 請求。
+- 快速返回 `2xx`，需要較長處理時使用非同步任務。
+- 檢查防火牆、WAF、CDN 和負載平衡規則。
+- 本地開發時，確認目前通道 URL 與控制台設定一致。
+
+## 修復
+
+更新設定的 Webhook URL，確保端點公開可存取，並快速返回 `2xx` 回應。移除會攔截 Kyren 請求的網路規則。
+
+## 仍未解決時聯絡支援
+
+聯絡 Kyren 支援時，請提供訂單號、預期事件類型、Webhook URL 的網域和路徑，以及你的伺服器日誌時間點。
+
+## 相關頁面
+
+- [Webhook 概述](/zh-Hant/webhooks/overview)
+- [Webhook 重試](/zh-Hant/webhooks/retries)
+- [測試](/zh-Hant/testing)
+

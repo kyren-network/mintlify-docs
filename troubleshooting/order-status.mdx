@@ -1,0 +1,54 @@
+---
+title: "Order status does not match expectation"
+description: "Understand Kyren Pay order statuses and reconciliation checks."
+language: en
+audience: merchant
+product_area: troubleshooting
+intent: troubleshooting
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: support
+---
+
+## Symptom
+
+An order status in Kyren Pay differs from what your system or customer expected.
+
+## Likely causes
+
+| Status | What it usually means |
+| --- | --- |
+| `pending` | Payment is not completed or the gateway has not confirmed the final result. |
+| `paid` | Payment succeeded and your system can fulfill if other checks pass. |
+| `failed` | Payment was declined, canceled, or failed at the payment gateway. |
+| `closed` / `expired` | The checkout or payment window ended before successful payment. |
+| `refunded` | A refund has been recorded where available. |
+
+Gateway delays can cause short-lived differences between customer-facing payment screens, Kyren order status, and your internal system. Epay source orders may also require extra reconciliation against the source order identifier.
+
+## Check this in Kyren
+
+- Open **Dashboard > Orders** and search for the order.
+- Compare status, amount, currency, creation time, and paid time.
+- Check whether the order has an Epay source order identifier.
+
+## Check this in your server
+
+- Compare the Kyren order ID with your internal order ID.
+- Confirm whether your system relies on Webhooks, polling, or both.
+- Check whether an early `pending` status was cached after the order later changed.
+- Use millisecond timestamps when comparing API data, such as `1736932200000`.
+
+## Fix
+
+Use `paid` as the fulfillment signal, keep fulfillment idempotent, and refresh order status before manual reconciliation. Treat `pending` as waiting unless your business rules explicitly close the internal order.
+
+## Contact support if unresolved
+
+Contact Kyren support with the Kyren order number, source order identifier if present, expected status, observed status, and timestamps.
+
+## Related pages
+
+- [Dashboard orders](/dashboard/orders)
+- [Retrieve an order API reference](/api-reference/orders/retrieve-an-order)
+

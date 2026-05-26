@@ -1,0 +1,51 @@
+---
+title: "金額、幣種或時間戳校驗失敗"
+description: "修復金額、幣種和時間戳的常見格式錯誤。"
+language: zh-Hant
+audience: merchant
+product_area: troubleshooting
+intent: troubleshooting
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: support
+---
+
+## 現象
+
+Kyren Pay 因金額、幣種或時間戳欄位無效而拒絕請求。
+
+## 常見原因
+
+- 金額以 JSON 數字傳入，而不是字串。
+- 金額字串包含逗號、幣種符號或不支援的小數精度。
+- 幣種不支援目前產品或支付方式。
+- 幣種代碼不是 `USD` 這樣的三位代碼。
+- 時間戳以秒或日期字串傳入，而不是 Unix 毫秒。
+- 日期範圍查詢使用了錯誤時區，或開始和結束時間戳順序反了。
+
+## 在 Kyren 中檢查
+
+- 建立 Checkout Session 前確認支援的幣種。
+- 將產品幣種與請求幣種核對。
+- 查看 API 參考中的時間戳欄位範例。
+
+## 在你的伺服器檢查
+
+- 金額值使用字串，例如 `"9.99"`。
+- 使用大寫三位幣種代碼。
+- 使用 Unix 毫秒時間戳，例如 `1736932200000`。
+- 日期範圍中，確保 `start_time` 早於 `end_time`。
+
+## 修復
+
+呼叫 Kyren 前標準化請求資料：將十進位金額轉為字串，根據支援幣種校驗幣種代碼，並將日期轉換為 Unix 毫秒。
+
+## 仍未解決時聯絡支援
+
+聯絡 Kyren 支援時，請提供介面路徑、回應錯誤、請求中的金額字串、幣種代碼和時間戳值。
+
+## 相關頁面
+
+- [取得支援幣種 API 參考](/api-reference/config/get-supported-currencies)
+- [測試](/zh-Hant/testing)
+

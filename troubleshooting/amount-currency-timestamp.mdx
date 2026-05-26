@@ -1,0 +1,51 @@
+---
+title: "Amount, currency, or timestamp validation fails"
+description: "Fix common formatting errors for amounts, currencies, and timestamps."
+language: en
+audience: merchant
+product_area: troubleshooting
+intent: troubleshooting
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: support
+---
+
+## Symptom
+
+Kyren Pay rejects a request because an amount, currency, or timestamp field is invalid.
+
+## Likely causes
+
+- Amounts are sent as JSON numbers instead of strings.
+- Amount strings contain commas, currency symbols, or unsupported precision.
+- The currency is not supported for the requested product or payment method.
+- The currency code is not a three-letter code such as `USD`.
+- Timestamps are sent in seconds or formatted date strings instead of Unix milliseconds.
+- Date-range queries use the wrong timezone or swap start and end timestamps.
+
+## Check this in Kyren
+
+- Confirm supported currencies before creating checkout sessions.
+- Compare the product currency with the request currency.
+- Review examples in the API reference for timestamp fields.
+
+## Check this in your server
+
+- Send amount values as strings, such as `"9.99"`.
+- Use uppercase three-letter currency codes.
+- Send Unix millisecond timestamps, such as `1736932200000`.
+- For date ranges, ensure `start_time` is earlier than `end_time`.
+
+## Fix
+
+Normalize request data before calling Kyren: convert decimal amounts to strings, validate currency codes against supported currencies, and convert dates to Unix milliseconds.
+
+## Contact support if unresolved
+
+Contact Kyren support with the endpoint path, response error, amount string, currency code, and timestamp values used in the request.
+
+## Related pages
+
+- [Get supported currencies API reference](/api-reference/config/get-supported-currencies)
+- [Testing](/testing)
+

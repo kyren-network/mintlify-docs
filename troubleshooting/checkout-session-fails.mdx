@@ -1,0 +1,53 @@
+---
+title: "Checkout session creation fails"
+description: "Fix validation and configuration errors when creating checkout sessions."
+language: en
+audience: merchant
+product_area: troubleshooting
+intent: troubleshooting
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: support
+---
+
+## Symptom
+
+Creating a Checkout Session returns an error or no hosted checkout URL is created.
+
+## Likely causes
+
+- The `product_id` does not exist or belongs to another merchant.
+- The product is archived and can no longer be used for new sessions.
+- The currency is not supported for the requested checkout.
+- Amount or price fields are sent as numbers instead of decimal strings.
+- `success_url` or `cancel_url` is missing or invalid.
+- Authentication failed before the checkout request was processed.
+
+## Check this in Kyren
+
+- Confirm the product is active in **Dashboard > Products**.
+- Check the product price and currency in the dashboard.
+- Confirm your checkout settings use valid return URLs.
+- Review Developer settings if the API response indicates authentication failure.
+
+## Check this in your server
+
+- Send amount and price values as decimal strings, such as `"9.99"`.
+- Use a supported three-letter currency code such as `USD`.
+- Confirm `success_url` and `cancel_url` are absolute HTTPS URLs.
+- Log the request body and Kyren response status, excluding secrets.
+
+## Fix
+
+Update the request to use an active product, a supported currency, decimal string amounts, valid redirect URLs, and a valid `x-api-key`.
+
+## Contact support if unresolved
+
+Contact Kyren support with the request time, product ID, currency, response status, and error message. Do not send API keys.
+
+## Related pages
+
+- [Quickstart](/quickstart)
+- [Dashboard checkouts](/dashboard/checkouts)
+- [Create a checkout session API reference](/api-reference/checkouts/create-a-checkout-session)
+

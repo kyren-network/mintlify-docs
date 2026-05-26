@@ -1,0 +1,54 @@
+---
+title: "API 請求返回 401"
+description: "排查 Kyren Pay API 驗證失敗問題。"
+language: zh-Hant
+audience: merchant
+product_area: troubleshooting
+intent: troubleshooting
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: support
+---
+
+## 現象
+
+你的伺服器呼叫 Kyren Pay API 時收到 `401 Unauthorized`。
+
+## 常見原因
+
+- 缺少 `x-api-key` 請求標頭，或請求標頭為空。
+- API Key 無效、已過期，或已輪換。
+- 請求使用了錯誤環境的 Key。
+- 已啟用 IP 允許清單，但請求來自未列入清單的伺服器 IP。
+- Key 已外洩，不應繼續信任。
+
+## 在 Kyren 中檢查
+
+- 開啟 **控制台 > 開發者設定**，確認目前有效的 API Key。
+- 如果啟用了 IP 允許清單，確認你的伺服器出口 IP 已列入清單。
+- 如果 Key 可能外洩，請輪換 Key，並更新伺服器設定。
+
+## 在你的伺服器檢查
+
+- 確認請求以 HTTP Header 形式傳送 `x-api-key`。
+- 檢查部署後執行中的程序是否正確載入密鑰。
+- 確認請求傳送到預期的 Kyren Pay API Base URL。
+- 排查近期部署中是否修改了 Key、密鑰名稱或設定。
+
+## 修復
+
+1. 新增或修正 `x-api-key` 請求標頭。
+2. 使用開發者設定中的目前 Key 替換過期 Key。
+3. 當託管服務商變更出口 IP 時，更新 IP 允許清單。
+4. 對已提交到程式碼、寫入日誌或被外部分享的 Key 進行輪換。
+
+## 仍未解決時聯絡支援
+
+聯絡 Kyren 支援時，請提供請求時間、介面路徑、回應狀態和商戶帳號。不要傳送完整 API Key。
+
+## 相關頁面
+
+- [驗證](/zh-Hant/authentication)
+- [開發者設定](/zh-Hant/dashboard/developer-settings)
+- [測試](/zh-Hant/testing)
+

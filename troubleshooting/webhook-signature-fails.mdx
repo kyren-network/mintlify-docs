@@ -1,0 +1,51 @@
+---
+title: "Webhook signature verification fails"
+description: "Fix common Kyren Pay Webhook signature verification errors."
+language: en
+audience: merchant
+product_area: troubleshooting
+intent: troubleshooting
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: support
+---
+
+## Symptom
+
+Your Webhook endpoint receives a request, but signature verification fails.
+
+## Likely causes
+
+- Your framework parsed or reformatted the JSON before verification.
+- The verifier uses the wrong Webhook secret.
+- Middleware altered whitespace, encoding, or field order in the body.
+- The timestamp is handled as seconds instead of Unix milliseconds.
+- The signed string uses the wrong concatenation format.
+- The comparison is not constant-time and fails or leaks timing information.
+
+## Check this in Kyren
+
+- Copy the current Webhook secret from Developer settings.
+- Confirm the request headers include `X-Kyren-Signature` and `X-Kyren-Timestamp`.
+- Confirm the timestamp value is a millisecond timestamp, such as `1736932200000`.
+
+## Check this in your server
+
+- Verify against the raw request body bytes before JSON parsing.
+- Build the signed string as `timestamp + "." + raw_body`.
+- Compute `sha256=` plus the HMAC-SHA256 digest using the Webhook secret.
+- Compare the expected and received signatures with a constant-time function.
+
+## Fix
+
+Change the route to read the raw body for Kyren Webhooks, use the current Webhook secret, treat timestamps as Unix milliseconds, and match the documented signing format exactly.
+
+## Contact support if unresolved
+
+Contact Kyren support with the event time, order number, timestamp header, and a redacted description of your verification code. Do not send the Webhook secret.
+
+## Related pages
+
+- [Webhook signatures](/webhooks/signatures)
+- [Collect your first payment](/guides/collect-first-payment)
+
