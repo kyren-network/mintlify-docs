@@ -29,7 +29,7 @@ curl https://api.kyren.top/v1/products \
 
 ## Test Card Numbers
 
-Use these test card numbers on the checkout page to simulate different payment scenarios:
+Use these card numbers only when Kyren has issued a staging or test-capable environment, or when Kyren has enabled a test-capable payment gateway for your merchant. Do not assume these card numbers produce deterministic outcomes on production checkout sessions.
 
 | Card Number | Behavior |
 | --- | --- |
@@ -78,7 +78,7 @@ Before switching to production, make sure you have:
     Use the production key issued for `api.kyren.top`
   </Step>
   <Step title="Update base URL">
-    Change from the staging base URL to `api.kyren.top`
+    If Kyren issued a staging base URL, change from that URL to `api.kyren.top`
   </Step>
   <Step title="Update webhook URL">
     Set your production webhook endpoint in the Dashboard

@@ -29,7 +29,7 @@ curl https://api.kyren.top/v1/products \
 
 ## 测试卡号
 
-在收银页面使用以下测试卡号模拟不同的支付场景：
+只有在 Kyren 已向你提供 Staging 或可测试环境，或为你的商户启用可测试支付网关时，才应使用以下卡号。不要假设这些卡号会在生产收银台中产生确定性的测试结果。
 
 | 卡号 | 行为 |
 | --- | --- |
@@ -78,7 +78,7 @@ https://abc123.ngrok.io/webhooks/kyren
     使用 `api.kyren.top` 对应的生产密钥
   </Step>
   <Step title="更新接口地址">
-    从 staging 地址切换到 `api.kyren.top`
+    如果 Kyren 向你提供了 Staging Base URL，请从该地址切换到 `api.kyren.top`
   </Step>
   <Step title="更新 Webhook URL">
     在控制台中设置生产环境的 Webhook 端点
