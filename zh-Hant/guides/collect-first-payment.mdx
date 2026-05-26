@@ -144,8 +144,8 @@ function verifySignature(payload, signature, timestamp) {
     .update(data)
     .digest('hex');
 
-  const currentTime = Math.floor(Date.now() / 1000);
-  if (Math.abs(currentTime - parseInt(timestamp)) > 300) {
+  const currentTime = Date.now();
+  if (Math.abs(currentTime - Number(timestamp)) > 5 * 60 * 1000) {
     return false;
   }
 
