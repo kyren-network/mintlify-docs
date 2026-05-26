@@ -1,0 +1,29 @@
+---
+title: "Epay 遷移檢查清單"
+description: "將 Epay 風格整合遷移到 Kyren Pay 相容端點的檢查清單。"
+language: zh-Hant
+audience: developer
+product_area: epay
+intent: migration
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: engineering
+---
+
+將現有 Epay 風格整合替換為 Kyren Pay 相容端點時，請使用此清單。
+
+## 檢查清單
+
+- 將舊 Epay 基礎 URL 替換為 Kyren Pay API 基礎 URL，並保留你使用的相容路徑。
+- 設定 Kyren 發放的 `pid` 和商戶密鑰。
+- 發送真實流量前，驗證 [Epay MD5 簽名](/zh-Hant/epay-migration/signature)實作。
+- 將支付類型值對應到支援值：`alipay`、`wxpay`、`creditcard`、`crypto`、`paynow`。
+- 確認 `notify_url` 可訪問，並能驗證 Epay 相容通知簽名。
+- 確認瀏覽器跳轉收銀台的 `return_url` 行為。
+- 每次處理支付結果通知後返回純文字 `success`。
+- 依你的整合路徑，驗證 [`submit.php`](/zh-Hant/epay-migration/submit-php) 瀏覽器收銀台或 [`mapi.php`](/zh-Hant/epay-migration/mapi-php) 直連建立支付。
+- 驗證 [`api.php?act=order`](/zh-Hant/epay-migration/api-php) 可透過 `out_trade_no` 或 `trade_no` 查詢。
+- 處理 `api.php?act=refund` 相容端點目前不支援的情況，並與 Kyren 平台協助單獨協調退款處理。
+- 對帳遷移後的 Epay 來源訂單、Kyren 訂單與結算。
+
+測試時請使用 Kyren 發放的憑證。低風險真實付款檢查僅應在 Kyren 或支援團隊批准後進行。

@@ -1,0 +1,84 @@
+---
+title: "mapi.php 直連建立支付"
+description: "使用 Epay 相容 mapi.php 端點進行服務端直連建立支付。"
+language: zh-Hant
+audience: developer
+product_area: epay
+intent: migration
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: engineering
+---
+
+`/epay/mapi.php` 是服務端到服務端的 Epay 相容端點。它接收表單 `POST`，建立或復用 Kyren 訂單，並依所選渠道返回 `payurl`、`qrcode`、`img`、`trade_no` 等 Epay 風格欄位。
+
+該端點使用 `pid + sign`，不使用 `x-api-key`。由於它是服務端直連端點，開啟 API IP 白名單時可能會驗證來源 IP。白名單驗證失敗時可能返回數字 `code` 為 `0`，並附帶 `msg`。
+
+## 參數
+
+必填參數：
+
+| 參數 | 說明 |
+| --- | --- |
+| `pid` | Kyren 發放的商戶 Epay 相容商戶 ID。 |
+| `type` | 支付類型。支援值包括 `alipay`、`wxpay`、`creditcard`、`crypto`、`paynow`。 |
+| `out_trade_no` | 你的商戶訂單號。 |
+| `notify_url` | 商戶支付結果通知 URL。 |
+| `name` | 訂單或商品名稱。 |
+| `money` | 十進位字串金額，例如 `"9.99"`。 |
+| `clientip` | 你的服務端採集到的終端使用者 IP。 |
+| `sign` | Epay 相容 MD5 簽名。 |
+| `sign_type` | 簽名類型，通常為 `MD5`。 |
+
+可選參數：
+
+| 參數 | 說明 |
+| --- | --- |
+| `return_url` | 渠道需要支付頁時使用的瀏覽器返回 URL。 |
+| `money_type` | 你的現有整合傳入的幣種或金額類型。 |
+| `device` | 你的現有整合傳入的裝置上下文。 |
+| `param` | 商戶透傳中繼資料，會在通知中返回。 |
+| `channel_param` | 渠道相關擴展資料。 |
+
+## 請求範例
+
+```bash
+curl -X POST https://api.kyren.top/epay/mapi.php \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "pid=10001" \
+  --data-urlencode "type=alipay" \
+  --data-urlencode "out_trade_no=ORDER_10002" \
+  --data-urlencode "notify_url=https://merchant.example.com/notify" \
+  --data-urlencode "name=AI credits" \
+  --data-urlencode "money=9.99" \
+  --data-urlencode "clientip=203.0.113.10" \
+  --data-urlencode "sign=lowercase_md5_signature" \
+  --data-urlencode "sign_type=MD5"
+```
+
+## 成功回應範例
+
+```json
+{
+  "code": 1,
+  "msg": "success",
+  "trade_no": "K202605260001",
+  "out_trade_no": "ORDER_10002",
+  "type": "alipay",
+  "money": "9.99",
+  "payurl": "https://api.kyren.top/epay/redirect/order_abc123",
+  "qrcode": "https://api.kyren.top/epay/qr/order_abc123",
+  "img": "https://api.kyren.top/epay/qr/order_abc123.png"
+}
+```
+
+## 失敗回應範例
+
+```json
+{
+  "code": 0,
+  "msg": "IP not allowed"
+}
+```
+
+查看 [Epay MD5 簽名](/zh-Hant/epay-migration/signature)和 [`mapi.php` API 參考](/api-reference/epay-compatibility/mapiphp-direct-create-payment-compatibility-endpoint)。

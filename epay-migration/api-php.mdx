@@ -1,0 +1,66 @@
+---
+title: "api.php order query and refund compatibility"
+description: "Use Epay-compatible api.php order query and understand refund compatibility behavior."
+language: en
+audience: developer
+product_area: epay
+intent: migration
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: engineering
+---
+
+`/epay/api.php` provides Epay-compatible operational actions. Use `act=order` to query migrated Epay-style orders. `act=refund` is currently unsupported and returns a compatibility error; refunds are handled separately with platform assistance.
+
+## Order query
+
+Call `GET` or `POST` `/epay/api.php?act=order` with `pid`, raw merchant `key`, and one of `out_trade_no` or `trade_no`.
+
+This endpoint uses the raw merchant `key` with `pid` for compatibility order query. It may be subject to the API IP allowlist when enabled.
+
+```bash
+curl "https://api.kyren.top/epay/api.php?act=order&pid=10001&key=merchant_secret&out_trade_no=ORDER_10002"
+```
+
+Example success response:
+
+```json
+{
+  "code": 1,
+  "msg": "success",
+  "trade_no": "K202605260001",
+  "out_trade_no": "ORDER_10002",
+  "type": "alipay",
+  "name": "AI credits",
+  "money": "9.99",
+  "trade_status": "TRADE_SUCCESS",
+  "addtime": "2026-05-26 10:30:00",
+  "endtime": "2026-05-26 10:31:12"
+}
+```
+
+`addtime` and `endtime` are Epay-compatible datetime strings when exposed by this compatibility query.
+
+Example failure response:
+
+```json
+{
+  "code": 0,
+  "msg": "order not found"
+}
+```
+
+## Refund compatibility
+
+`GET` or `POST` `/epay/api.php?act=refund` is currently unsupported and returns a compatibility error. Do not build automated refund logic against this path. Coordinate refund handling separately with Kyren platform assistance.
+
+Example response:
+
+```json
+{
+  "code": 0,
+  "msg": "refund compatibility endpoint is currently unsupported"
+}
+```
+
+See the [`api.php` API reference](/api-reference/epay-compatibility/apiphp-query-refund-compatibility-endpoint).

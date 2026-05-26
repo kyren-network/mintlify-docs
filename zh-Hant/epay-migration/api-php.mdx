@@ -1,0 +1,66 @@
+---
+title: "api.php 訂單查詢與退款相容"
+description: "使用 Epay 相容 api.php 查詢訂單，並了解退款相容行為。"
+language: zh-Hant
+audience: developer
+product_area: epay
+intent: migration
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: engineering
+---
+
+`/epay/api.php` 提供 Epay 相容的維運動作。使用 `act=order` 查詢遷移後的 Epay 風格訂單。`act=refund` 目前不支援，會返回相容錯誤；退款需透過平台協助另行處理。
+
+## 訂單查詢
+
+呼叫 `GET` 或 `POST` `/epay/api.php?act=order`，傳入 `pid`、原始商戶 `key`，以及 `out_trade_no` 或 `trade_no` 之一。
+
+該端點為了相容訂單查詢，使用原始商戶 `key` 和 `pid`。開啟 API IP 白名單時可能會驗證來源 IP。
+
+```bash
+curl "https://api.kyren.top/epay/api.php?act=order&pid=10001&key=merchant_secret&out_trade_no=ORDER_10002"
+```
+
+成功回應範例：
+
+```json
+{
+  "code": 1,
+  "msg": "success",
+  "trade_no": "K202605260001",
+  "out_trade_no": "ORDER_10002",
+  "type": "alipay",
+  "name": "AI credits",
+  "money": "9.99",
+  "trade_status": "TRADE_SUCCESS",
+  "addtime": "2026-05-26 10:30:00",
+  "endtime": "2026-05-26 10:31:12"
+}
+```
+
+`addtime` 和 `endtime` 在該相容查詢暴露時是 Epay 相容的日期時間字串。
+
+失敗回應範例：
+
+```json
+{
+  "code": 0,
+  "msg": "order not found"
+}
+```
+
+## 退款相容
+
+`GET` 或 `POST` `/epay/api.php?act=refund` 目前不支援，會返回相容錯誤。不要基於此路徑建立自動退款邏輯。請與 Kyren 平台協助單獨協調退款處理。
+
+回應範例：
+
+```json
+{
+  "code": 0,
+  "msg": "refund compatibility endpoint is currently unsupported"
+}
+```
+
+查看 [`api.php` API 參考](/api-reference/epay-compatibility/apiphp-query-refund-compatibility-endpoint)。

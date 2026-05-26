@@ -1,0 +1,75 @@
+---
+title: "Epay MD5 signature"
+description: "Build and verify Epay-compatible MD5 signatures for Kyren Pay migration endpoints."
+language: en
+audience: developer
+product_area: epay
+intent: migration
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: engineering
+---
+
+Epay-compatible requests use `pid + sign` instead of `x-api-key`. Build `sign` as the lowercase MD5 of `k=v&...` plus the merchant key.
+
+## Algorithm
+
+1. Remove `sign` and `sign_type`.
+2. Drop parameters with empty values.
+3. Sort the remaining parameters by ascending key in ASCII key order.
+4. Join each pair as `k=v`, separated with `&`.
+5. Append the merchant key directly to the joined string.
+6. Compute MD5 and output lowercase hexadecimal.
+
+Do not add an extra `&key=` segment. Append the merchant key directly after the joined parameter string.
+
+## Example
+
+Input parameters:
+
+```json
+{
+  "pid": "10001",
+  "type": "alipay",
+  "out_trade_no": "ORDER_10001",
+  "notify_url": "https://merchant.example.com/notify",
+  "return_url": "https://merchant.example.com/return",
+  "name": "AI credits",
+  "money": "9.99",
+  "param": "account_123",
+  "sign_type": "MD5"
+}
+```
+
+After removing `sign_type`, dropping empty values, and sorting by key:
+
+```text
+money=9.99&name=AI credits&notify_url=https://merchant.example.com/notify&out_trade_no=ORDER_10001&param=account_123&pid=10001&return_url=https://merchant.example.com/return&type=alipay
+```
+
+If the merchant key is `merchant_secret`, sign this exact string:
+
+```text
+money=9.99&name=AI credits&notify_url=https://merchant.example.com/notify&out_trade_no=ORDER_10001&param=account_123&pid=10001&return_url=https://merchant.example.com/return&type=alipaymerchant_secret
+```
+
+The resulting `sign` is the lowercase MD5 hexadecimal digest of that signing string.
+
+## Verification checklist
+
+- Use the Kyren-issued `pid` and merchant key for the merchant account receiving the order.
+- Exclude both `sign` and `sign_type` before signing.
+- Drop empty values before sorting.
+- Sort by raw parameter key, not by display label or JSON order.
+- Keep decimal values as strings, for example `"9.99"`.
+- Send `sign_type` as `MD5` when the endpoint requires it, but do not include it in the signing string.
+
+## Common mistakes
+
+- Adding `&key=` before the merchant key.
+- Including `sign_type` in the signing string.
+- Keeping blank optional parameters in the signing string.
+- Signing a rounded or numeric money value instead of the original decimal string.
+- Sending `x-api-key` to an Epay-compatible endpoint.
+
+See the [`submit.php` API reference](/api-reference/epay-compatibility/submitphp-redirect-checkout-compatibility-endpoint) for the redirect checkout endpoint schema.

@@ -1,0 +1,42 @@
+---
+title: "Epay-compatible migration"
+description: "Migrate an existing Epay-style integration to Kyren Pay compatibility endpoints."
+language: en
+audience: developer
+product_area: epay
+intent: migration
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: engineering
+---
+
+Use Epay compatibility when you already have an Epay-style integration and need to keep the same request shape while moving payment traffic to Kyren Pay. New integrations should prefer native Kyren Checkout through the [Quickstart](/quickstart), because native Checkout uses Kyren API authentication and the current order model directly.
+
+Epay source orders created through these compatibility endpoints flow into the same Kyren order and settlement system as native Checkout orders. The compatibility layer is only the entry point and response format.
+
+## Endpoint map
+
+| Existing Epay path | Method | Purpose | Kyren behavior |
+| --- | --- | --- | --- |
+| `/epay/submit.php` | `GET` or `POST` | Page redirect checkout | Creates or reuses an order, then returns HTTP `302` to `/epay/redirect/{orderId}` or an upstream payment page. |
+| `/epay/mapi.php` | `POST` | Server-to-server direct payment creation | Creates or reuses an order and returns Epay-style fields such as `payurl`, `qrcode`, `img`, and `trade_no` depending on channel. |
+| `/epay/api.php?act=order` | `GET` or `POST` | Order query | Queries by `out_trade_no` or `trade_no`. |
+| `/epay/api.php?act=refund` | `GET` or `POST` | Refund compatibility path | Currently returns an unsupported compatibility error. Refunds are handled separately with platform assistance. |
+
+## Migration flow
+
+1. Replace your Epay base URL with the Kyren Pay API base URL while keeping the compatible path.
+2. Use your Kyren-issued `pid` and merchant key for Epay-compatible signing.
+3. Keep `pid + sign` authentication for Epay-compatible requests. Do not send `x-api-key`.
+4. Map your payment `type` values to supported values: `alipay`, `wxpay`, `creditcard`, `crypto`, or `paynow`.
+5. Route browser checkout traffic to [`submit.php`](/epay-migration/submit-php) or server-side payment creation to [`mapi.php`](/epay-migration/mapi-php).
+6. Verify payment results from the `notify_url` GET notification and return the plain string `success` after processing.
+7. Use [`api.php?act=order`](/epay-migration/api-php) for compatibility order queries and reconcile the resulting Kyren orders and settlements.
+
+## Related pages
+
+- [Epay MD5 signature](/epay-migration/signature)
+- [submit.php redirect checkout](/epay-migration/submit-php)
+- [mapi.php direct payment creation](/epay-migration/mapi-php)
+- [api.php order query and refund compatibility](/epay-migration/api-php)
+- [Epay migration checklist](/epay-migration/migration-checklist)

@@ -1,0 +1,84 @@
+---
+title: "mapi.php direct payment creation"
+description: "Use the Epay-compatible mapi.php endpoint for server-to-server payment creation."
+language: en
+audience: developer
+product_area: epay
+intent: migration
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: engineering
+---
+
+`/epay/mapi.php` is the server-to-server Epay compatibility endpoint. It accepts form `POST`, creates or reuses a Kyren order, and returns Epay-style response fields such as `payurl`, `qrcode`, `img`, and `trade_no` depending on the selected channel.
+
+This endpoint uses `pid + sign`, not `x-api-key`. Because it is server-to-server, it may be subject to the API IP allowlist when enabled. A failed allowlist check can return numeric `code` `0` with `msg`.
+
+## Parameters
+
+Required parameters:
+
+| Parameter | Description |
+| --- | --- |
+| `pid` | Kyren-issued merchant Epay-compatible merchant ID. |
+| `type` | Payment type. Supported values include `alipay`, `wxpay`, `creditcard`, `crypto`, and `paynow`. |
+| `out_trade_no` | Your merchant order number. |
+| `notify_url` | Merchant payment result notification URL. |
+| `name` | Order or product name. |
+| `money` | Decimal string amount, for example `"9.99"`. |
+| `clientip` | End-user client IP collected by your server. |
+| `sign` | Epay-compatible MD5 signature. |
+| `sign_type` | Signature type, usually `MD5`. |
+
+Optional parameters:
+
+| Parameter | Description |
+| --- | --- |
+| `return_url` | Browser return URL when the channel uses a payment page. |
+| `money_type` | Currency or money type if provided by your existing integration. |
+| `device` | Device context from your existing integration. |
+| `param` | Passthrough merchant metadata returned in notifications. |
+| `channel_param` | Channel-specific extension data. |
+
+## Example request
+
+```bash
+curl -X POST https://api.kyren.top/epay/mapi.php \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "pid=10001" \
+  --data-urlencode "type=alipay" \
+  --data-urlencode "out_trade_no=ORDER_10002" \
+  --data-urlencode "notify_url=https://merchant.example.com/notify" \
+  --data-urlencode "name=AI credits" \
+  --data-urlencode "money=9.99" \
+  --data-urlencode "clientip=203.0.113.10" \
+  --data-urlencode "sign=lowercase_md5_signature" \
+  --data-urlencode "sign_type=MD5"
+```
+
+## Success response example
+
+```json
+{
+  "code": 1,
+  "msg": "success",
+  "trade_no": "K202605260001",
+  "out_trade_no": "ORDER_10002",
+  "type": "alipay",
+  "money": "9.99",
+  "payurl": "https://api.kyren.top/epay/redirect/order_abc123",
+  "qrcode": "https://api.kyren.top/epay/qr/order_abc123",
+  "img": "https://api.kyren.top/epay/qr/order_abc123.png"
+}
+```
+
+## Failure response example
+
+```json
+{
+  "code": 0,
+  "msg": "IP not allowed"
+}
+```
+
+See [Epay MD5 signature](/epay-migration/signature) and the [`mapi.php` API reference](/api-reference/epay-compatibility/mapiphp-direct-create-payment-compatibility-endpoint).

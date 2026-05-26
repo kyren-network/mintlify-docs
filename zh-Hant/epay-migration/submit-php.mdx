@@ -1,0 +1,71 @@
+---
+title: "submit.php 跳轉收銀台"
+description: "使用 Epay 相容 submit.php 端點完成瀏覽器跳轉收銀台。"
+language: zh-Hant
+audience: developer
+product_area: epay
+intent: migration
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: engineering
+---
+
+`/epay/submit.php` 是面向瀏覽器的 Epay 相容端點。它會建立或復用 Kyren 訂單，並返回 HTTP `302` 到 `/epay/redirect/{orderId}` 或上游支付頁面。
+
+當客戶瀏覽器需要跳轉到收銀台時使用此路徑。該端點使用 `pid + sign`，不使用 `x-api-key`，終端使用者瀏覽器訪問不需要商戶伺服器 IP 白名單。
+
+## 參數
+
+必填參數：
+
+| 參數 | 說明 |
+| --- | --- |
+| `pid` | Kyren 發放的商戶 Epay 相容商戶 ID。 |
+| `type` | 支付類型。支援值包括 `alipay`、`wxpay`、`creditcard`、`crypto`、`paynow`。 |
+| `out_trade_no` | 你的商戶訂單號。 |
+| `notify_url` | 商戶支付結果通知 URL。 |
+| `return_url` | 收銀台結束後的瀏覽器返回 URL。 |
+| `name` | 訂單或商品名稱。 |
+| `money` | 十進位字串金額，例如 `"9.99"`。 |
+| `sign` | Epay 相容 MD5 簽名。 |
+| `sign_type` | 簽名類型，通常為 `MD5`。 |
+
+可選參數：
+
+| 參數 | 說明 |
+| --- | --- |
+| `money_type` | 你的現有整合傳入的幣種或金額類型。 |
+| `param` | 商戶透傳中繼資料，會在通知中返回。 |
+| `channel_param` | 渠道相關擴展資料。 |
+
+## 表單範例
+
+```html
+<form method="post" action="https://api.kyren.top/epay/submit.php">
+  <input type="hidden" name="pid" value="10001" />
+  <input type="hidden" name="type" value="alipay" />
+  <input type="hidden" name="out_trade_no" value="ORDER_10001" />
+  <input type="hidden" name="notify_url" value="https://merchant.example.com/notify" />
+  <input type="hidden" name="return_url" value="https://merchant.example.com/return" />
+  <input type="hidden" name="name" value="AI credits" />
+  <input type="hidden" name="money" value="9.99" />
+  <input type="hidden" name="param" value="account_123" />
+  <input type="hidden" name="sign" value="lowercase_md5_signature" />
+  <input type="hidden" name="sign_type" value="MD5" />
+  <button type="submit">Pay</button>
+</form>
+```
+
+## 通知處理
+
+付款完成後，Kyren 會向 `notify_url` 發起 GET 請求，包含：
+
+`pid`、`trade_no`、`out_trade_no`、`type`、`name`、`money`、`trade_status`、`param`、`sign`、`sign_type`。
+
+驗證簽名，冪等處理結果，然後返回純文字：
+
+```text
+success
+```
+
+查看 [Epay MD5 簽名](/zh-Hant/epay-migration/signature)和 [`submit.php` API 參考](/api-reference/epay-compatibility/submitphp-redirect-checkout-compatibility-endpoint)。

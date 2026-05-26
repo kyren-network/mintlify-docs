@@ -1,0 +1,75 @@
+---
+title: "Epay MD5 签名"
+description: "为 Kyren Pay 迁移端点生成并校验 Epay 兼容 MD5 签名。"
+language: zh
+audience: developer
+product_area: epay
+intent: migration
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: engineering
+---
+
+Epay 兼容请求使用 `pid + sign`，不使用 `x-api-key`。`sign` 的生成方式是：对 `k=v&...` 拼接商户密钥后的字符串计算小写 MD5。
+
+## 算法
+
+1. 移除 `sign` 和 `sign_type`。
+2. 去掉空值参数。
+3. 将剩余参数按 key 升序排列，使用 ASCII key 顺序。
+4. 将每个参数拼成 `k=v`，并用 `&` 连接。
+5. 将商户密钥直接追加到连接后的字符串末尾。
+6. 计算 MD5，并输出小写十六进制字符串。
+
+不要额外拼接 `&key=`。商户密钥是直接追加到参数字符串末尾。
+
+## 示例
+
+输入参数：
+
+```json
+{
+  "pid": "10001",
+  "type": "alipay",
+  "out_trade_no": "ORDER_10001",
+  "notify_url": "https://merchant.example.com/notify",
+  "return_url": "https://merchant.example.com/return",
+  "name": "AI credits",
+  "money": "9.99",
+  "param": "account_123",
+  "sign_type": "MD5"
+}
+```
+
+移除 `sign_type`、去掉空值并按 key 排序后：
+
+```text
+money=9.99&name=AI credits&notify_url=https://merchant.example.com/notify&out_trade_no=ORDER_10001&param=account_123&pid=10001&return_url=https://merchant.example.com/return&type=alipay
+```
+
+如果商户密钥是 `merchant_secret`，则对以下原文签名：
+
+```text
+money=9.99&name=AI credits&notify_url=https://merchant.example.com/notify&out_trade_no=ORDER_10001&param=account_123&pid=10001&return_url=https://merchant.example.com/return&type=alipaymerchant_secret
+```
+
+最终 `sign` 是该签名字符串的 MD5 小写十六进制摘要。
+
+## 校验清单
+
+- 使用收款商户账号对应的 Kyren 发放 `pid` 和商户密钥。
+- 签名前排除 `sign` 和 `sign_type`。
+- 排序前移除空值参数。
+- 按原始参数 key 排序，不按展示名称或 JSON 顺序排序。
+- 金额保持为字符串，例如 `"9.99"`。
+- 端点要求时发送 `sign_type=MD5`，但不要把它放入签名字符串。
+
+## 常见错误
+
+- 在商户密钥前添加 `&key=`。
+- 将 `sign_type` 放入签名字符串。
+- 在签名字符串中保留空的可选参数。
+- 对四舍五入后的数值金额签名，而不是原始金额字符串。
+- 向 Epay 兼容端点发送 `x-api-key`。
+
+查看 [`submit.php` API 参考](/api-reference/epay-compatibility/submitphp-redirect-checkout-compatibility-endpoint)了解跳转收银台端点结构。

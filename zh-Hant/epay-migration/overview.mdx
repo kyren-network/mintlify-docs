@@ -1,0 +1,42 @@
+---
+title: "Epay 相容遷移"
+description: "將現有 Epay 風格整合遷移到 Kyren Pay 相容端點。"
+language: zh-Hant
+audience: developer
+product_area: epay
+intent: migration
+visibility: public
+last_verified_at: 2026-05-26
+source_owner: engineering
+---
+
+如果你已經有 Epay 風格的整合，並希望在遷移到 Kyren Pay 時保留原有請求格式，請使用 Epay 相容路徑。新接入建議優先使用原生 Kyren Checkout，參考[快速開始](/zh-Hant/quickstart)，因為原生 Checkout 直接使用 Kyren API 認證和目前訂單模型。
+
+透過這些相容端點建立的 Epay 來源訂單，會進入與原生 Checkout 訂單相同的 Kyren 訂單與結算系統。相容層只影響入口路徑和回應格式。
+
+## 端點對照
+
+| 原 Epay 路徑 | 方法 | 用途 | Kyren 行為 |
+| --- | --- | --- | --- |
+| `/epay/submit.php` | `GET` 或 `POST` | 頁面跳轉收銀台 | 建立或復用訂單，然後返回 HTTP `302` 到 `/epay/redirect/{orderId}` 或上游支付頁面。 |
+| `/epay/mapi.php` | `POST` | 服務端直連建立支付 | 建立或復用訂單，並依渠道返回 `payurl`、`qrcode`、`img`、`trade_no` 等 Epay 風格欄位。 |
+| `/epay/api.php?act=order` | `GET` 或 `POST` | 訂單查詢 | 透過 `out_trade_no` 或 `trade_no` 查詢。 |
+| `/epay/api.php?act=refund` | `GET` 或 `POST` | 退款相容路徑 | 目前返回不支援的相容錯誤。退款需透過平台協助另行處理。 |
+
+## 遷移流程
+
+1. 將 Epay 基礎 URL 替換為 Kyren Pay API 基礎 URL，並保留相容路徑。
+2. 使用 Kyren 發放的 `pid` 和商戶密鑰進行 Epay 相容簽名。
+3. Epay 相容請求繼續使用 `pid + sign` 認證。不要發送 `x-api-key`。
+4. 將支付 `type` 對應到支援值：`alipay`、`wxpay`、`creditcard`、`crypto` 或 `paynow`。
+5. 瀏覽器收銀台流量接入 [`submit.php`](/zh-Hant/epay-migration/submit-php)，服務端建立支付接入 [`mapi.php`](/zh-Hant/epay-migration/mapi-php)。
+6. 從 `notify_url` 的 GET 通知中驗證支付結果，處理完成後返回純文字 `success`。
+7. 使用 [`api.php?act=order`](/zh-Hant/epay-migration/api-php) 做相容訂單查詢，並對帳 Kyren 訂單與結算。
+
+## 相關頁面
+
+- [Epay MD5 簽名](/zh-Hant/epay-migration/signature)
+- [submit.php 跳轉收銀台](/zh-Hant/epay-migration/submit-php)
+- [mapi.php 直連建立支付](/zh-Hant/epay-migration/mapi-php)
+- [api.php 訂單查詢與退款相容](/zh-Hant/epay-migration/api-php)
+- [Epay 遷移檢查清單](/zh-Hant/epay-migration/migration-checklist)
