@@ -21,7 +21,7 @@ servers:
   - url: https://api.kyren.top
     description: Production
   - url: https://staging-api.kyren.top
-    description: Test / Sandbox
+    description: Staging, available only with credentials issued by Kyren
 
 security:
   - ApiKeyAuth: []
@@ -720,7 +720,7 @@ components:
       in: header
       name: x-api-key
       description: |
-        Your API key. Use `kyren_live_*` for production and `kyren_test_*` for testing.
+        Your API key. Public production API-key endpoints accept `kyren_live_*` keys. Staging credentials are environment-specific and must be used only with the staging environment for which Kyren issued them.
 
   parameters:
     ResourceId:

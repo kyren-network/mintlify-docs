@@ -1,29 +1,30 @@
 ---
 title: Testing
-description: Use the sandbox environment to test your integration
+description: Test your Kyren Pay integration before going live
 ---
 
-Kyren Pay provides a fully functional sandbox environment for testing your integration without processing real payments.
+Use this page to test your integration without making assumptions about unsupported environments.
 
-## Sandbox Environment
+## Current environment model
 
-| Setting | Value |
+| Item | Current behavior |
 | --- | --- |
-| **Base URL** | `https://test-api.kyren.top` |
-| **API Key Prefix** | `kyren_test_` |
-| **Dashboard** | [dashboard.kyren.top](https://dashboard.kyren.top) (switch to Test Mode) |
+| Production API | `https://api.kyren.top` |
+| Production API key prefix | `kyren_live_` |
+| Self-service test keys | Not currently exposed in the merchant dashboard |
+| Staging access | Available only with a base URL and credentials issued by Kyren |
 
-<Info>
-  The sandbox environment mirrors production exactly. All API endpoints, webhooks, and responses behave identically.
-</Info>
+<Warning>
+  Do not send test traffic to an arbitrary staging URL unless Kyren has issued credentials for that environment.
+</Warning>
 
 ## Test API Keys
 
-Use your test API key (prefixed with `kyren_test_`) to interact with the sandbox:
+Use an API key issued for the target environment:
 
 ```bash
-curl https://test-api.kyren.top/v1/products \
-  -H "x-api-key: kyren_test_xxxxxxxxxxxxxxxxxxxx"
+curl https://api.kyren.top/v1/products \
+  -H "x-api-key: kyren_live_xxxxxxxxxxxxxxxxxxxx"
 ```
 
 ## Test Card Numbers
@@ -44,7 +45,7 @@ For all test cards:
 
 ## Test WeChat Pay / Alipay
 
-In the sandbox, QR code payments are automatically completed after a short delay. No actual scanning is required.
+QR payment behavior depends on the gateway configuration attached to your merchant. Use Kyren-provided credentials for the target environment or coordinate a callback simulation when validating asynchronous status updates.
 
 ## Testing Webhooks
 
@@ -74,10 +75,10 @@ Before switching to production, make sure you have:
 
 <Steps>
   <Step title="Replace API keys">
-    Switch from `kyren_test_` to `kyren_live_` keys
+    Use the production key issued for `api.kyren.top`
   </Step>
   <Step title="Update base URL">
-    Change from `test-api.kyren.top` to `api.kyren.top`
+    Change from the staging base URL to `api.kyren.top`
   </Step>
   <Step title="Update webhook URL">
     Set your production webhook endpoint in the Dashboard

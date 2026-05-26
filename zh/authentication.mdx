@@ -9,12 +9,11 @@ description: 使用 API 密钥认证你的 API 请求
 
 启润支付使用 API 密钥来认证请求。你可以在[商户控制台](https://dashboard.kyren.top)中管理你的 API 密钥。
 
-有两种类型的 API 密钥：
+当前后端实现接受生产 API 密钥：
 
 | 密钥类型 | 前缀 | 用途 |
 | --- | --- | --- |
 | **生产密钥** | `kyren_live_` | 生产环境 — 真实付款 |
-| **测试密钥** | `kyren_test_` | 沙盒环境 — 不会产生真实扣款 |
 
 ## 发送认证请求
 
@@ -35,13 +34,15 @@ curl https://api.kyren.top/v1/products \
 
 ## 环境
 
-| 环境 | 接口地址 | API 密钥前缀 |
+| 环境 | Base URL | API 密钥前缀 |
 | --- | --- | --- |
 | 生产环境 | `https://api.kyren.top` | `kyren_live_` |
-| 沙盒环境 | `https://test-api.kyren.top` | `kyren_test_` |
+| Staging | 由 Kyren 支持提供 | 仅使用 Kyren 为该 Staging 环境提供的凭证 |
 
 <Info>
-  测试密钥和生产密钥完全隔离。使用测试密钥创建的数据在生产环境中不可见，反之亦然。
+  当前公开生产 API 接受 `kyren_live_` 前缀的生产密钥。
+  商户控制台目前不提供自助创建 `kyren_test_` 测试密钥。
+  只有在 Kyren 向你提供对应环境的 Base URL 和凭证时，才应使用 Staging 环境。
 </Info>
 
 ## 重新生成 API 密钥
@@ -70,4 +71,4 @@ curl https://api.kyren.top/v1/products \
 常见原因：
 - 缺少 `x-api-key` 请求头
 - API 密钥无效或已过期
-- 在生产环境 URL 上使用了测试密钥（或反之）
+- 使用了当前环境不接受的 API Key 前缀

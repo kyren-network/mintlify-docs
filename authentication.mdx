@@ -9,12 +9,11 @@ All API requests must be authenticated using an API key passed in the `x-api-key
 
 Kyren Pay uses API keys to authenticate requests. You can manage your API keys from the [Merchant Dashboard](https://dashboard.kyren.top).
 
-There are two types of API keys:
+The current backend implementation accepts live API keys:
 
 | Key Type | Prefix | Purpose |
 | --- | --- | --- |
 | **Live** | `kyren_live_` | Production environment — real payments |
-| **Test** | `kyren_test_` | Sandbox environment — no real charges |
 
 ## Making Authenticated Requests
 
@@ -38,10 +37,12 @@ curl https://api.kyren.top/v1/products \
 | Environment | Base URL | API Key Prefix |
 | --- | --- | --- |
 | Production | `https://api.kyren.top` | `kyren_live_` |
-| Sandbox | `https://test-api.kyren.top` | `kyren_test_` |
+| Staging | Issued by Kyren support | Use only the credentials issued for that staging environment |
 
 <Info>
-  Test and live API keys are completely separate. Data created with test keys is not visible in the live environment, and vice versa.
+  The current public production API accepts live API keys with the `kyren_live_` prefix.
+  Kyren does not currently expose self-service `kyren_test_` keys in the merchant dashboard.
+  Use a staging base URL only when Kyren has issued matching staging credentials to you.
 </Info>
 
 ## Regenerating API Keys
@@ -70,4 +71,4 @@ If authentication fails, the API returns a `401 Unauthorized` response:
 Common causes:
 - Missing `x-api-key` header
 - Invalid or expired API key
-- Using a test key against the production URL (or vice versa)
+- Using an API key prefix not accepted by the current environment

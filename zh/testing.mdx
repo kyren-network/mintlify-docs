@@ -1,29 +1,30 @@
 ---
 title: 测试
-description: 使用沙盒环境测试你的集成
+description: 上线前测试你的 Kyren Pay 集成
 ---
 
-启润支付提供完整的沙盒环境，让你无需处理真实付款即可测试集成。
+使用本页测试你的集成，不要假设未公开支持的环境或密钥类型。
 
-## 沙盒环境
+## 当前环境模型
 
-| 配置 | 值 |
+| 项目 | 当前行为 |
 | --- | --- |
-| **接口地址** | `https://test-api.kyren.top` |
-| **API 密钥前缀** | `kyren_test_` |
-| **控制台** | [dashboard.kyren.top](https://dashboard.kyren.top)（切换到测试模式） |
+| 生产 API | `https://api.kyren.top` |
+| 生产 API 密钥前缀 | `kyren_live_` |
+| 自助测试密钥 | 商户控制台目前不提供 |
+| Staging 访问 | 仅在 Kyren 提供 Base URL 和凭证后可用 |
 
-<Info>
-  沙盒环境与生产环境完全一致。所有 API 端点、Webhook 和响应的行为完全相同。
-</Info>
+<Warning>
+  除非 Kyren 已向你提供对应环境的凭证，否则不要向任意 Staging URL 发送测试流量。
+</Warning>
 
 ## 测试 API 密钥
 
-使用测试 API 密钥（前缀为 `kyren_test_`）与沙盒交互：
+使用目标环境实际签发的 API 密钥：
 
 ```bash
-curl https://test-api.kyren.top/v1/products \
-  -H "x-api-key: kyren_test_xxxxxxxxxxxxxxxxxxxx"
+curl https://api.kyren.top/v1/products \
+  -H "x-api-key: kyren_live_xxxxxxxxxxxxxxxxxxxx"
 ```
 
 ## 测试卡号
@@ -44,7 +45,7 @@ curl https://test-api.kyren.top/v1/products \
 
 ## 测试微信支付 / 支付宝
 
-在沙盒环境中，二维码支付会在短暂延迟后自动完成，无需实际扫码。
+二维码支付行为取决于商户绑定的网关配置。验证异步状态更新时，请使用 Kyren 为目标环境提供的凭证，或配合回调模拟。
 
 ## 测试 Webhook
 
@@ -74,10 +75,10 @@ https://abc123.ngrok.io/webhooks/kyren
 
 <Steps>
   <Step title="替换 API 密钥">
-    从 `kyren_test_` 切换到 `kyren_live_` 密钥
+    使用 `api.kyren.top` 对应的生产密钥
   </Step>
   <Step title="更新接口地址">
-    从 `test-api.kyren.top` 切换到 `api.kyren.top`
+    从 staging 地址切换到 `api.kyren.top`
   </Step>
   <Step title="更新 Webhook URL">
     在控制台中设置生产环境的 Webhook 端点
