@@ -65,13 +65,34 @@ node scripts/evaluate-copilot-retrieval.mjs \
   --json
 ```
 
+## Build a Phase 5C answer context
+
+```bash
+node scripts/build-copilot-answer-context.mjs \
+  --index generated/copilot-knowledge-index.json \
+  --lang en \
+  --query "My API call returns 401. What should I check?" \
+  --json
+```
+
+The answer context package is the handoff object for a future Copilot answer API. It includes:
+
+- The user query and language.
+- Top retrieved context chunks.
+- Page-level citations.
+- Answer mode: `answer_from_docs` or `support_handoff`.
+- Must-follow and must-not-follow answer rules.
+- A prompt string that can be passed to an LLM layer.
+
+This command still does not call an LLM. It validates that the retrieval output can be transformed into a safe, cited answer context before adding model generation.
+
 ## Run tests
 
 ```bash
 node --test tests/copilot-local-validation.test.mjs
 ```
 
-Use these checks as a source-quality gate. A successful local run means the docs are structurally ready for Copilot indexing. The Phase 5B index validates chunk and citation contracts locally; it does not replace future validation with embeddings, vector search, answer generation, and citation rendering.
+Use these checks as a source-quality gate. A successful local run means the docs are structurally ready for Copilot indexing. The Phase 5B index validates chunk and citation contracts locally, and the Phase 5C answer context validates the model-input contract. These checks do not replace future validation with embeddings, vector search, answer generation, and citation rendering.
 
 ## Related pages
 

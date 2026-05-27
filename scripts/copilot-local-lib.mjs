@@ -285,6 +285,110 @@ export function retrieveFromIndex(query, index, language, limit = 3) {
     .slice(0, limit);
 }
 
+export function buildAnswerContext(query, index, language = 'en', limit = 3) {
+  const chunks = retrieveFromIndex(query, index, language, limit);
+  const citations = chunks
+    .reduce((items, chunk) => {
+      if (!items.some((item) => item.url === chunk.url)) {
+        items.push({
+          url: chunk.url,
+          title: chunk.title,
+          section: chunk.section,
+          language: chunk.language,
+        });
+      }
+      return items;
+    }, [])
+    .slice(0, 3);
+  const answerPolicy = classifyAnswerPolicy(query, chunks);
+  const instructions = answerInstructions(language);
+  return {
+    schemaVersion: 1,
+    generator: 'kyren-pay-docs/scripts/build-copilot-answer-context.mjs',
+    generatedAt: new Date().toISOString(),
+    query,
+    language,
+    answerPolicy,
+    contextChunks: chunks.map((chunk, index) => ({
+      rank: index + 1,
+      id: chunk.id,
+      url: chunk.url,
+      title: chunk.title,
+      section: chunk.section,
+      language: chunk.language,
+      score: chunk.score,
+      text: chunk.text,
+      citation: chunk.citation,
+    })),
+    citations,
+    instructions,
+    prompt: buildAnswerPrompt(query, language, answerPolicy, chunks, citations, instructions),
+  };
+}
+
+function classifyAnswerPolicy(query, chunks) {
+  const text = `${query}\n${chunks.map((chunk) => `${chunk.url} ${chunk.title} ${chunk.text}`).join('\n')}`.toLowerCase();
+  if (/settlement|结算|結算|payout|kyc|kyb|approve|approval|审核|審核/.test(text)) {
+    return {
+      mode: 'support_handoff',
+      reason: 'This question may depend on account-specific review, operational approval, or private merchant configuration.',
+    };
+  }
+  return {
+    mode: 'answer_from_docs',
+    reason: 'The retrieved public documentation contains safe merchant-facing guidance for this question.',
+  };
+}
+
+function answerInstructions(language) {
+  const localizedStyle = {
+    en: 'Answer in English.',
+    zh: '使用简体中文回答。',
+    'zh-Hant': '使用繁體中文回答。',
+  };
+  return {
+    answerLanguage: localizedStyle[language] || localizedStyle.en,
+    must: [
+      'Use only the provided context chunks and public citations.',
+      'Start with the most likely answer or next concrete check.',
+      'Cite 1-3 public documentation pages from the citation list.',
+      'When support handoff is required, explain what information to prepare without asking for secrets.',
+    ],
+    mustNot: [
+      'Do not ask for full API keys, Webhook secrets, card data, or private credentials.',
+      'Do not promise refund, settlement, payout, KYC, or KYB approval or timing.',
+      'Do not invent undocumented dashboard screens or API behavior.',
+      'Do not convert decimal string fields into floating-point JSON numbers.',
+    ],
+  };
+}
+
+function buildAnswerPrompt(query, language, answerPolicy, chunks, citations, instructions) {
+  const sourceText = chunks
+    .map((chunk, index) => `[Source ${index + 1}] ${chunk.title} - ${chunk.section}\nURL: ${chunk.url}\n${chunk.text}`)
+    .join('\n\n');
+  const citationText = citations.map((citation, index) => `${index + 1}. ${citation.title}: ${citation.url}`).join('\n');
+  return [
+    `User language: ${language}`,
+    `Answer mode: ${answerPolicy.mode}`,
+    `Policy reason: ${answerPolicy.reason}`,
+    `Language instruction: ${instructions.answerLanguage}`,
+    '',
+    'User question:',
+    query,
+    '',
+    'Context:',
+    sourceText,
+    '',
+    'Allowed citations:',
+    citationText,
+    '',
+    'Rules:',
+    ...instructions.must.map((rule) => `- ${rule}`),
+    ...instructions.mustNot.map((rule) => `- ${rule}`),
+  ].join('\n');
+}
+
 export function assertFilesExist(root, pages) {
   return pages.filter((page) => !existsSync(path.join(root, pageToFile(page))));
 }

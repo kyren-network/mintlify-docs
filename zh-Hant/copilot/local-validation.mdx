@@ -65,13 +65,34 @@ node scripts/evaluate-copilot-retrieval.mjs \
   --json
 ```
 
+## 構建 Phase 5C 回答上下文
+
+```bash
+node scripts/build-copilot-answer-context.mjs \
+  --index generated/copilot-knowledge-index.json \
+  --lang zh-Hant \
+  --query "API 請求返回 401，應該檢查什麼？" \
+  --json
+```
+
+回答上下文包是未來 Copilot 回答 API 的交接物件。它包含：
+
+- 使用者問題和語言。
+- Top 檢索上下文 chunk。
+- 頁面級 citation。
+- 回答模式：`answer_from_docs` 或 `support_handoff`。
+- 必須遵守和必須避免的回答規則。
+- 可交給 LLM 層使用的 prompt 字串。
+
+該命令仍然不會呼叫 LLM。它用於驗證在加入模型生成前，檢索結果能否被轉換成安全、帶引用的回答上下文。
+
 ## 執行測試
 
 ```bash
 node --test tests/copilot-local-validation.test.mjs
 ```
 
-這些檢查適合作為知識源品質門檻。本地通過表示文檔在結構上已準備好被 Copilot 索引。Phase 5B 索引會在本地驗證 chunk 和引用契約；它不能替代未來的 embedding、向量檢索、答案生成和引用渲染驗證。
+這些檢查適合作為知識源品質門檻。本地通過表示文檔在結構上已準備好被 Copilot 索引。Phase 5B 索引會在本地驗證 chunk 和引用契約，Phase 5C 回答上下文會驗證模型輸入契約；它們不能替代未來的 embedding、向量檢索、答案生成和引用渲染驗證。
 
 ## 相關頁面
 
