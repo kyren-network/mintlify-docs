@@ -1,0 +1,64 @@
+---
+title: "Copilot 问题路由图谱"
+description: "将商户问题模式映射到最合适的 Kyren Pay 文档来源。"
+language: zh
+audience: copilot
+product_area: copilot
+intent: retrieval_routing
+visibility: public
+last_verified_at: 2026-05-27
+source_owner: support
+---
+
+使用本页在生成答案前，将商户问题路由到最相关的 Kyren Pay 文档。
+
+## 集成设置
+
+| 问题变体 | 主要来源 | 次要来源 |
+| --- | --- | --- |
+| “如何开始？”、“应该选哪种集成方式？”、“用控制台还是 API？” | [开始使用](/zh/start-here) | [快速开始](/zh/quickstart) |
+| “如何创建第一笔支付？”、“如何端到端测试收银台？” | [收第一笔款](/zh/guides/collect-first-payment) | [测试集成](/zh/testing) |
+| “应该使用哪个 Base URL？”、“这是哪个环境？” | [认证](/zh/authentication) | [测试集成](/zh/testing) |
+
+## 控制台任务
+
+| 问题变体 | 主要来源 | 次要来源 |
+| --- | --- | --- |
+| “在哪里创建产品？”、“如何归档产品？” | [产品控制台](/zh/dashboard/products) | [Create a product API](/api-reference/products/create-a-product) |
+| “在哪里找 Checkout 链接？”、“如何查 Checkout Session？” | [Checkout 控制台](/zh/dashboard/checkouts) | [Checkout API](/api-reference/checkouts/create-a-checkout-session) |
+| “在哪里找订单？”、“这个订单状态是什么意思？” | [订单控制台](/zh/dashboard/orders) | [订单状态不符合预期](/zh/troubleshooting/order-status) |
+| “在哪里配置 API Key 和 Webhook？” | [开发者设置](/zh/dashboard/developer-settings) | [认证](/zh/authentication) |
+
+## Webhook
+
+| 问题变体 | 主要来源 | 次要来源 |
+| --- | --- | --- |
+| “有哪些事件？”、“order.paid 是什么？” | [Webhook 事件](/zh/webhooks/events) | [Webhook 概览](/zh/webhooks/overview) |
+| “为什么签名验证失败？” | [Webhook 签名验证失败](/zh/troubleshooting/webhook-signature-fails) | [Webhook 签名](/zh/webhooks/signatures) |
+| “为什么没有收到 Webhook？” | [未收到 Webhook](/zh/troubleshooting/webhook-not-received) | [Webhook 重试](/zh/webhooks/retries) |
+| “客户付款了但没有加积分” | [客户已付款但未到账](/zh/troubleshooting/paid-but-not-credited) | [Webhook 事件](/zh/webhooks/events) |
+
+## Epay 迁移
+
+| 问题变体 | 主要来源 | 次要来源 |
+| --- | --- | --- |
+| “能继续用 Epay SDK 吗？”、“应该用哪个 Epay 端点？” | [Epay 兼容迁移](/zh/epay-migration/overview) | [Epay 迁移清单](/zh/epay-migration/migration-checklist) |
+| “MD5 sign 怎么算？”、“需要加 &key= 吗？” | [Epay MD5 签名](/zh/epay-migration/signature) | [submit.php API 参考](/api-reference/epay-compatibility/submitphp-redirect-checkout-compatibility-endpoint) |
+| “submit.php 怎么工作？” | [submit.php 跳转收银台](/zh/epay-migration/submit-php) | [submit.php API 参考](/api-reference/epay-compatibility/submitphp-redirect-checkout-compatibility-endpoint) |
+| “mapi.php 怎么工作？” | [mapi.php 直接创建支付](/zh/epay-migration/mapi-php) | [mapi.php API 参考](/api-reference/epay-compatibility/mapiphp-direct-create-payment-compatibility-endpoint) |
+| “能用 api.php refund 吗？”、“如何查询 Epay 订单？” | [api.php 订单查询与退款兼容](/zh/epay-migration/api-php) | [api.php API 参考](/api-reference/epay-compatibility/apiphp-order-queryrefund-compatibility-endpoint) |
+
+## 故障排除
+
+| 问题变体 | 主要来源 | 次要来源 |
+| --- | --- | --- |
+| “API 返回 401”、“invalid key”、“IP 不在白名单” | [API 请求返回 401](/zh/troubleshooting/api-401) | [开发者设置](/zh/dashboard/developer-settings) |
+| “Checkout 创建失败”、“产品无效”、“币种错误” | [Checkout Session 创建失败](/zh/troubleshooting/checkout-session-fails) | [Create a checkout session](/api-reference/checkouts/create-a-checkout-session) |
+| “金额校验失败”、“时间戳错误”、“币种不对” | [金额、币种或时间戳校验失败](/zh/troubleshooting/amount-currency-timestamp) | [支持币种](/api-reference/config/get-supported-currencies) |
+| “无法结算”、“为什么不能结款？” | [未满足结款条件](/zh/troubleshooting/settlement-eligibility) | [上线检查清单](/zh/go-live-checklist) |
+
+## 相关页面
+
+- [Copilot 回答边界](/zh/copilot/answer-boundaries)
+- [支持升级清单](/zh/copilot/support-escalation)
+- [商户常见问题](/zh/faq/common-questions)

@@ -1,0 +1,103 @@
+---
+title: "Support escalation checklist"
+description: "Help Kyren Copilot collect safe, useful information before routing a merchant to support."
+language: en
+audience: copilot
+product_area: copilot
+intent: support_handoff
+visibility: public
+last_verified_at: 2026-05-27
+source_owner: support
+---
+
+Use this checklist when a merchant question cannot be answered from public documentation alone.
+
+## Always ask for
+
+- Merchant account or merchant ID.
+- The affected endpoint, dashboard page, or workflow.
+- Kyren order number, checkout session ID, or merchant `out_trade_no` when available.
+- Timestamp in the merchant's timezone and, for API requests, the Unix millisecond timestamp if relevant.
+- Response status, error code, and error message.
+- Redacted server logs that show request time, endpoint, and response.
+
+## Never ask for
+
+- Full API keys.
+- Webhook signing secrets.
+- Raw card numbers, card security codes, or full payment credentials.
+- Customer passwords or private customer documents.
+- Unredacted production server secrets.
+
+## Issue-specific handoff
+
+### API authentication
+
+Ask for:
+
+- Endpoint path.
+- Request time.
+- Response status and error message.
+- Whether an IP allowlist is enabled.
+- The first and last few visible characters of the key only, if the merchant can safely provide them.
+
+Do not ask for the full `x-api-key`.
+
+### Webhooks
+
+Ask for:
+
+- Configured Webhook URL host and path.
+- Event type expected, such as `order.paid`.
+- Order number or checkout session ID.
+- Merchant server log timestamp.
+- Response status returned by the merchant server.
+
+Do not ask for the Webhook secret or raw private payloads.
+
+### Paid but not credited
+
+Ask for:
+
+- Kyren order number.
+- Internal user ID or internal order ID, if the merchant stored one.
+- The paid time shown by Kyren.
+- The merchant fulfillment job log around that time.
+- Whether the fulfillment handler is idempotent.
+
+### Settlement or payout review
+
+Ask for:
+
+- Merchant account.
+- Available balance, pending balance, and frozen balance if shown.
+- Any dashboard message shown.
+- Currency.
+- Last relevant order or balance transaction IDs if available.
+
+Do not promise approval or timing.
+
+### Epay migration
+
+Ask for:
+
+- Endpoint used: `submit.php`, `mapi.php`, or `api.php`.
+- `pid`.
+- `out_trade_no` or `trade_no`.
+- Payment `type`.
+- Redacted signing string inputs.
+- Numeric `code` and `msg` returned by Kyren.
+
+Do not ask for the raw merchant key.
+
+## Escalation wording
+
+```text
+This needs account-specific review, so Kyren support should check it. Please provide the merchant account, affected order or checkout session ID, request time, endpoint or dashboard page, and the exact error message. Do not send full API keys, Webhook secrets, card data, or other private credentials.
+```
+
+## Related pages
+
+- [Copilot answer boundaries](/copilot/answer-boundaries)
+- [Question routing map](/copilot/question-routing)
+- [Common merchant questions](/faq/common-questions)

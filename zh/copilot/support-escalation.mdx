@@ -1,0 +1,103 @@
+---
+title: "支持升级清单"
+description: "帮助 Kyren Copilot 在引导商户联系支持前，收集安全且有用的信息。"
+language: zh
+audience: copilot
+product_area: copilot
+intent: support_handoff
+visibility: public
+last_verified_at: 2026-05-27
+source_owner: support
+---
+
+当商户问题无法仅凭公开文档回答时，使用本清单。
+
+## 始终可以索取
+
+- 商户账户或商户 ID。
+- 受影响的端点、控制台页面或业务流程。
+- 可用时提供 Kyren 订单号、Checkout Session ID 或商户 `out_trade_no`。
+- 商户时区下的时间；如果是 API 请求，相关时可提供 Unix 毫秒时间戳。
+- 响应状态、错误码和错误信息。
+- 已脱敏的服务端日志，包含请求时间、端点和响应。
+
+## 不要索取
+
+- 完整 API Key。
+- Webhook 签名密钥。
+- 原始卡号、卡安全码或完整支付凭证。
+- 客户密码或客户隐私文件。
+- 未脱敏的生产服务器密钥。
+
+## 按问题类型升级
+
+### API 认证
+
+索取：
+
+- 端点路径。
+- 请求时间。
+- 响应状态和错误信息。
+- 是否开启 IP 白名单。
+- 如商户可安全提供，仅提供 Key 可见部分的前后几个字符。
+
+不要索取完整 `x-api-key`。
+
+### Webhook
+
+索取：
+
+- 已配置 Webhook URL 的 host 和 path。
+- 预期事件类型，例如 `order.paid`。
+- 订单号或 Checkout Session ID。
+- 商户服务器日志时间。
+- 商户服务器返回的响应状态。
+
+不要索取 Webhook secret 或原始私密 payload。
+
+### 已付款但未到账
+
+索取：
+
+- Kyren 订单号。
+- 商户内部用户 ID 或订单 ID，如果已保存。
+- Kyren 显示的支付成功时间。
+- 该时间附近的履约任务日志。
+- 履约处理是否具备幂等性。
+
+### 结算或打款审核
+
+索取：
+
+- 商户账户。
+- 可用余额、待结余额，以及如有显示的冻结余额。
+- 控制台提示信息。
+- 币种。
+- 可用时提供最近相关订单或余额流水 ID。
+
+不要承诺审批或时间。
+
+### Epay 迁移
+
+索取：
+
+- 使用的端点：`submit.php`、`mapi.php` 或 `api.php`。
+- `pid`。
+- `out_trade_no` 或 `trade_no`。
+- 支付 `type`。
+- 已脱敏的签名字符串输入。
+- Kyren 返回的数字 `code` 和 `msg`。
+
+不要索取原始商户密钥。
+
+## 升级话术
+
+```text
+这个问题需要账户级审核，建议由 Kyren 支持查看。请提供商户账户、受影响的订单或 Checkout Session ID、请求时间、端点或控制台页面，以及完整错误信息。不要发送完整 API Key、Webhook secret、卡数据或其他私密凭证。
+```
+
+## 相关页面
+
+- [Copilot 回答边界](/zh/copilot/answer-boundaries)
+- [问题路由图谱](/zh/copilot/question-routing)
+- [商户常见问题](/zh/faq/common-questions)

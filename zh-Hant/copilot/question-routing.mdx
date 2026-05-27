@@ -1,0 +1,64 @@
+---
+title: "Copilot 問題路由圖譜"
+description: "將商戶問題模式映射到最合適的 Kyren Pay 文檔來源。"
+language: zh-Hant
+audience: copilot
+product_area: copilot
+intent: retrieval_routing
+visibility: public
+last_verified_at: 2026-05-27
+source_owner: support
+---
+
+使用本頁在產生答案前，將商戶問題路由到最相關的 Kyren Pay 文檔。
+
+## 整合設定
+
+| 問題變體 | 主要來源 | 次要來源 |
+| --- | --- | --- |
+| 「如何開始？」、「應該選哪種整合方式？」、「用控制台還是 API？」 | [開始使用](/zh-Hant/start-here) | [快速開始](/zh-Hant/quickstart) |
+| 「如何建立第一筆支付？」、「如何端到端測試收銀台？」 | [收第一筆款](/zh-Hant/guides/collect-first-payment) | [測試整合](/zh-Hant/testing) |
+| 「應該使用哪個 Base URL？」、「這是哪個環境？」 | [認證](/zh-Hant/authentication) | [測試整合](/zh-Hant/testing) |
+
+## 控制台任務
+
+| 問題變體 | 主要來源 | 次要來源 |
+| --- | --- | --- |
+| 「在哪裡建立產品？」、「如何封存產品？」 | [產品控制台](/zh-Hant/dashboard/products) | [Create a product API](/api-reference/products/create-a-product) |
+| 「在哪裡找 Checkout 連結？」、「如何查 Checkout Session？」 | [Checkout 控制台](/zh-Hant/dashboard/checkouts) | [Checkout API](/api-reference/checkouts/create-a-checkout-session) |
+| 「在哪裡找訂單？」、「這個訂單狀態是什麼意思？」 | [訂單控制台](/zh-Hant/dashboard/orders) | [訂單狀態不符合預期](/zh-Hant/troubleshooting/order-status) |
+| 「在哪裡配置 API Key 和 Webhook？」 | [開發者設定](/zh-Hant/dashboard/developer-settings) | [認證](/zh-Hant/authentication) |
+
+## Webhook
+
+| 問題變體 | 主要來源 | 次要來源 |
+| --- | --- | --- |
+| 「有哪些事件？」、「order.paid 是什麼？」 | [Webhook 事件](/zh-Hant/webhooks/events) | [Webhook 概覽](/zh-Hant/webhooks/overview) |
+| 「為什麼簽名驗證失敗？」 | [Webhook 簽名驗證失敗](/zh-Hant/troubleshooting/webhook-signature-fails) | [Webhook 簽名](/zh-Hant/webhooks/signatures) |
+| 「為什麼沒有收到 Webhook？」 | [未收到 Webhook](/zh-Hant/troubleshooting/webhook-not-received) | [Webhook 重試](/zh-Hant/webhooks/retries) |
+| 「客戶付款了但沒有加積分」 | [客戶已付款但未入帳](/zh-Hant/troubleshooting/paid-but-not-credited) | [Webhook 事件](/zh-Hant/webhooks/events) |
+
+## Epay 遷移
+
+| 問題變體 | 主要來源 | 次要來源 |
+| --- | --- | --- |
+| 「能繼續用 Epay SDK 嗎？」、「應該用哪個 Epay 端點？」 | [Epay 相容遷移](/zh-Hant/epay-migration/overview) | [Epay 遷移清單](/zh-Hant/epay-migration/migration-checklist) |
+| 「MD5 sign 怎麼算？」、「需要加 &key= 嗎？」 | [Epay MD5 簽名](/zh-Hant/epay-migration/signature) | [submit.php API 參考](/api-reference/epay-compatibility/submitphp-redirect-checkout-compatibility-endpoint) |
+| 「submit.php 怎麼工作？」 | [submit.php 跳轉收銀台](/zh-Hant/epay-migration/submit-php) | [submit.php API 參考](/api-reference/epay-compatibility/submitphp-redirect-checkout-compatibility-endpoint) |
+| 「mapi.php 怎麼工作？」 | [mapi.php 直接建立支付](/zh-Hant/epay-migration/mapi-php) | [mapi.php API 參考](/api-reference/epay-compatibility/mapiphp-direct-create-payment-compatibility-endpoint) |
+| 「能用 api.php refund 嗎？」、「如何查詢 Epay 訂單？」 | [api.php 訂單查詢與退款相容](/zh-Hant/epay-migration/api-php) | [api.php API 參考](/api-reference/epay-compatibility/apiphp-order-queryrefund-compatibility-endpoint) |
+
+## 故障排除
+
+| 問題變體 | 主要來源 | 次要來源 |
+| --- | --- | --- |
+| 「API 返回 401」、「invalid key」、「IP 不在白名單」 | [API 請求返回 401](/zh-Hant/troubleshooting/api-401) | [開發者設定](/zh-Hant/dashboard/developer-settings) |
+| 「Checkout 建立失敗」、「產品無效」、「幣種錯誤」 | [Checkout Session 建立失敗](/zh-Hant/troubleshooting/checkout-session-fails) | [Create a checkout session](/api-reference/checkouts/create-a-checkout-session) |
+| 「金額校驗失敗」、「時間戳錯誤」、「幣種不對」 | [金額、幣種或時間戳校驗失敗](/zh-Hant/troubleshooting/amount-currency-timestamp) | [支援幣種](/api-reference/config/get-supported-currencies) |
+| 「無法結算」、「為什麼不能結款？」 | [未滿足結款條件](/zh-Hant/troubleshooting/settlement-eligibility) | [上線檢查清單](/zh-Hant/go-live-checklist) |
+
+## 相關頁面
+
+- [Copilot 回答邊界](/zh-Hant/copilot/answer-boundaries)
+- [支援升級清單](/zh-Hant/copilot/support-escalation)
+- [商戶常見問題](/zh-Hant/faq/common-questions)

@@ -1,0 +1,64 @@
+---
+title: "Copilot question routing map"
+description: "Map merchant question patterns to the best Kyren Pay documentation source."
+language: en
+audience: copilot
+product_area: copilot
+intent: retrieval_routing
+visibility: public
+last_verified_at: 2026-05-27
+source_owner: support
+---
+
+Use this page to route merchant questions to the most relevant Kyren Pay documentation before composing an answer.
+
+## Integration setup
+
+| Question variants | Primary source | Secondary source |
+| --- | --- | --- |
+| "How do I start?", "Which integration path should I use?", "Dashboard or API?" | [Start here](/start-here) | [Quickstart](/quickstart) |
+| "How do I create my first payment?", "How do I test checkout end to end?" | [Collect your first payment](/guides/collect-first-payment) | [Testing your integration](/testing) |
+| "What base URL should I use?", "Which environment is this?" | [Authentication](/authentication) | [Testing your integration](/testing) |
+
+## Dashboard tasks
+
+| Question variants | Primary source | Secondary source |
+| --- | --- | --- |
+| "Where do I create products?", "How do I archive a product?" | [Products dashboard](/dashboard/products) | [Create a product API](/api-reference/products/create-a-product) |
+| "Where are checkout links?", "How do I find a checkout session?" | [Checkouts dashboard](/dashboard/checkouts) | [Checkout API](/api-reference/checkouts/create-a-checkout-session) |
+| "Where do I find an order?", "What does this order status mean?" | [Orders dashboard](/dashboard/orders) | [Order status does not match expectation](/troubleshooting/order-status) |
+| "Where are API keys and Webhooks configured?" | [Developer settings](/dashboard/developer-settings) | [Authentication](/authentication) |
+
+## Webhooks
+
+| Question variants | Primary source | Secondary source |
+| --- | --- | --- |
+| "Which events exist?", "What does order.paid mean?" | [Webhook events](/webhooks/events) | [Webhook overview](/webhooks/overview) |
+| "Why did signature verification fail?" | [Webhook signature verification fails](/troubleshooting/webhook-signature-fails) | [Webhook signatures](/webhooks/signatures) |
+| "Why did I not receive a webhook?" | [Webhook not received](/troubleshooting/webhook-not-received) | [Webhook retries](/webhooks/retries) |
+| "My customer paid but credits were not added" | [Customer paid but was not credited](/troubleshooting/paid-but-not-credited) | [Webhook events](/webhooks/events) |
+
+## Epay migration
+
+| Question variants | Primary source | Secondary source |
+| --- | --- | --- |
+| "Can I keep my Epay SDK?", "Which Epay endpoint should I use?" | [Epay-compatible migration](/epay-migration/overview) | [Epay migration checklist](/epay-migration/migration-checklist) |
+| "How do I calculate the MD5 sign?", "Should I add &key=?" | [Epay MD5 signature](/epay-migration/signature) | [submit.php API reference](/api-reference/epay-compatibility/submitphp-redirect-checkout-compatibility-endpoint) |
+| "How does submit.php work?" | [submit.php redirect checkout](/epay-migration/submit-php) | [submit.php API reference](/api-reference/epay-compatibility/submitphp-redirect-checkout-compatibility-endpoint) |
+| "How does mapi.php work?" | [mapi.php direct payment creation](/epay-migration/mapi-php) | [mapi.php API reference](/api-reference/epay-compatibility/mapiphp-direct-create-payment-compatibility-endpoint) |
+| "Can I use api.php refund?", "How do I query an Epay order?" | [api.php order query and refund compatibility](/epay-migration/api-php) | [api.php API reference](/api-reference/epay-compatibility/apiphp-order-queryrefund-compatibility-endpoint) |
+
+## Troubleshooting
+
+| Question variants | Primary source | Secondary source |
+| --- | --- | --- |
+| "API returns 401", "invalid key", "IP not allowed" | [API request returns 401](/troubleshooting/api-401) | [Developer settings](/dashboard/developer-settings) |
+| "Checkout creation fails", "invalid product", "currency error" | [Checkout session creation fails](/troubleshooting/checkout-session-fails) | [Create a checkout session](/api-reference/checkouts/create-a-checkout-session) |
+| "Amount validation fails", "timestamp error", "wrong currency" | [Amount, currency, or timestamp validation fails](/troubleshooting/amount-currency-timestamp) | [Supported currencies](/api-reference/config/get-supported-currencies) |
+| "Settlement unavailable", "why can't I settle?" | [Settlement eligibility is not met](/troubleshooting/settlement-eligibility) | [Go-live checklist](/go-live-checklist) |
+
+## Related pages
+
+- [Copilot answer boundaries](/copilot/answer-boundaries)
+- [Support escalation checklist](/copilot/support-escalation)
+- [Common merchant questions](/faq/common-questions)

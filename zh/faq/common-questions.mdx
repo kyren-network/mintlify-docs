@@ -1,0 +1,91 @@
+---
+title: "商户常见问题"
+description: "Kyren Pay 商户高频问题的简短答案，以及对应的权威文档链接。"
+language: zh
+audience: merchant
+product_area: faq
+intent: support_deflection
+visibility: public
+last_verified_at: 2026-05-27
+source_owner: support
+---
+
+## 开始使用
+
+### 应该使用哪种集成方式？
+
+新集成优先使用原生 Kyren Checkout。只有在你已经有 Epay 风格集成，并希望保留大部分现有 SDK 或请求结构时，才使用 Epay 兼容。
+
+阅读：[开始使用](/zh/start-here)、[Epay 兼容迁移](/zh/epay-migration/overview)。
+
+### 不写 API，可以在控制台创建付款吗？
+
+可以。你可以在商户控制台创建产品和 Checkout 链接。若需要自动创建收银台，请使用 API。
+
+阅读：[产品控制台](/zh/dashboard/products)、[Checkout 控制台](/zh/dashboard/checkouts)、[快速开始](/zh/quickstart)。
+
+### 金额应该用什么格式？
+
+使用十进制字符串，不要使用浮点 JSON 数字。例如发送 `"9.99"`，不要发送 `9.99`。
+
+阅读：[金额、币种或时间戳校验失败](/zh/troubleshooting/amount-currency-timestamp)。
+
+## API 和 Webhook
+
+### 为什么 API 请求返回 401？
+
+常见原因包括缺少 `x-api-key`、Key 错误、使用了错误环境的 Key，或开启 IP 白名单后来源 IP 不匹配。不要在浏览器代码中暴露密钥。
+
+阅读：[API 请求返回 401](/zh/troubleshooting/api-401)、[认证](/zh/authentication)。
+
+### 为什么 Webhook 签名验证失败？
+
+请检查原始请求体、正确的 Webhook secret、毫秒级时间戳、签名字符串拼接方式，以及是否使用恒定时间比较。
+
+阅读：[Webhook 签名验证失败](/zh/troubleshooting/webhook-signature-fails)、[Webhook 签名](/zh/webhooks/signatures)。
+
+### 为什么客户付款了但没有加积分？
+
+检查 Kyren 订单是否已支付、你的服务器是否收到并处理 `order.paid` 事件、履约逻辑是否幂等，以及创建 Checkout 时是否在 `metadata` 中保存了内部用户或订单 ID。
+
+阅读：[客户已付款但未到账](/zh/troubleshooting/paid-but-not-credited)。
+
+## 控制台和运营
+
+### 在哪里查订单？
+
+使用订单控制台搜索并查看支付状态。咨询具体支付问题时，请向支持提供 Kyren 订单号。
+
+阅读：[订单控制台](/zh/dashboard/orders)、[订单状态不符合预期](/zh/troubleshooting/order-status)。
+
+### 为什么无法结算？
+
+结算资格可能取决于 KYC/KYB 状态、可用余额、待结余额、冻结资金和配置阈值。Kyren 支持可以协助查看，但文档不能保证审批或时间。
+
+阅读：[未满足结款条件](/zh/troubleshooting/settlement-eligibility)。
+
+### 联系支持时应该提供什么？
+
+提供商户账户、受影响流程、订单号或 Checkout Session ID、时间戳、端点或控制台页面、响应状态和已脱敏日志。不要发送完整 API Key、Webhook secret、卡数据或私密凭证。
+
+阅读：[支持升级清单](/zh/copilot/support-escalation)。
+
+## Epay 兼容
+
+### 可以继续使用 Epay 风格 SDK 吗？
+
+很多情况下可以。你需要替换 Base URL，使用 Kyren 签发的 `pid` 和商户密钥，验证 MD5 签名，并将支付类型映射到 Kyren 支持的值。
+
+阅读：[Epay 迁移清单](/zh/epay-migration/migration-checklist)。
+
+### Epay MD5 签名怎么算？
+
+移除 `sign`、`sign_type` 和空值；按 key 排序剩余参数；用 `&` 拼接成 `k=v`；直接在末尾追加商户密钥；然后计算小写 MD5。
+
+阅读：[Epay MD5 签名](/zh/epay-migration/signature)。
+
+### 可以使用 `api.php?act=refund` 吗？
+
+兼容退款路径当前不支持，会返回兼容错误。退款处理需与 Kyren 平台协助另行协调。
+
+阅读：[api.php 订单查询与退款兼容](/zh/epay-migration/api-php)。

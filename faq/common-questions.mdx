@@ -1,0 +1,91 @@
+---
+title: "Common merchant questions"
+description: "Short answers to frequent Kyren Pay merchant questions with links to canonical docs."
+language: en
+audience: merchant
+product_area: faq
+intent: support_deflection
+visibility: public
+last_verified_at: 2026-05-27
+source_owner: support
+---
+
+## Getting started
+
+### Which integration path should I use?
+
+Use native Kyren Checkout for new integrations. Use Epay compatibility only if you already have an Epay-style integration and want to keep most of your existing SDK or request shape.
+
+Read: [Start here](/start-here), [Epay-compatible migration](/epay-migration/overview).
+
+### Can I create payments from the dashboard without using the API?
+
+Yes. You can create products and checkout links in the merchant dashboard. For automated checkout creation, use the API.
+
+Read: [Products dashboard](/dashboard/products), [Checkouts dashboard](/dashboard/checkouts), [Quickstart](/quickstart).
+
+### What format should amount values use?
+
+Use decimal strings, not floating-point JSON numbers. For example, send `"9.99"` rather than `9.99`.
+
+Read: [Amount, currency, or timestamp validation fails](/troubleshooting/amount-currency-timestamp).
+
+## API and Webhooks
+
+### Why does my API request return 401?
+
+Common causes include a missing `x-api-key`, using the wrong key, using a key for the wrong environment, or an IP allowlist mismatch when enabled. Do not expose secret keys in browser code.
+
+Read: [API request returns 401](/troubleshooting/api-401), [Authentication](/authentication).
+
+### Why did my Webhook signature verification fail?
+
+Verify the raw request body, use the correct Webhook secret, check the timestamp in milliseconds, rebuild the signed string exactly, and compare signatures in constant time.
+
+Read: [Webhook signature verification fails](/troubleshooting/webhook-signature-fails), [Webhook signatures](/webhooks/signatures).
+
+### Why did my customer pay but not receive credits?
+
+Check whether the Kyren order is paid, whether your server received and processed the `order.paid` event, whether your fulfillment logic is idempotent, and whether you stored an internal user or order ID in `metadata`.
+
+Read: [Customer paid but was not credited](/troubleshooting/paid-but-not-credited).
+
+## Dashboard and operations
+
+### Where do I find an order?
+
+Use the Orders dashboard to search and inspect payment state. Share the Kyren order number with support when asking about a specific payment.
+
+Read: [Orders dashboard](/dashboard/orders), [Order status does not match expectation](/troubleshooting/order-status).
+
+### Why is settlement not available?
+
+Settlement eligibility can depend on KYC/KYB status, available balance, pending balance, frozen funds, and configured thresholds. Kyren support can review a case, but the docs cannot guarantee approval or timing.
+
+Read: [Settlement eligibility is not met](/troubleshooting/settlement-eligibility).
+
+### What information should I send support?
+
+Send the merchant account, affected workflow, order number or checkout session ID, timestamp, endpoint or dashboard page, response status, and redacted logs. Do not send full API keys, Webhook secrets, card data, or private credentials.
+
+Read: [Support escalation checklist](/copilot/support-escalation).
+
+## Epay compatibility
+
+### Can I keep using my Epay-style SDK?
+
+In many cases, yes. Replace the base URL, use Kyren-issued `pid` and merchant key, verify MD5 signing, and map payment types to Kyren-supported values.
+
+Read: [Epay migration checklist](/epay-migration/migration-checklist).
+
+### How do I calculate the Epay MD5 signature?
+
+Remove `sign`, `sign_type`, and empty values; sort remaining parameters by key; join as `k=v` with `&`; append the merchant key directly; then compute lowercase MD5.
+
+Read: [Epay MD5 signature](/epay-migration/signature).
+
+### Can I use `api.php?act=refund`?
+
+The compatibility refund path is currently unsupported and returns a compatibility error. Coordinate refund handling separately with Kyren platform assistance.
+
+Read: [api.php order query and refund compatibility](/epay-migration/api-php).

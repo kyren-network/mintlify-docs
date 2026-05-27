@@ -1,0 +1,91 @@
+---
+title: "商戶常見問題"
+description: "Kyren Pay 商戶高頻問題的簡短答案，以及對應的權威文檔連結。"
+language: zh-Hant
+audience: merchant
+product_area: faq
+intent: support_deflection
+visibility: public
+last_verified_at: 2026-05-27
+source_owner: support
+---
+
+## 開始使用
+
+### 應該使用哪種整合方式？
+
+新整合優先使用原生 Kyren Checkout。只有在你已經有 Epay 風格整合，並希望保留大部分現有 SDK 或請求結構時，才使用 Epay 相容。
+
+閱讀：[開始使用](/zh-Hant/start-here)、[Epay 相容遷移](/zh-Hant/epay-migration/overview)。
+
+### 不寫 API，可以在控制台建立付款嗎？
+
+可以。你可以在商戶控制台建立產品和 Checkout 連結。若需要自動建立收銀台，請使用 API。
+
+閱讀：[產品控制台](/zh-Hant/dashboard/products)、[Checkout 控制台](/zh-Hant/dashboard/checkouts)、[快速開始](/zh-Hant/quickstart)。
+
+### 金額應該用什麼格式？
+
+使用十進位字串，不要使用浮點 JSON 數字。例如發送 `"9.99"`，不要發送 `9.99`。
+
+閱讀：[金額、幣種或時間戳校驗失敗](/zh-Hant/troubleshooting/amount-currency-timestamp)。
+
+## API 和 Webhook
+
+### 為什麼 API 請求返回 401？
+
+常見原因包括缺少 `x-api-key`、Key 錯誤、使用了錯誤環境的 Key，或開啟 IP 白名單後來源 IP 不匹配。不要在瀏覽器程式碼中暴露密鑰。
+
+閱讀：[API 請求返回 401](/zh-Hant/troubleshooting/api-401)、[認證](/zh-Hant/authentication)。
+
+### 為什麼 Webhook 簽名驗證失敗？
+
+請檢查原始請求體、正確的 Webhook secret、毫秒級時間戳、簽名字串拼接方式，以及是否使用恆定時間比較。
+
+閱讀：[Webhook 簽名驗證失敗](/zh-Hant/troubleshooting/webhook-signature-fails)、[Webhook 簽名](/zh-Hant/webhooks/signatures)。
+
+### 為什麼客戶付款了但沒有加積分？
+
+檢查 Kyren 訂單是否已支付、你的伺服器是否收到並處理 `order.paid` 事件、履約邏輯是否冪等，以及建立 Checkout 時是否在 `metadata` 中保存了內部使用者或訂單 ID。
+
+閱讀：[客戶已付款但未入帳](/zh-Hant/troubleshooting/paid-but-not-credited)。
+
+## 控制台和營運
+
+### 在哪裡查訂單？
+
+使用訂單控制台搜尋並查看支付狀態。諮詢具體支付問題時，請向支援提供 Kyren 訂單號。
+
+閱讀：[訂單控制台](/zh-Hant/dashboard/orders)、[訂單狀態不符合預期](/zh-Hant/troubleshooting/order-status)。
+
+### 為什麼無法結算？
+
+結算資格可能取決於 KYC/KYB 狀態、可用餘額、待結餘額、凍結資金和配置門檻。Kyren 支援可以協助查看，但文檔不能保證審批或時間。
+
+閱讀：[未滿足結款條件](/zh-Hant/troubleshooting/settlement-eligibility)。
+
+### 聯絡支援時應該提供什麼？
+
+提供商戶帳戶、受影響流程、訂單號或 Checkout Session ID、時間戳、端點或控制台頁面、回應狀態和已脫敏日誌。不要發送完整 API Key、Webhook secret、卡資料或私密憑證。
+
+閱讀：[支援升級清單](/zh-Hant/copilot/support-escalation)。
+
+## Epay 相容
+
+### 可以繼續使用 Epay 風格 SDK 嗎？
+
+很多情況下可以。你需要替換 Base URL，使用 Kyren 簽發的 `pid` 和商戶密鑰，驗證 MD5 簽名，並將支付類型映射到 Kyren 支援的值。
+
+閱讀：[Epay 遷移清單](/zh-Hant/epay-migration/migration-checklist)。
+
+### Epay MD5 簽名怎麼算？
+
+移除 `sign`、`sign_type` 和空值；按 key 排序剩餘參數；用 `&` 拼接成 `k=v`；直接在末尾追加商戶密鑰；然後計算小寫 MD5。
+
+閱讀：[Epay MD5 簽名](/zh-Hant/epay-migration/signature)。
+
+### 可以使用 `api.php?act=refund` 嗎？
+
+相容退款路徑目前不支援，會返回相容錯誤。退款處理需與 Kyren 平台協助另行協調。
+
+閱讀：[api.php 訂單查詢與退款相容](/zh-Hant/epay-migration/api-php)。

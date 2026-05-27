@@ -75,6 +75,20 @@
                 ]
               },
               {
+                "group": "FAQ",
+                "pages": [
+                  "faq/common-questions"
+                ]
+              },
+              {
+                "group": "Copilot Sources",
+                "pages": [
+                  "copilot/answer-boundaries",
+                  "copilot/question-routing",
+                  "copilot/support-escalation"
+                ]
+              },
+              {
                 "group": "References",
                 "pages": [
                   "authentication",
@@ -151,6 +165,20 @@
                 ]
               },
               {
+                "group": "常见问题",
+                "pages": [
+                  "zh/faq/common-questions"
+                ]
+              },
+              {
+                "group": "Copilot 数据源",
+                "pages": [
+                  "zh/copilot/answer-boundaries",
+                  "zh/copilot/question-routing",
+                  "zh/copilot/support-escalation"
+                ]
+              },
+              {
                 "group": "参考",
                 "pages": [
                   "zh/authentication",
@@ -224,6 +252,20 @@
                   "zh-Hant/epay-migration/mapi-php",
                   "zh-Hant/epay-migration/api-php",
                   "zh-Hant/epay-migration/migration-checklist"
+                ]
+              },
+              {
+                "group": "常見問題",
+                "pages": [
+                  "zh-Hant/faq/common-questions"
+                ]
+              },
+              {
+                "group": "Copilot 資料源",
+                "pages": [
+                  "zh-Hant/copilot/answer-boundaries",
+                  "zh-Hant/copilot/question-routing",
+                  "zh-Hant/copilot/support-escalation"
                 ]
               },
               {
