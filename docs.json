@@ -88,7 +88,8 @@
                   "copilot/support-escalation",
                   "copilot/retrieval-index",
                   "copilot/chunking-and-citations",
-                  "copilot/retrieval-evaluation"
+                  "copilot/retrieval-evaluation",
+                  "copilot/local-validation"
                 ]
               },
               {
@@ -181,7 +182,8 @@
                   "zh/copilot/support-escalation",
                   "zh/copilot/retrieval-index",
                   "zh/copilot/chunking-and-citations",
-                  "zh/copilot/retrieval-evaluation"
+                  "zh/copilot/retrieval-evaluation",
+                  "zh/copilot/local-validation"
                 ]
               },
               {
@@ -274,7 +276,8 @@
                   "zh-Hant/copilot/support-escalation",
                   "zh-Hant/copilot/retrieval-index",
                   "zh-Hant/copilot/chunking-and-citations",
-                  "zh-Hant/copilot/retrieval-evaluation"
+                  "zh-Hant/copilot/retrieval-evaluation",
+                  "zh-Hant/copilot/local-validation"
                 ]
               },
               {

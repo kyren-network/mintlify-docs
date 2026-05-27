@@ -1,0 +1,54 @@
+---
+title: "本地驗證"
+description: "執行 Kyren Copilot 文檔知識源和檢索評測的本地檢查。"
+language: zh-Hant
+audience: copilot
+product_area: copilot
+intent: local_validation
+visibility: public
+last_verified_at: 2026-05-27
+source_owner: support
+---
+
+在修改 Copilot 知識源文檔或檢索評測用例前，先執行本地驗證腳本。這些腳本不會呼叫 LLM，也不會驗證最終回答品質。它們用於驗證文檔知識源是否完整，以及輕量本地檢索器是否能從 Phase 5A 評測集中命中預期來源頁面。
+
+## 驗證知識源覆蓋
+
+```bash
+node scripts/validate-copilot-sources.mjs
+```
+
+該檢查會驗證：
+
+- 每種語言的導航中都有六個 Copilot 資料源頁面。
+- 導航引用的 Copilot 頁面都存在。
+- Phase 5A 資料源頁面已包含在公開 MDX 知識源集合中。
+- 測試、腳本、建置產物、Playwright 報告等排除檔案不會被當作商戶可見來源。
+
+## 評測檢索
+
+```bash
+node scripts/evaluate-copilot-retrieval.mjs
+```
+
+評測器讀取 [檢索評測集](/zh-Hant/copilot/retrieval-evaluation)，執行本地詞法檢索，並要求每個用例在 Top-3 結果中返回必須命中的來源頁面。
+
+供 CI 或後續 Phase 5B 工具使用時，可以輸出 JSON：
+
+```bash
+node scripts/evaluate-copilot-retrieval.mjs --json
+```
+
+## 執行測試
+
+```bash
+node --test tests/copilot-local-validation.test.mjs
+```
+
+這些檢查適合作為知識源品質門檻。本地通過表示文檔在結構上已準備好被 Copilot 索引；它不能替代 Phase 5B 中的 embedding、向量檢索、答案生成和引用渲染驗證。
+
+## 相關頁面
+
+- [Copilot 檢索索引](/zh-Hant/copilot/retrieval-index)
+- [切片和引用規則](/zh-Hant/copilot/chunking-and-citations)
+- [檢索評測集](/zh-Hant/copilot/retrieval-evaluation)

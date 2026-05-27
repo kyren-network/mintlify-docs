@@ -1,0 +1,54 @@
+---
+title: "Local validation"
+description: "Run local checks for Kyren Copilot documentation sources and retrieval evaluation."
+language: en
+audience: copilot
+product_area: copilot
+intent: local_validation
+visibility: public
+last_verified_at: 2026-05-27
+source_owner: support
+---
+
+Use the local validation scripts before changing Copilot source docs or retrieval evaluation cases. These scripts do not call an LLM and do not validate final answer quality. They validate whether the documentation source set is complete and whether a lightweight local retriever can find the expected source pages from the Phase 5A evaluation set.
+
+## Validate source coverage
+
+```bash
+node scripts/validate-copilot-sources.mjs
+```
+
+This check verifies:
+
+- Each language has six Copilot source pages in navigation.
+- Referenced Copilot pages exist on disk.
+- Phase 5A source pages are included in the public MDX source set.
+- Excluded files such as tests, scripts, build output, and Playwright reports are not treated as merchant-facing sources.
+
+## Evaluate retrieval
+
+```bash
+node scripts/evaluate-copilot-retrieval.mjs
+```
+
+The evaluator reads [Retrieval evaluation set](/copilot/retrieval-evaluation), runs a local lexical retriever, and requires each case to return the required source page in the top three results.
+
+For CI or later Phase 5B tooling, use JSON output:
+
+```bash
+node scripts/evaluate-copilot-retrieval.mjs --json
+```
+
+## Run tests
+
+```bash
+node --test tests/copilot-local-validation.test.mjs
+```
+
+Use these checks as a source-quality gate. A successful local run means the docs are structurally ready for Copilot indexing; it does not replace Phase 5B validation with embeddings, vector search, answer generation, and citation rendering.
+
+## Related pages
+
+- [Copilot retrieval index](/copilot/retrieval-index)
+- [Chunking and citation rules](/copilot/chunking-and-citations)
+- [Retrieval evaluation set](/copilot/retrieval-evaluation)
