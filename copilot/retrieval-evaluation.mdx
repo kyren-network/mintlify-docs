@@ -1,0 +1,87 @@
+---
+title: "Retrieval evaluation set"
+description: "Test questions and expected citations for validating Kyren Copilot documentation retrieval."
+language: en
+audience: copilot
+product_area: copilot
+intent: retrieval_evaluation
+visibility: public
+last_verified_at: 2026-05-27
+source_owner: support
+---
+
+Use this test set to evaluate whether Kyren Copilot retrieves the right documentation and stays within answer boundaries. A Phase 5A retrieval run passes when each question retrieves the required source page in the top 3 results and the answer avoids the listed failure mode.
+
+## Pass criteria
+
+| Metric | Required result |
+| --- | --- |
+| Top-3 source hit rate | At least 90% of questions include the required source in the top 3 retrieved pages. |
+| Language match | Same-language source is used when the question is English, Simplified Chinese, or Traditional Chinese and an equivalent page exists. |
+| Citation accuracy | Each answer cites 1-3 relevant public docs pages. |
+| Boundary compliance | No answer asks for secrets or promises account-review outcomes. |
+| Format compliance | Amount examples remain strings such as `"9.99"` and native timestamps remain Unix milliseconds. |
+
+## English test questions
+
+| Test question | Required source | Useful supporting source | Must avoid |
+| --- | --- | --- | --- |
+| My API call returns 401. What should I check? | [API request returns 401](/troubleshooting/api-401) | [Authentication](/authentication) | Asking for the full API key. |
+| Checkout session creation fails with a currency error. | [Checkout session creation fails](/troubleshooting/checkout-session-fails) | [Supported currencies](/api-reference/config/get-supported-currencies) | Treating amount as a JSON number. |
+| The customer paid but my app did not add credits. | [Customer paid but was not credited](/troubleshooting/paid-but-not-credited) | [Webhook events](/webhooks/events) | Automatic merchant fulfillment recovery claim. |
+| I did not receive a webhook. | [Webhook not received](/troubleshooting/webhook-not-received) | [Webhook retries](/webhooks/retries) | Undocumented Webhook log screen claim. |
+| Webhook signature verification fails. | [Webhook signature verification fails](/troubleshooting/webhook-signature-fails) | [Webhook signatures](/webhooks/signatures) | Ignoring raw body or millisecond timestamp requirements. |
+| How do I calculate Epay sign? | [Epay MD5 signature](/epay-migration/signature) | [submit.php API reference](/api-reference/epay-compatibility/submitphp-redirect-checkout-compatibility-endpoint) | Adding `&key=` before the merchant key. |
+| Can I use api.php refund? | [api.php order query and refund compatibility](/epay-migration/api-php) | [Epay-compatible migration](/epay-migration/overview) | Merchant refund self-service support claim. |
+| Which integration path should I choose? | [Start here](/start-here) | [Epay-compatible migration](/epay-migration/overview) | Recommending Epay compatibility for a new native integration. |
+| Why is settlement not available? | [Settlement eligibility is not met](/troubleshooting/settlement-eligibility) | [Go-live checklist](/go-live-checklist) | Promising settlement approval or timing. |
+| What should I send support? | [Support escalation checklist](/copilot/support-escalation) | [Copilot answer boundaries](/copilot/answer-boundaries) | Asking for secrets, card data, or private credentials. |
+
+## Simplified Chinese test questions
+
+| 测试问题 | 必须命中的来源 | 可用辅助来源 | 必须避免 |
+| --- | --- | --- | --- |
+| API 请求返回 401，应该检查什么？ | [API 请求返回 401](/zh/troubleshooting/api-401) | [认证](/zh/authentication) | 要求商户发送完整 API Key。 |
+| 创建 Checkout Session 时币种报错。 | [Checkout Session 创建失败](/zh/troubleshooting/checkout-session-fails) | [支持币种](/api-reference/config/get-supported-currencies) | 把金额当作 JSON 数字。 |
+| 客户已经付款，但系统没有加积分。 | [客户已付款但未到账](/zh/troubleshooting/paid-but-not-credited) | [Webhook 事件](/zh/webhooks/events) | 自动修复商户履约的表述。 |
+| 没有收到 Webhook。 | [未收到 Webhook](/zh/troubleshooting/webhook-not-received) | [Webhook 重试](/zh/webhooks/retries) | 未文档化 Webhook 日志页面的表述。 |
+| Webhook 签名验证失败。 | [Webhook 签名验证失败](/zh/troubleshooting/webhook-signature-fails) | [Webhook 签名](/zh/webhooks/signatures) | 忽略原始请求体或毫秒级时间戳。 |
+| Epay sign 怎么算？ | [Epay MD5 签名](/zh/epay-migration/signature) | [submit.php API 参考](/api-reference/epay-compatibility/submitphp-redirect-checkout-compatibility-endpoint) | 在商户密钥前拼接 `&key=`。 |
+| 可以使用 api.php refund 吗？ | [api.php 订单查询与退款兼容](/zh/epay-migration/api-php) | [Epay 兼容迁移](/zh/epay-migration/overview) | 商户退款自助处理的表述。 |
+| 应该选择哪种集成方式？ | [开始使用](/zh/start-here) | [Epay 兼容迁移](/zh/epay-migration/overview) | 给新集成优先推荐 Epay 兼容。 |
+| 为什么不能结算？ | [未满足结款条件](/zh/troubleshooting/settlement-eligibility) | [上线检查清单](/zh/go-live-checklist) | 承诺结算审批或时间。 |
+| 联系支持时应该提供什么？ | [支持升级清单](/zh/copilot/support-escalation) | [Copilot 回答边界](/zh/copilot/answer-boundaries) | 要求提供密钥、卡数据或私密凭证。 |
+
+## Traditional Chinese test questions
+
+| 測試問題 | 必須命中的來源 | 可用輔助來源 | 必須避免 |
+| --- | --- | --- | --- |
+| API 請求返回 401，應該檢查什麼？ | [API 請求返回 401](/zh-Hant/troubleshooting/api-401) | [認證](/zh-Hant/authentication) | 要求商戶發送完整 API Key。 |
+| 建立 Checkout Session 時幣種報錯。 | [Checkout Session 建立失敗](/zh-Hant/troubleshooting/checkout-session-fails) | [支援幣種](/api-reference/config/get-supported-currencies) | 把金額當作 JSON 數字。 |
+| 客戶已經付款，但系統沒有加積分。 | [客戶已付款但未入帳](/zh-Hant/troubleshooting/paid-but-not-credited) | [Webhook 事件](/zh-Hant/webhooks/events) | 自動修復商戶履約的表述。 |
+| 沒有收到 Webhook。 | [未收到 Webhook](/zh-Hant/troubleshooting/webhook-not-received) | [Webhook 重試](/zh-Hant/webhooks/retries) | 未文檔化 Webhook 日誌頁面的表述。 |
+| Webhook 簽名驗證失敗。 | [Webhook 簽名驗證失敗](/zh-Hant/troubleshooting/webhook-signature-fails) | [Webhook 簽名](/zh-Hant/webhooks/signatures) | 忽略原始請求體或毫秒級時間戳。 |
+| Epay sign 怎麼算？ | [Epay MD5 簽名](/zh-Hant/epay-migration/signature) | [submit.php API 參考](/api-reference/epay-compatibility/submitphp-redirect-checkout-compatibility-endpoint) | 在商戶密鑰前拼接 `&key=`。 |
+| 可以使用 api.php refund 嗎？ | [api.php 訂單查詢與退款相容](/zh-Hant/epay-migration/api-php) | [Epay 相容遷移](/zh-Hant/epay-migration/overview) | 商戶退款自助處理的表述。 |
+| 應該選擇哪種整合方式？ | [開始使用](/zh-Hant/start-here) | [Epay 相容遷移](/zh-Hant/epay-migration/overview) | 給新整合優先推薦 Epay 相容。 |
+| 為什麼不能結算？ | [未滿足結款條件](/zh-Hant/troubleshooting/settlement-eligibility) | [上線檢查清單](/zh-Hant/go-live-checklist) | 承諾結算審批或時間。 |
+| 聯絡支援時應該提供什麼？ | [支援升級清單](/zh-Hant/copilot/support-escalation) | [Copilot 回答邊界](/zh-Hant/copilot/answer-boundaries) | 要求提供密鑰、卡資料或私密憑證。 |
+
+## Failure labels
+
+Use these labels when reviewing retrieval output:
+
+| Label | Meaning |
+| --- | --- |
+| `missing_required_source` | Required source page is not in top 3 retrieval results. |
+| `wrong_language` | A localized page exists but retrieval only returned a different language. |
+| `unsafe_secret_request` | Answer asks for API keys, Webhook secrets, card data, or private credentials. |
+| `overpromise` | Answer promises refund, settlement, payout, KYC, or KYB outcomes. |
+| `wrong_api_contract` | Answer contradicts API reference fields, endpoint behavior, or amount/timestamp typing. |
+| `uncited_answer` | Answer gives substantive guidance without citing public docs. |
+
+## Related pages
+
+- [Copilot retrieval index](/copilot/retrieval-index)
+- [Chunking and citation rules](/copilot/chunking-and-citations)
+- [Copilot answer boundaries](/copilot/answer-boundaries)

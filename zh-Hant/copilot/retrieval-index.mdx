@@ -1,0 +1,75 @@
+---
+title: "Copilot 檢索索引"
+description: "定義應納入 Copilot 檢索的 Kyren Pay 文檔頁面。"
+language: zh-Hant
+audience: copilot
+product_area: copilot
+intent: retrieval_index
+visibility: public
+last_verified_at: 2026-05-27
+source_owner: support
+---
+
+將本頁作為 Phase 5A 檢索索引契約。它定義哪些文檔頁面應被索引、如何分類，以及當多個頁面匹配同一個商戶問題時應優先使用哪些頁面。
+
+## 索引規則
+
+- 索引商戶文檔標籤下的公開 MDX 頁面，以及下方列出的生成式 API Reference 頁面。
+- 保留頁面語言：`en`、`zh` 或 `zh-Hant`。
+- 頁面存在 frontmatter 時，保留 `audience`、`product_area`、`intent`、`visibility`、`last_verified_at` 和 `source_owner`。
+- 每個 chunk 儲存 canonical URL、標題、章節標題、語言和源檔案路徑。
+- 優先檢索同語言內容。如果同語言結果較弱，可回退檢索英文來源，並用使用者語言回答。
+- 不索引密鑰、本地憑證、私有支援備註或未提交的本地 diff。
+
+## 優先來源
+
+| 主題 | 主要頁面 | 為什麼重要 |
+| --- | --- | --- |
+| 整合路徑 | [開始使用](/zh-Hant/start-here)、[快速開始](/zh-Hant/quickstart)、[收第一筆款](/zh-Hant/guides/collect-first-payment) | 首次使用和接入路徑問題的最佳來源。 |
+| 控制台工作流 | [產品](/zh-Hant/dashboard/products)、[Checkout](/zh-Hant/dashboard/checkouts)、[訂單](/zh-Hant/dashboard/orders)、[開發者設定](/zh-Hant/dashboard/developer-settings) | 商戶使用控制台時的最佳來源。 |
+| API 基礎 | [認證](/zh-Hant/authentication)、[錯誤](/zh-Hant/errors)、[測試](/zh-Hant/testing)、[程式碼範例](/zh-Hant/guides/code-examples) | API 設定和通用整合細節的最佳來源。 |
+| Webhook | [Webhook 概覽](/zh-Hant/webhooks/overview)、[事件](/zh-Hant/webhooks/events)、[簽名](/zh-Hant/webhooks/signatures)、[重試](/zh-Hant/webhooks/retries) | 事件處理和 Webhook 驗證的最佳來源。 |
+| 故障排除 | 所有 [故障排除](/zh-Hant/troubleshooting/api-401) 頁面 | 診斷、可能原因、安全修復和支援交接的最佳來源。 |
+| Epay 遷移 | 所有 [Epay 遷移](/zh-Hant/epay-migration/overview) 頁面 | Epay 相容端點行為和遷移約束的最佳來源。 |
+| Copilot 策略 | [回答邊界](/zh-Hant/copilot/answer-boundaries)、[問題路由](/zh-Hant/copilot/question-routing)、[支援升級](/zh-Hant/copilot/support-escalation) | 回答策略和支援升級的最佳來源。 |
+| FAQ | [商戶常見問題](/zh-Hant/faq/common-questions) | 簡短支援分流答案的最佳來源。 |
+
+## API Reference 來源
+
+以高精度、低於任務指南的召回優先級索引這些生成式 API Reference 頁面：
+
+| API 區域 | 頁面 |
+| --- | --- |
+| Config | [取得支援幣種](/api-reference/config/get-supported-currencies) |
+| Products | [列出產品](/api-reference/products/list-all-products)、[建立產品](/api-reference/products/create-a-product)、[取得產品](/api-reference/products/retrieve-a-product)、[封存產品](/api-reference/products/archive-a-product)、[更新產品](/api-reference/products/update-a-product) |
+| Checkouts | [建立 Checkout Session](/api-reference/checkouts/create-a-checkout-session)、[取得 Checkout Session](/api-reference/checkouts/retrieve-a-checkout-session) |
+| Orders | [列出訂單](/api-reference/orders/list-all-orders)、[取得訂單](/api-reference/orders/retrieve-an-order)、[匯出訂單 CSV](/api-reference/orders/export-orders-as-csv) |
+| Balance | [取得帳戶餘額](/api-reference/balance/retrieve-account-balance)、[列出餘額流水](/api-reference/balance/list-balance-transactions) |
+| Epay Compatibility | [submit.php](/api-reference/epay-compatibility/submitphp-redirect-checkout-compatibility-endpoint)、[mapi.php](/api-reference/epay-compatibility/mapiphp-direct-create-payment-compatibility-endpoint)、[api.php](/api-reference/epay-compatibility/apiphp-order-queryrefund-compatibility-endpoint) |
+
+## 檢索優先級
+
+當多個頁面匹配時，按以下順序排序：
+
+1. 與症狀完全匹配的故障排除頁面。
+2. 精確任務指南或控制台指南。
+3. 描述端點結構的 API Reference 頁面。
+4. 用於簡短答案措辭的 FAQ 頁面。
+5. 用於邊界和升級判斷的 Copilot 策略頁面。
+
+例如，401 問題應優先檢索 [API 請求返回 401](/zh-Hant/troubleshooting/api-401)，再檢索 [認證](/zh-Hant/authentication)。請求體 schema 問題應優先檢索相關 API Reference，而不是寬泛指南。
+
+## 排除項
+
+不要將這些內容作為商戶可見答案來源：
+
+- 草稿計劃、內部實施規格、測試 fixture 或本地構建產物。
+- 生成的 Playwright 報告。
+- 源碼註釋，除非未來實現明確標記為公開文檔。
+- 未提交的 `openapi.yaml` 改動，直到它被有意提交並驗證。
+
+## 相關頁面
+
+- [切片和引用規則](/zh-Hant/copilot/chunking-and-citations)
+- [檢索評估集](/zh-Hant/copilot/retrieval-evaluation)
+- [問題路由圖譜](/zh-Hant/copilot/question-routing)

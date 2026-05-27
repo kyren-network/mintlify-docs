@@ -1,0 +1,106 @@
+---
+title: "Chunking and citation rules"
+description: "Define how Kyren Pay docs should be chunked, retrieved, and cited by Copilot."
+language: en
+audience: copilot
+product_area: copilot
+intent: retrieval_policy
+visibility: public
+last_verified_at: 2026-05-27
+source_owner: support
+---
+
+Use these rules when building the Phase 5B retrieval pipeline or evaluating Copilot answer quality.
+
+## Chunk boundaries
+
+- Create one chunk for each page frontmatter block and introduction.
+- Create one chunk per `##` section.
+- Keep nested `###` sections inside the nearest `##` chunk unless the section exceeds 800 words.
+- Keep Markdown tables with their heading and the paragraph that introduces them.
+- Keep code examples with the paragraph immediately before them.
+- Keep related-page lists as metadata, not as answer content, unless the user asks where to read next.
+
+## Chunk size
+
+Target chunk size:
+
+| Content type | Target |
+| --- | --- |
+| Concept pages | 250-500 words |
+| Troubleshooting sections | 150-350 words |
+| API reference endpoint summaries | One endpoint operation per chunk |
+| FAQ entries | One question and answer per chunk |
+| Copilot policy tables | One table row group per chunk when possible |
+
+Split a chunk when it mixes unrelated intents, such as authentication setup and webhook verification.
+
+## Metadata
+
+Every chunk should include:
+
+```json
+{
+  "url": "/troubleshooting/api-401",
+  "title": "API request returns 401",
+  "section": "Likely causes",
+  "language": "en",
+  "audience": "merchant",
+  "product_area": "troubleshooting",
+  "intent": "troubleshooting",
+  "source_owner": "support",
+  "last_verified_at": "2026-05-26"
+}
+```
+
+For generated API reference pages, set `product_area` to the OpenAPI tag and `intent` to `api_reference`.
+
+## Retrieval behavior
+
+- Retrieve at least 3 candidate chunks and at most 8 chunks for one user question.
+- Prefer exact symptom pages before broad overview pages.
+- Prefer same-language chunks; use English fallback only when localized recall is weak.
+- Use API reference chunks for parameter names, response fields, enum values, and endpoint paths.
+- Use troubleshooting chunks for diagnosis and merchant actions.
+- Use Copilot policy chunks for refusal, escalation, and safety boundaries.
+
+## Citation rules
+
+Every substantive answer should cite 1-3 source pages. Use page-level citations, not private source file paths.
+
+Good citation set:
+
+- [API request returns 401](/troubleshooting/api-401)
+- [Authentication](/authentication)
+
+Poor citation set:
+
+- Internal source file paths.
+- More than five links for a simple answer.
+- A broad overview page when an exact troubleshooting page exists.
+
+## Answer style
+
+Copilot answers should:
+
+- Start with the most likely answer.
+- Give the next concrete check or fix.
+- Include exact field names, endpoint paths, or event names when relevant.
+- Include a support handoff when the issue depends on account review.
+- Avoid long generic disclaimers.
+
+## Hard boundaries
+
+Copilot must not:
+
+- Ask for full API keys or Webhook secrets.
+- Invent undocumented dashboard screens.
+- Promise refund, settlement, payout, KYC, or KYB outcomes.
+- Treat Epay compatibility as the preferred path for new integrations.
+- Convert decimal string fields to floating-point JSON numbers.
+
+## Related pages
+
+- [Copilot retrieval index](/copilot/retrieval-index)
+- [Retrieval evaluation set](/copilot/retrieval-evaluation)
+- [Copilot answer boundaries](/copilot/answer-boundaries)

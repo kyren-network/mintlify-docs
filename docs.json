@@ -85,7 +85,10 @@
                 "pages": [
                   "copilot/answer-boundaries",
                   "copilot/question-routing",
-                  "copilot/support-escalation"
+                  "copilot/support-escalation",
+                  "copilot/retrieval-index",
+                  "copilot/chunking-and-citations",
+                  "copilot/retrieval-evaluation"
                 ]
               },
               {
@@ -175,7 +178,10 @@
                 "pages": [
                   "zh/copilot/answer-boundaries",
                   "zh/copilot/question-routing",
-                  "zh/copilot/support-escalation"
+                  "zh/copilot/support-escalation",
+                  "zh/copilot/retrieval-index",
+                  "zh/copilot/chunking-and-citations",
+                  "zh/copilot/retrieval-evaluation"
                 ]
               },
               {
@@ -265,7 +271,10 @@
                 "pages": [
                   "zh-Hant/copilot/answer-boundaries",
                   "zh-Hant/copilot/question-routing",
-                  "zh-Hant/copilot/support-escalation"
+                  "zh-Hant/copilot/support-escalation",
+                  "zh-Hant/copilot/retrieval-index",
+                  "zh-Hant/copilot/chunking-and-citations",
+                  "zh-Hant/copilot/retrieval-evaluation"
                 ]
               },
               {

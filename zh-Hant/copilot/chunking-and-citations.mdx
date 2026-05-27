@@ -1,0 +1,106 @@
+---
+title: "切片和引用規則"
+description: "定義 Kyren Pay 文檔應如何被 Copilot 切片、檢索和引用。"
+language: zh-Hant
+audience: copilot
+product_area: copilot
+intent: retrieval_policy
+visibility: public
+last_verified_at: 2026-05-27
+source_owner: support
+---
+
+在構建 Phase 5B 檢索管線或評估 Copilot 回答品質時，使用這些規則。
+
+## Chunk 邊界
+
+- 為每個頁面的 frontmatter 和引言建立一個 chunk。
+- 每個 `##` 章節建立一個 chunk。
+- `###` 子章節保留在最近的 `##` chunk 中，除非該章節超過 800 詞。
+- Markdown 表格應與其標題和引入段落放在一起。
+- 程式碼範例應與其前一段說明放在一起。
+- 相關頁面列表作為 metadata 保存；除非使用者詢問下一步閱讀位置，否則不要作為答案正文。
+
+## Chunk 大小
+
+目標 chunk 大小：
+
+| 內容類型 | 目標 |
+| --- | --- |
+| 概念頁面 | 250-500 詞 |
+| 故障排除章節 | 150-350 詞 |
+| API Reference 端點摘要 | 每個端點 operation 一個 chunk |
+| FAQ 條目 | 每個問題和答案一個 chunk |
+| Copilot 策略表格 | 盡量按表格行組切分 |
+
+當一個 chunk 混合了不相關 intent，例如 API 認證設定和 Webhook 驗證，應拆分。
+
+## Metadata
+
+每個 chunk 應包含：
+
+```json
+{
+  "url": "/zh-Hant/troubleshooting/api-401",
+  "title": "API 請求返回 401",
+  "section": "可能原因",
+  "language": "zh-Hant",
+  "audience": "merchant",
+  "product_area": "troubleshooting",
+  "intent": "troubleshooting",
+  "source_owner": "support",
+  "last_verified_at": "2026-05-26"
+}
+```
+
+對於生成式 API Reference 頁面，將 `product_area` 設為 OpenAPI tag，將 `intent` 設為 `api_reference`。
+
+## 檢索行為
+
+- 每個使用者問題至少檢索 3 個候選 chunk，最多檢索 8 個 chunk。
+- 優先檢索精確症狀頁面，再檢索寬泛概覽頁。
+- 優先使用同語言 chunk；只有本地化召回較弱時才回退英文。
+- 參數名、回應欄位、列舉值和端點路徑使用 API Reference chunk。
+- 診斷和商戶操作使用故障排除 chunk。
+- 拒答、升級和安全邊界使用 Copilot 策略 chunk。
+
+## 引用規則
+
+每個實質性回答應引用 1-3 個來源頁面。使用頁面級引用，不使用私有源檔案路徑。
+
+良好引用：
+
+- [API 請求返回 401](/zh-Hant/troubleshooting/api-401)
+- [認證](/zh-Hant/authentication)
+
+較差引用：
+
+- 內部源檔案路徑。
+- 簡單回答引用超過五個連結。
+- 已有精確故障排除頁面時卻引用寬泛概覽頁。
+
+## 回答風格
+
+Copilot 回答應：
+
+- 先給出最可能的答案。
+- 給出下一步具體檢查或修復。
+- 相關時包含準確欄位名、端點路徑或事件名。
+- 問題依賴帳戶審核時包含支援交接。
+- 避免冗長泛泛的免責聲明。
+
+## 硬邊界
+
+Copilot 不得：
+
+- 要求完整 API Key 或 Webhook secret。
+- 編造未文檔化的控制台頁面。
+- 承諾退款、結算、打款、KYC 或 KYB 結果。
+- 將 Epay 相容當作新整合的首選路徑。
+- 將十進位字串欄位轉換成浮點 JSON 數字。
+
+## 相關頁面
+
+- [Copilot 檢索索引](/zh-Hant/copilot/retrieval-index)
+- [檢索評估集](/zh-Hant/copilot/retrieval-evaluation)
+- [Copilot 回答邊界](/zh-Hant/copilot/answer-boundaries)

@@ -1,0 +1,106 @@
+---
+title: "切片和引用规则"
+description: "定义 Kyren Pay 文档应如何被 Copilot 切片、检索和引用。"
+language: zh
+audience: copilot
+product_area: copilot
+intent: retrieval_policy
+visibility: public
+last_verified_at: 2026-05-27
+source_owner: support
+---
+
+在构建 Phase 5B 检索管线或评估 Copilot 回答质量时，使用这些规则。
+
+## Chunk 边界
+
+- 为每个页面的 frontmatter 和引言创建一个 chunk。
+- 每个 `##` 章节创建一个 chunk。
+- `###` 子章节保留在最近的 `##` chunk 中，除非该章节超过 800 词。
+- Markdown 表格应与其标题和引入段落放在一起。
+- 代码示例应与其前一段说明放在一起。
+- 相关页面列表作为 metadata 保存；除非用户询问下一步阅读位置，否则不要作为答案正文。
+
+## Chunk 大小
+
+目标 chunk 大小：
+
+| 内容类型 | 目标 |
+| --- | --- |
+| 概念页面 | 250-500 词 |
+| 故障排除章节 | 150-350 词 |
+| API Reference 端点摘要 | 每个端点 operation 一个 chunk |
+| FAQ 条目 | 每个问题和答案一个 chunk |
+| Copilot 策略表格 | 尽量按表格行组切分 |
+
+当一个 chunk 混合了不相关 intent，例如 API 认证设置和 Webhook 验证，应拆分。
+
+## Metadata
+
+每个 chunk 应包含：
+
+```json
+{
+  "url": "/zh/troubleshooting/api-401",
+  "title": "API 请求返回 401",
+  "section": "可能原因",
+  "language": "zh",
+  "audience": "merchant",
+  "product_area": "troubleshooting",
+  "intent": "troubleshooting",
+  "source_owner": "support",
+  "last_verified_at": "2026-05-26"
+}
+```
+
+对于生成式 API Reference 页面，将 `product_area` 设为 OpenAPI tag，将 `intent` 设为 `api_reference`。
+
+## 检索行为
+
+- 每个用户问题至少检索 3 个候选 chunk，最多检索 8 个 chunk。
+- 优先检索精确症状页面，再检索宽泛概览页。
+- 优先使用同语言 chunk；只有本地化召回较弱时才回退英文。
+- 参数名、响应字段、枚举值和端点路径使用 API Reference chunk。
+- 诊断和商户操作使用故障排除 chunk。
+- 拒答、升级和安全边界使用 Copilot 策略 chunk。
+
+## 引用规则
+
+每个实质性回答应引用 1-3 个来源页面。使用页面级引用，不使用私有源文件路径。
+
+良好引用：
+
+- [API 请求返回 401](/zh/troubleshooting/api-401)
+- [认证](/zh/authentication)
+
+较差引用：
+
+- 内部源文件路径。
+- 简单回答引用超过五个链接。
+- 已有精确故障排除页面时却引用宽泛概览页。
+
+## 回答风格
+
+Copilot 回答应：
+
+- 先给出最可能的答案。
+- 给出下一步具体检查或修复。
+- 相关时包含准确字段名、端点路径或事件名。
+- 问题依赖账户审核时包含支持交接。
+- 避免冗长泛泛的免责声明。
+
+## 硬边界
+
+Copilot 不得：
+
+- 要求完整 API Key 或 Webhook secret。
+- 编造未文档化的控制台页面。
+- 承诺退款、结算、打款、KYC 或 KYB 结果。
+- 将 Epay 兼容当作新集成的首选路径。
+- 将十进制字符串字段转换成浮点 JSON 数字。
+
+## 相关页面
+
+- [Copilot 检索索引](/zh/copilot/retrieval-index)
+- [检索评估集](/zh/copilot/retrieval-evaluation)
+- [Copilot 回答边界](/zh/copilot/answer-boundaries)

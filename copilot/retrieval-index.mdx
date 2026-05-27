@@ -1,0 +1,75 @@
+---
+title: "Copilot retrieval index"
+description: "Define the Kyren Pay documentation pages that should be indexed for Copilot retrieval."
+language: en
+audience: copilot
+product_area: copilot
+intent: retrieval_index
+visibility: public
+last_verified_at: 2026-05-27
+source_owner: support
+---
+
+Use this page as the Phase 5A retrieval index contract. It defines which documentation pages should be indexed, how they should be classified, and which pages should be preferred when multiple pages match the same merchant question.
+
+## Indexing rules
+
+- Index public MDX pages in the merchant documentation tab and the generated API reference pages listed below.
+- Preserve the page language as `en`, `zh`, or `zh-Hant`.
+- Preserve frontmatter fields when present: `audience`, `product_area`, `intent`, `visibility`, `last_verified_at`, and `source_owner`.
+- Store each chunk with its canonical URL, title, section heading, language, and source file path.
+- Prefer same-language retrieval. If same-language results are weak, retrieve English sources as fallback and answer in the user's language.
+- Do not index secrets, local credentials, private support notes, or uncommitted local diffs.
+
+## Priority sources
+
+| Topic | Primary pages | Why they matter |
+| --- | --- | --- |
+| Integration path | [Start here](/start-here), [Quickstart](/quickstart), [Collect your first payment](/guides/collect-first-payment) | Best sources for first-use and onboarding questions. |
+| Dashboard workflows | [Products](/dashboard/products), [Checkouts](/dashboard/checkouts), [Orders](/dashboard/orders), [Developer settings](/dashboard/developer-settings) | Best sources for merchants using the console. |
+| API basics | [Authentication](/authentication), [Errors](/errors), [Testing](/testing), [Code examples](/guides/code-examples) | Best sources for API setup and general integration details. |
+| Webhooks | [Webhook overview](/webhooks/overview), [Events](/webhooks/events), [Signatures](/webhooks/signatures), [Retries](/webhooks/retries) | Best sources for event handling and webhook verification. |
+| Troubleshooting | All [Troubleshooting](/troubleshooting/api-401) pages | Best sources for diagnosis, likely causes, safe fixes, and support handoff. |
+| Epay migration | All [Epay migration](/epay-migration/overview) pages | Best sources for Epay-compatible endpoint behavior and migration constraints. |
+| Copilot policy | [Answer boundaries](/copilot/answer-boundaries), [Question routing](/copilot/question-routing), [Support escalation](/copilot/support-escalation) | Best sources for answer policy and support escalation. |
+| FAQ | [Common merchant questions](/faq/common-questions) | Best source for short support-deflection answers. |
+
+## API reference sources
+
+Index these generated API reference pages with high precision and lower recall priority than task guides:
+
+| API area | Pages |
+| --- | --- |
+| Config | [Get supported currencies](/api-reference/config/get-supported-currencies) |
+| Products | [List products](/api-reference/products/list-all-products), [Create product](/api-reference/products/create-a-product), [Retrieve product](/api-reference/products/retrieve-a-product), [Archive product](/api-reference/products/archive-a-product), [Update product](/api-reference/products/update-a-product) |
+| Checkouts | [Create checkout session](/api-reference/checkouts/create-a-checkout-session), [Retrieve checkout session](/api-reference/checkouts/retrieve-a-checkout-session) |
+| Orders | [List orders](/api-reference/orders/list-all-orders), [Retrieve order](/api-reference/orders/retrieve-an-order), [Export orders as CSV](/api-reference/orders/export-orders-as-csv) |
+| Balance | [Retrieve account balance](/api-reference/balance/retrieve-account-balance), [List balance transactions](/api-reference/balance/list-balance-transactions) |
+| Epay Compatibility | [submit.php](/api-reference/epay-compatibility/submitphp-redirect-checkout-compatibility-endpoint), [mapi.php](/api-reference/epay-compatibility/mapiphp-direct-create-payment-compatibility-endpoint), [api.php](/api-reference/epay-compatibility/apiphp-order-queryrefund-compatibility-endpoint) |
+
+## Retrieval priority
+
+When multiple pages match, rank sources in this order:
+
+1. Exact troubleshooting page for the symptom.
+2. Exact task guide or dashboard guide.
+3. API reference page for endpoint shape.
+4. FAQ page for concise answer wording.
+5. Copilot policy page for boundaries and escalation.
+
+For example, a 401 question should retrieve [API request returns 401](/troubleshooting/api-401) before [Authentication](/authentication). A request body schema question should retrieve the relevant API reference before a broad guide.
+
+## Exclusions
+
+Do not use these as merchant-facing answer sources:
+
+- Draft plans, internal implementation specs, test fixtures, or local build output.
+- Generated Playwright reports.
+- Source code comments unless a future implementation explicitly marks them as public docs.
+- Uncommitted `openapi.yaml` changes until they are intentionally committed and validated.
+
+## Related pages
+
+- [Chunking and citation rules](/copilot/chunking-and-citations)
+- [Retrieval evaluation set](/copilot/retrieval-evaluation)
+- [Question routing map](/copilot/question-routing)

@@ -1,0 +1,75 @@
+---
+title: "Copilot 检索索引"
+description: "定义应纳入 Copilot 检索的 Kyren Pay 文档页面。"
+language: zh
+audience: copilot
+product_area: copilot
+intent: retrieval_index
+visibility: public
+last_verified_at: 2026-05-27
+source_owner: support
+---
+
+将本页作为 Phase 5A 检索索引契约。它定义哪些文档页面应被索引、如何分类，以及当多个页面匹配同一个商户问题时应优先使用哪些页面。
+
+## 索引规则
+
+- 索引商户文档标签下的公开 MDX 页面，以及下方列出的生成式 API Reference 页面。
+- 保留页面语言：`en`、`zh` 或 `zh-Hant`。
+- 页面存在 frontmatter 时，保留 `audience`、`product_area`、`intent`、`visibility`、`last_verified_at` 和 `source_owner`。
+- 每个 chunk 存储 canonical URL、标题、章节标题、语言和源文件路径。
+- 优先检索同语言内容。如果同语言结果较弱，可回退检索英文来源，并用用户语言回答。
+- 不索引密钥、本地凭证、私有支持备注或未提交的本地 diff。
+
+## 优先来源
+
+| 主题 | 主要页面 | 为什么重要 |
+| --- | --- | --- |
+| 集成路径 | [开始使用](/zh/start-here)、[快速开始](/zh/quickstart)、[收第一笔款](/zh/guides/collect-first-payment) | 首次使用和接入路径问题的最佳来源。 |
+| 控制台工作流 | [产品](/zh/dashboard/products)、[Checkout](/zh/dashboard/checkouts)、[订单](/zh/dashboard/orders)、[开发者设置](/zh/dashboard/developer-settings) | 商户使用控制台时的最佳来源。 |
+| API 基础 | [认证](/zh/authentication)、[错误](/zh/errors)、[测试](/zh/testing)、[代码示例](/zh/guides/code-examples) | API 设置和通用集成细节的最佳来源。 |
+| Webhook | [Webhook 概览](/zh/webhooks/overview)、[事件](/zh/webhooks/events)、[签名](/zh/webhooks/signatures)、[重试](/zh/webhooks/retries) | 事件处理和 Webhook 验证的最佳来源。 |
+| 故障排除 | 所有 [故障排除](/zh/troubleshooting/api-401) 页面 | 诊断、可能原因、安全修复和支持交接的最佳来源。 |
+| Epay 迁移 | 所有 [Epay 迁移](/zh/epay-migration/overview) 页面 | Epay 兼容端点行为和迁移约束的最佳来源。 |
+| Copilot 策略 | [回答边界](/zh/copilot/answer-boundaries)、[问题路由](/zh/copilot/question-routing)、[支持升级](/zh/copilot/support-escalation) | 回答策略和支持升级的最佳来源。 |
+| FAQ | [商户常见问题](/zh/faq/common-questions) | 简短支持分流答案的最佳来源。 |
+
+## API Reference 来源
+
+以高精度、低于任务指南的召回优先级索引这些生成式 API Reference 页面：
+
+| API 区域 | 页面 |
+| --- | --- |
+| Config | [获取支持币种](/api-reference/config/get-supported-currencies) |
+| Products | [列出产品](/api-reference/products/list-all-products)、[创建产品](/api-reference/products/create-a-product)、[获取产品](/api-reference/products/retrieve-a-product)、[归档产品](/api-reference/products/archive-a-product)、[更新产品](/api-reference/products/update-a-product) |
+| Checkouts | [创建 Checkout Session](/api-reference/checkouts/create-a-checkout-session)、[获取 Checkout Session](/api-reference/checkouts/retrieve-a-checkout-session) |
+| Orders | [列出订单](/api-reference/orders/list-all-orders)、[获取订单](/api-reference/orders/retrieve-an-order)、[导出订单 CSV](/api-reference/orders/export-orders-as-csv) |
+| Balance | [获取账户余额](/api-reference/balance/retrieve-account-balance)、[列出余额流水](/api-reference/balance/list-balance-transactions) |
+| Epay Compatibility | [submit.php](/api-reference/epay-compatibility/submitphp-redirect-checkout-compatibility-endpoint)、[mapi.php](/api-reference/epay-compatibility/mapiphp-direct-create-payment-compatibility-endpoint)、[api.php](/api-reference/epay-compatibility/apiphp-order-queryrefund-compatibility-endpoint) |
+
+## 检索优先级
+
+当多个页面匹配时，按以下顺序排序：
+
+1. 与症状完全匹配的故障排除页面。
+2. 精确任务指南或控制台指南。
+3. 描述端点结构的 API Reference 页面。
+4. 用于简短答案措辞的 FAQ 页面。
+5. 用于边界和升级判断的 Copilot 策略页面。
+
+例如，401 问题应优先检索 [API 请求返回 401](/zh/troubleshooting/api-401)，再检索 [认证](/zh/authentication)。请求体 schema 问题应优先检索相关 API Reference，而不是宽泛指南。
+
+## 排除项
+
+不要将这些内容作为商户可见答案来源：
+
+- 草稿计划、内部实施规格、测试 fixture 或本地构建产物。
+- 生成的 Playwright 报告。
+- 源码注释，除非未来实现明确标记为公开文档。
+- 未提交的 `openapi.yaml` 改动，直到它被有意提交并验证。
+
+## 相关页面
+
+- [切片和引用规则](/zh/copilot/chunking-and-citations)
+- [检索评估集](/zh/copilot/retrieval-evaluation)
+- [问题路由图谱](/zh/copilot/question-routing)
