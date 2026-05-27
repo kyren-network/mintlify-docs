@@ -20,7 +20,7 @@ node scripts/validate-copilot-sources.mjs
 
 This check verifies:
 
-- Each language has six Copilot source pages in navigation.
+- Each language has seven Copilot source pages in navigation.
 - Referenced Copilot pages exist on disk.
 - Phase 5A source pages are included in the public MDX source set.
 - Excluded files such as tests, scripts, build output, and Playwright reports are not treated as merchant-facing sources.
@@ -39,13 +39,39 @@ For CI or later Phase 5B tooling, use JSON output:
 node scripts/evaluate-copilot-retrieval.mjs --json
 ```
 
+## Build the Phase 5B index
+
+```bash
+node scripts/build-copilot-index.mjs --out generated/copilot-knowledge-index.json
+```
+
+The generated index is a portable JSON artifact for the next Copilot service layer. It contains page metadata, section chunks, token lists, and citation metadata. Do not commit generated index files unless a release process explicitly requires a pinned artifact.
+
+## Query the index locally
+
+```bash
+node scripts/query-copilot-index.mjs \
+  --index generated/copilot-knowledge-index.json \
+  --lang en \
+  --query "Webhook signature verification fails" \
+  --json
+```
+
+Use this command to inspect the exact chunks and citations that a downstream Copilot API would receive. To evaluate the built artifact instead of live MDX files, run:
+
+```bash
+node scripts/evaluate-copilot-retrieval.mjs \
+  --index generated/copilot-knowledge-index.json \
+  --json
+```
+
 ## Run tests
 
 ```bash
 node --test tests/copilot-local-validation.test.mjs
 ```
 
-Use these checks as a source-quality gate. A successful local run means the docs are structurally ready for Copilot indexing; it does not replace Phase 5B validation with embeddings, vector search, answer generation, and citation rendering.
+Use these checks as a source-quality gate. A successful local run means the docs are structurally ready for Copilot indexing. The Phase 5B index validates chunk and citation contracts locally; it does not replace future validation with embeddings, vector search, answer generation, and citation rendering.
 
 ## Related pages
 

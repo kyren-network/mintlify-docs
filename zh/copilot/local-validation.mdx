@@ -20,7 +20,7 @@ node scripts/validate-copilot-sources.mjs
 
 该检查会验证：
 
-- 每种语言的导航中都有六个 Copilot 数据源页面。
+- 每种语言的导航中都有七个 Copilot 数据源页面。
 - 导航引用的 Copilot 页面都存在。
 - Phase 5A 数据源页面已包含在公开 MDX 知识源集合中。
 - 测试、脚本、构建产物、Playwright 报告等排除文件不会被当作商户可见来源。
@@ -39,13 +39,39 @@ node scripts/evaluate-copilot-retrieval.mjs
 node scripts/evaluate-copilot-retrieval.mjs --json
 ```
 
+## 构建 Phase 5B 索引
+
+```bash
+node scripts/build-copilot-index.mjs --out generated/copilot-knowledge-index.json
+```
+
+生成的索引是供下一层 Copilot 服务使用的可移植 JSON 文件。它包含页面 metadata、章节 chunk、token 列表和引用 metadata。除非发布流程明确需要固定版本的产物，否则不要提交生成的索引文件。
+
+## 本地查询索引
+
+```bash
+node scripts/query-copilot-index.mjs \
+  --index generated/copilot-knowledge-index.json \
+  --lang zh \
+  --query "Webhook 签名验证失败" \
+  --json
+```
+
+使用该命令检查下游 Copilot API 将拿到的具体 chunk 和引用。若要评测已构建的索引产物，而不是直接读取 MDX 文件，运行：
+
+```bash
+node scripts/evaluate-copilot-retrieval.mjs \
+  --index generated/copilot-knowledge-index.json \
+  --json
+```
+
 ## 运行测试
 
 ```bash
 node --test tests/copilot-local-validation.test.mjs
 ```
 
-这些检查适合作为知识源质量门禁。本地通过表示文档在结构上已准备好被 Copilot 索引；它不能替代 Phase 5B 中的 embedding、向量检索、答案生成和引用渲染验证。
+这些检查适合作为知识源质量门禁。本地通过表示文档在结构上已准备好被 Copilot 索引。Phase 5B 索引会在本地验证 chunk 和引用契约；它不能替代未来的 embedding、向量检索、答案生成和引用渲染验证。
 
 ## 相关页面
 

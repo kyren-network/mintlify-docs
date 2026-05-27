@@ -20,7 +20,7 @@ node scripts/validate-copilot-sources.mjs
 
 該檢查會驗證：
 
-- 每種語言的導航中都有六個 Copilot 資料源頁面。
+- 每種語言的導航中都有七個 Copilot 資料源頁面。
 - 導航引用的 Copilot 頁面都存在。
 - Phase 5A 資料源頁面已包含在公開 MDX 知識源集合中。
 - 測試、腳本、建置產物、Playwright 報告等排除檔案不會被當作商戶可見來源。
@@ -39,13 +39,39 @@ node scripts/evaluate-copilot-retrieval.mjs
 node scripts/evaluate-copilot-retrieval.mjs --json
 ```
 
+## 構建 Phase 5B 索引
+
+```bash
+node scripts/build-copilot-index.mjs --out generated/copilot-knowledge-index.json
+```
+
+生成的索引是供下一層 Copilot 服務使用的可攜式 JSON 檔案。它包含頁面 metadata、章節 chunk、token 列表和引用 metadata。除非發布流程明確需要固定版本的產物，否則不要提交生成的索引檔案。
+
+## 本地查詢索引
+
+```bash
+node scripts/query-copilot-index.mjs \
+  --index generated/copilot-knowledge-index.json \
+  --lang zh-Hant \
+  --query "Webhook 簽名驗證失敗" \
+  --json
+```
+
+使用該命令檢查下游 Copilot API 將拿到的具體 chunk 和引用。若要評測已構建的索引產物，而不是直接讀取 MDX 檔案，執行：
+
+```bash
+node scripts/evaluate-copilot-retrieval.mjs \
+  --index generated/copilot-knowledge-index.json \
+  --json
+```
+
 ## 執行測試
 
 ```bash
 node --test tests/copilot-local-validation.test.mjs
 ```
 
-這些檢查適合作為知識源品質門檻。本地通過表示文檔在結構上已準備好被 Copilot 索引；它不能替代 Phase 5B 中的 embedding、向量檢索、答案生成和引用渲染驗證。
+這些檢查適合作為知識源品質門檻。本地通過表示文檔在結構上已準備好被 Copilot 索引。Phase 5B 索引會在本地驗證 chunk 和引用契約；它不能替代未來的 embedding、向量檢索、答案生成和引用渲染驗證。
 
 ## 相關頁面
 

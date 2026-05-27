@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 
@@ -55,6 +56,23 @@ export function stripMdx(content) {
     .trim();
 }
 
+export function extractSections(content) {
+  const withoutFrontmatter = content.replace(/^---[\s\S]*?\n---\n/, '');
+  const sections = [];
+  let current = { heading: 'Overview', lines: [] };
+  for (const line of withoutFrontmatter.split('\n')) {
+    const heading = line.match(/^(#{2,3})\s+(.+)$/);
+    if (heading) {
+      if (current.lines.join('\n').trim()) sections.push(current);
+      current = { heading: heading[2].trim(), lines: [] };
+    } else {
+      current.lines.push(line);
+    }
+  }
+  if (current.lines.join('\n').trim()) sections.push(current);
+  return sections.length ? sections : [{ heading: 'Overview', lines: [withoutFrontmatter] }];
+}
+
 export function listMdxFiles(root = process.cwd(), dir = '.') {
   const files = [];
   for (const entry of readdirSync(path.join(root, dir), { withFileTypes: true })) {
@@ -83,6 +101,68 @@ export function loadPublicSources(root = process.cwd()) {
       frontmatter,
     };
   });
+}
+
+function stableId(...parts) {
+  return createHash('sha256').update(parts.join('\n')).digest('hex').slice(0, 16);
+}
+
+export function buildChunksFromSource(source, content) {
+  return extractSections(content)
+    .map((section, index) => {
+      const text = stripMdx(section.lines.join('\n'));
+      if (!text) return null;
+      const sourcePath = source.file;
+      return {
+        id: stableId(source.url, section.heading, String(index), text),
+        sourcePath,
+        url: source.url,
+        title: source.title,
+        section: section.heading,
+        language: source.language,
+        productArea: source.frontmatter.product_area || null,
+        intent: source.frontmatter.intent || null,
+        audience: source.frontmatter.audience || null,
+        visibility: source.frontmatter.visibility || 'public',
+        lastVerifiedAt: source.frontmatter.last_verified_at || null,
+        sourceOwner: source.frontmatter.source_owner || null,
+        text,
+        tokens: tokenize(`${source.title} ${section.heading} ${text}`),
+        citation: {
+          url: source.url,
+          title: source.title,
+          section: section.heading,
+        },
+      };
+    })
+    .filter(Boolean);
+}
+
+export function buildKnowledgeIndex(root = process.cwd()) {
+  const sources = listMdxFiles(root).map((file) => {
+    const content = readFileSync(path.join(root, file), 'utf8');
+    const frontmatter = parseFrontmatter(content);
+    const page = file.replace(/\.mdx$/, '');
+    const source = {
+      file,
+      url: pageToUrl(page),
+      title: frontmatter.title || page.split('/').at(-1),
+      language: frontmatter.language || detectLanguage(file),
+      frontmatter,
+    };
+    return { ...source, chunks: buildChunksFromSource(source, content) };
+  });
+  const chunks = sources.flatMap((source) => source.chunks);
+  return {
+    schemaVersion: 1,
+    generator: 'kyren-pay-docs/scripts/build-copilot-index.mjs',
+    generatedAt: new Date().toISOString(),
+    sourceCount: sources.length,
+    chunkCount: chunks.length,
+    languages: LANGUAGES,
+    sources: sources.map(({ chunks: _chunks, ...source }) => source),
+    chunks,
+  };
 }
 
 export function extractCopilotGroups(config) {
@@ -170,6 +250,10 @@ function sourceBoost(source, queryTokens, query) {
   return boost;
 }
 
+function textForRetrieval(item) {
+  return `${item.title} ${item.section || ''} ${item.url} ${item.text || ''}`.toLowerCase();
+}
+
 export function retrieve(query, sources, language, limit = 3) {
   const queryTokens = tokenize(query);
   const queryText = query.toLowerCase();
@@ -178,7 +262,7 @@ export function retrieve(query, sources, language, limit = 3) {
   const candidates = [...preferred, ...fallback];
   return candidates
     .map((source) => {
-      const haystack = `${source.title} ${source.url} ${source.text}`.toLowerCase();
+      const haystack = textForRetrieval(source);
       let score = sourceBoost(source, queryTokens, queryText);
       for (const token of queryTokens) {
         const escaped = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -188,6 +272,16 @@ export function retrieve(query, sources, language, limit = 3) {
     })
     .filter((source) => source.score > 0)
     .sort((a, b) => b.score - a.score || a.url.localeCompare(b.url))
+    .slice(0, limit);
+}
+
+export function retrieveFromIndex(query, index, language, limit = 3) {
+  const chunks = index.chunks || [];
+  return retrieve(query, chunks, language, Math.max(limit * 4, limit))
+    .reduce((unique, chunk) => {
+      if (!unique.some((item) => item.url === chunk.url)) unique.push(chunk);
+      return unique;
+    }, [])
     .slice(0, limit);
 }
 

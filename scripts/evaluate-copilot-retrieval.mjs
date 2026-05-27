@@ -5,20 +5,28 @@ import {
   loadPublicSources,
   parseEvaluationCases,
   retrieve,
+  retrieveFromIndex,
   urlToFile,
 } from './copilot-local-lib.mjs';
 
 const root = process.cwd();
 const json = process.argv.includes('--json');
-const sources = loadPublicSources(root).filter((source) => !source.url.endsWith('/copilot/retrieval-evaluation'));
+const indexArgPosition = process.argv.indexOf('--index');
+const indexPath = indexArgPosition === -1 ? null : process.argv[indexArgPosition + 1];
+const index = indexPath ? JSON.parse(readFileSync(indexPath, 'utf8')) : null;
+const sources = index
+  ? []
+  : loadPublicSources(root).filter((source) => !source.url.endsWith('/copilot/retrieval-evaluation'));
 const cases = parseEvaluationCases(readFileSync(path.join(root, 'copilot/retrieval-evaluation.mdx'), 'utf8'));
-const sourceUrls = new Set(sources.map((source) => source.url));
+const sourceUrls = new Set(index ? index.sources.map((source) => source.url) : sources.map((source) => source.url));
 const results = [];
 
 for (const testCase of cases) {
   const requiredFile = urlToFile(testCase.requiredUrl);
   const requiredUrl = requiredFile ? `/${requiredFile.replace(/\.mdx$/, '')}` : testCase.requiredUrl;
-  const topSources = retrieve(testCase.question, sources, testCase.language, 3);
+  const topSources = index
+    ? retrieveFromIndex(testCase.question, index, testCase.language, 3)
+    : retrieve(testCase.question, sources, testCase.language, 3);
   const topUrls = topSources.map((source) => source.url);
   const pass = topUrls.includes(requiredUrl) || (!requiredFile && sourceUrls.has(requiredUrl) === false);
   results.push({
@@ -29,8 +37,10 @@ for (const testCase of cases) {
     topSources: topSources.map((source) => ({
       url: source.url,
       title: source.title,
+      section: source.section || null,
       score: source.score,
       language: source.language,
+      citation: source.citation || { url: source.url, title: source.title, section: null },
     })),
     failureLabel: pass ? null : 'missing_required_source',
   });
@@ -40,6 +50,7 @@ const failures = results.filter((result) => !result.pass);
 const payload = {
   totalCases: results.length,
   failures: failures.length,
+  indexPath,
   cases: results,
 };
 
