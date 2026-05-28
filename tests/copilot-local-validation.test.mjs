@@ -5,7 +5,13 @@ import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { callOpenAICompatible, chatCompletionsUrl, readConfig } from '../scripts/ask-copilot.mjs';
+import {
+  callOpenAICompatible,
+  callOpenAICompatibleResponses,
+  chatCompletionsUrl,
+  readConfig,
+  responsesUrl,
+} from '../scripts/ask-copilot.mjs';
 
 const node = process.execPath;
 
@@ -37,15 +43,21 @@ function startMockOpenAICompatibleServer() {
       const parsed = JSON.parse(body);
       requests.push({ request, body: parsed });
       response.setHeader('content-type', 'application/json');
-      response.end(JSON.stringify({
-        choices: [
-          {
-            message: {
-              content: 'Check whether the API key is present and active. Do not share the full key. See the cited troubleshooting page.',
+      if (request.url.endsWith('/responses')) {
+        response.end(JSON.stringify({
+          output_text: 'Check whether the API key is present and active. Do not share the full key. See the cited troubleshooting page.',
+        }));
+      } else {
+        response.end(JSON.stringify({
+          choices: [
+            {
+              message: {
+                content: 'Check whether the API key is present and active. Do not share the full key. See the cited troubleshooting page.',
+              },
             },
-          },
-        ],
-      }));
+          ],
+        }));
+      }
     });
   });
   return new Promise((resolve) => {
@@ -225,6 +237,40 @@ test('Phase 5D OpenAI-compatible adapter appends chat completions to base URL wi
   );
 });
 
+test('Phase 5D OpenAI-compatible adapter appends responses to base URL without adding v1', () => {
+  assert.equal(
+    responsesUrl('https://sub.aclaw.ai'),
+    'https://sub.aclaw.ai/responses',
+  );
+  assert.equal(
+    responsesUrl('https://sub.aclaw.ai/v1'),
+    'https://sub.aclaw.ai/v1/responses',
+  );
+});
+
+test('Phase 5D OpenAI-compatible responses adapter sends answer context and returns model text', async () => {
+  const server = await startMockOpenAICompatibleServer();
+
+  try {
+    const answer = await callOpenAICompatibleResponses({
+      baseUrl: server.baseUrl,
+      model: 'test-model',
+      apiKey: 'test-key',
+    }, {
+      prompt: '[Source 1] API request returns 401\nURL: /troubleshooting/api-401\nCheck auth headers.',
+    });
+
+    assert.match(answer, /API key/i);
+    assert.equal(server.requests.length, 1);
+    assert.equal(server.requests[0].request.url, '/responses');
+    assert.equal(server.requests[0].request.headers.authorization, 'Bearer test-key');
+    assert.equal(server.requests[0].body.model, 'test-model');
+    assert.ok(server.requests[0].body.input.some((message) => message.content.includes('[Source 1]')));
+  } finally {
+    await server.close();
+  }
+});
+
 test('Phase 5D ask CLI returns cited answer JSON from a mock provider', () => {
   const tempDir = mkdtempSync(join(tmpdir(), 'kyren-copilot-ask-dry-'));
   const outputPath = join(tempDir, 'knowledge-index.json');
@@ -254,6 +300,64 @@ test('Phase 5D ask CLI returns cited answer JSON from a mock provider', () => {
   assert.ok(result.citations.some((citation) => citation.url === '/troubleshooting/api-401'));
 });
 
+test('Phase 5D ask CLI can select the responses API', () => {
+  const tempDir = mkdtempSync(join(tmpdir(), 'kyren-copilot-ask-responses-'));
+  const outputPath = join(tempDir, 'knowledge-index.json');
+  runScript('scripts/build-copilot-index.mjs', ['--out', outputPath]);
+
+  const output = runScriptWithEnv('scripts/ask-copilot.mjs', [
+    '--index',
+    outputPath,
+    '--lang',
+    'en',
+    '--query',
+    'My API call returns 401. What should I check?',
+    '--json',
+    '--api',
+    'responses',
+    '--dry-run-answer',
+    'Check whether the API key is present and active.',
+  ], {
+    APP_ASSISTANT_PROVIDER: 'openai-compatible',
+    APP_ASSISTANT_BASE_URL: 'http://127.0.0.1:1',
+    APP_ASSISTANT_MODEL: 'test-model',
+    APP_ASSISTANT_API_KEY: 'test-key',
+  });
+  const result = JSON.parse(output);
+
+  assert.equal(result.provider.api, 'responses');
+  assert.equal(result.provider.model, 'test-model');
+  assert.match(result.answer, /API key/i);
+});
+
+test('Phase 5D ask CLI reads the responses API from env', () => {
+  const tempDir = mkdtempSync(join(tmpdir(), 'kyren-copilot-ask-responses-env-'));
+  const outputPath = join(tempDir, 'knowledge-index.json');
+  runScript('scripts/build-copilot-index.mjs', ['--out', outputPath]);
+
+  const output = runScriptWithEnv('scripts/ask-copilot.mjs', [
+    '--index',
+    outputPath,
+    '--lang',
+    'en',
+    '--query',
+    'My API call returns 401. What should I check?',
+    '--json',
+    '--dry-run-answer',
+    'Check whether the API key is present and active.',
+  ], {
+    APP_ASSISTANT_PROVIDER: 'openai-compatible',
+    APP_ASSISTANT_BASE_URL: 'http://127.0.0.1:1',
+    APP_ASSISTANT_MODEL: 'test-model',
+    APP_ASSISTANT_API_KEY: 'test-key',
+    APP_ASSISTANT_API: 'responses',
+  });
+  const result = JSON.parse(output);
+
+  assert.equal(result.provider.api, 'responses');
+});
+
+
 test('Phase 5D config loader reads assistant variables from parent .env', () => {
   const tempRoot = mkdtempSync(join(tmpdir(), 'kyren-env-root-'));
   const docsDir = join(tempRoot, 'kyren-pay-docs');
@@ -282,6 +386,7 @@ test('Phase 5D config loader reads parent staging dotenv and explicit env file',
     'APP_ASSISTANT_BASE_URL=https://staging.example.test',
     'APP_ASSISTANT_MODEL=staging-model',
     'APP_ASSISTANT_API_KEY=staging-secret',
+    'APP_ASSISTANT_API=responses',
     '',
   ].join('\n'));
   writeFileSync(join(tempRoot, '.env.prod'), [
@@ -297,6 +402,7 @@ test('Phase 5D config loader reads parent staging dotenv and explicit env file',
 
   assert.equal(stagingConfig.baseUrl, 'https://staging.example.test');
   assert.equal(stagingConfig.model, 'staging-model');
+  assert.equal(stagingConfig.api, 'responses');
   assert.equal(prodConfig.baseUrl, 'https://prod.example.test');
   assert.equal(prodConfig.model, 'prod-model');
 });

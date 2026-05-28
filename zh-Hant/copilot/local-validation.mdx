@@ -109,6 +109,8 @@ node scripts/ask-copilot.mjs \
 
 使用 `--env-file ../.env.prod` 可以測試生產 provider 配置。
 
+命令預設使用 chat completions API。加入 `--api responses`，或設定 `APP_ASSISTANT_API=responses`，可以改為測試相容 OpenAI Responses 的 endpoint。URL 會基於 `APP_ASSISTANT_BASE_URL` 追加 `/responses`；例如 `https://sub.aclaw.ai` 會變成 `https://sub.aclaw.ai/responses`，`https://sub.aclaw.ai/v1` 會變成 `https://sub.aclaw.ai/v1/responses`。
+
 需要檢查原始回答、引用、回答模式、檢索 chunk 和 provider metadata 時，使用 `--json`：
 
 ```bash
@@ -117,6 +119,7 @@ node scripts/ask-copilot.mjs \
   --index generated/copilot-knowledge-index.json \
   --lang zh-Hant \
   --query "API 請求返回 401，應該檢查什麼？" \
+  --api responses \
   --json
 ```
 

@@ -109,6 +109,8 @@ node scripts/ask-copilot.mjs \
 
 Use `--env-file ../.env.prod` to test the production provider configuration.
 
+The command uses the chat completions API by default. Add `--api responses`, or set `APP_ASSISTANT_API=responses`, to test an OpenAI Responses-compatible endpoint instead. The URL is built from `APP_ASSISTANT_BASE_URL` by appending `/responses`; for example, `https://sub.aclaw.ai` becomes `https://sub.aclaw.ai/responses`, and `https://sub.aclaw.ai/v1` becomes `https://sub.aclaw.ai/v1/responses`.
+
 Use `--json` when you want to inspect the raw answer, citations, answer mode, retrieved chunks, and provider metadata:
 
 ```bash
@@ -117,6 +119,7 @@ node scripts/ask-copilot.mjs \
   --index generated/copilot-knowledge-index.json \
   --lang en \
   --query "My API call returns 401. What should I check?" \
+  --api responses \
   --json
 ```
 
