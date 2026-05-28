@@ -5,7 +5,7 @@ import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { callOpenAICompatible, readConfig } from '../scripts/ask-copilot.mjs';
+import { callOpenAICompatible, chatCompletionsUrl, readConfig } from '../scripts/ask-copilot.mjs';
 
 const node = process.execPath;
 
@@ -212,6 +212,17 @@ test('Phase 5D OpenAI-compatible adapter sends answer context and returns model 
   } finally {
     await server.close();
   }
+});
+
+test('Phase 5D OpenAI-compatible adapter accepts base URLs with or without v1 suffix', () => {
+  assert.equal(
+    chatCompletionsUrl('https://sub.aclaw.ai'),
+    'https://sub.aclaw.ai/v1/chat/completions',
+  );
+  assert.equal(
+    chatCompletionsUrl('https://sub.aclaw.ai/v1'),
+    'https://sub.aclaw.ai/v1/chat/completions',
+  );
 });
 
 test('Phase 5D ask CLI returns cited answer JSON from a mock provider', () => {

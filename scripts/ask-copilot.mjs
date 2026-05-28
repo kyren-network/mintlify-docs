@@ -61,7 +61,7 @@ export function readConfig(env = process.env, cwd = process.cwd(), envFile = nul
 export async function callOpenAICompatible({ baseUrl, model, apiKey }, context) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15000);
-  const response = await fetch(`${baseUrl}/v1/chat/completions`, {
+  const response = await fetch(chatCompletionsUrl(baseUrl), {
     method: 'POST',
     signal: controller.signal,
     headers: {
@@ -96,6 +96,13 @@ export async function callOpenAICompatible({ baseUrl, model, apiKey }, context) 
   }
   const payload = JSON.parse(text);
   return payload.choices?.[0]?.message?.content?.trim() || '';
+}
+
+export function chatCompletionsUrl(baseUrl) {
+  const normalized = baseUrl.replace(/\/+$/, '');
+  return normalized.endsWith('/v1')
+    ? `${normalized}/chat/completions`
+    : `${normalized}/v1/chat/completions`;
 }
 
 export async function runAskCopilot(argv = process.argv) {
