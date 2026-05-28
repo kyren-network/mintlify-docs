@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
 import { buildAnswerContext } from './copilot-local-lib.mjs';
 
 function readArg(argv, name, fallback = null) {
@@ -7,11 +8,24 @@ function readArg(argv, name, fallback = null) {
   return index === -1 ? fallback : argv[index + 1];
 }
 
-function readConfig() {
-  const provider = process.env.APP_ASSISTANT_PROVIDER || 'openai-compatible';
-  const baseUrl = process.env.APP_ASSISTANT_BASE_URL;
-  const model = process.env.APP_ASSISTANT_MODEL;
-  const apiKey = process.env.APP_ASSISTANT_API_KEY;
+export function loadAssistantEnv(env = process.env, cwd = process.cwd()) {
+  for (const file of [path.join(cwd, '.env'), path.join(cwd, '..', '.env')]) {
+    if (!existsSync(file)) continue;
+    for (const line of readFileSync(file, 'utf8').split(/\r?\n/)) {
+      const match = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
+      if (!match || match[1].startsWith('#')) continue;
+      if (env[match[1]] !== undefined) continue;
+      env[match[1]] = match[2].replace(/^['"]|['"]$/g, '');
+    }
+  }
+}
+
+export function readConfig(env = process.env, cwd = process.cwd()) {
+  loadAssistantEnv(env, cwd);
+  const provider = env.APP_ASSISTANT_PROVIDER || 'openai-compatible';
+  const baseUrl = env.APP_ASSISTANT_BASE_URL;
+  const model = env.APP_ASSISTANT_MODEL;
+  const apiKey = env.APP_ASSISTANT_API_KEY;
   if (provider !== 'openai-compatible') {
     throw new Error(`Unsupported APP_ASSISTANT_PROVIDER: ${provider}`);
   }

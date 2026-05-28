@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { callOpenAICompatible } from '../scripts/ask-copilot.mjs';
+import { callOpenAICompatible, readConfig } from '../scripts/ask-copilot.mjs';
 
 const node = process.execPath;
 
@@ -241,6 +241,25 @@ test('Phase 5D ask CLI returns cited answer JSON from a mock provider', () => {
   assert.equal(result.provider.model, 'test-model');
   assert.match(result.answer, /API key/i);
   assert.ok(result.citations.some((citation) => citation.url === '/troubleshooting/api-401'));
+});
+
+test('Phase 5D config loader reads assistant variables from parent .env', () => {
+  const tempRoot = mkdtempSync(join(tmpdir(), 'kyren-env-root-'));
+  const docsDir = join(tempRoot, 'kyren-pay-docs');
+  mkdirSync(docsDir);
+  writeFileSync(join(tempRoot, '.env'), [
+    'APP_ASSISTANT_PROVIDER=openai-compatible',
+    'APP_ASSISTANT_BASE_URL=https://example.test',
+    'APP_ASSISTANT_MODEL=test-model',
+    'APP_ASSISTANT_API_KEY=test-secret',
+    '',
+  ].join('\n'));
+  const config = readConfig({}, docsDir);
+
+  assert.equal(config.provider, 'openai-compatible');
+  assert.equal(config.baseUrl, 'https://example.test');
+  assert.equal(config.model, 'test-model');
+  assert.equal(config.apiKey, 'test-secret');
 });
 
 test('local validation scripts are committed source files', () => {
