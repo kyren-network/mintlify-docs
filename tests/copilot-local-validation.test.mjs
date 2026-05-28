@@ -214,10 +214,10 @@ test('Phase 5D OpenAI-compatible adapter sends answer context and returns model 
   }
 });
 
-test('Phase 5D OpenAI-compatible adapter accepts base URLs with or without v1 suffix', () => {
+test('Phase 5D OpenAI-compatible adapter appends chat completions to base URL without adding v1', () => {
   assert.equal(
     chatCompletionsUrl('https://sub.aclaw.ai'),
-    'https://sub.aclaw.ai/v1/chat/completions',
+    'https://sub.aclaw.ai/chat/completions',
   );
   assert.equal(
     chatCompletionsUrl('https://sub.aclaw.ai/v1'),

@@ -94,15 +94,18 @@ export async function callOpenAICompatible({ baseUrl, model, apiKey }, context) 
   if (!response.ok) {
     throw new Error(`Provider request failed with HTTP ${response.status}: ${text.slice(0, 500)}`);
   }
-  const payload = JSON.parse(text);
+  let payload;
+  try {
+    payload = JSON.parse(text);
+  } catch {
+    throw new Error(`Provider returned non-JSON response: ${text.slice(0, 200)}`);
+  }
   return payload.choices?.[0]?.message?.content?.trim() || '';
 }
 
 export function chatCompletionsUrl(baseUrl) {
   const normalized = baseUrl.replace(/\/+$/, '');
-  return normalized.endsWith('/v1')
-    ? `${normalized}/chat/completions`
-    : `${normalized}/v1/chat/completions`;
+  return `${normalized}/chat/completions`;
 }
 
 export async function runAskCopilot(argv = process.argv) {
