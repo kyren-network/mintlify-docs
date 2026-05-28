@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
+import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
+import { callOpenAICompatible } from '../scripts/ask-copilot.mjs';
 
 const node = process.execPath;
 
@@ -12,6 +14,49 @@ function runScript(script, args = []) {
     cwd: new URL('..', import.meta.url),
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
+  });
+}
+
+function runScriptWithEnv(script, args = [], env = {}) {
+  return execFileSync(node, [script, ...args], {
+    cwd: new URL('..', import.meta.url),
+    encoding: 'utf8',
+    env: { ...process.env, ...env },
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+}
+
+function startMockOpenAICompatibleServer() {
+  const requests = [];
+  const server = createServer((request, response) => {
+    let body = '';
+    request.on('data', (chunk) => {
+      body += chunk;
+    });
+    request.on('end', () => {
+      const parsed = JSON.parse(body);
+      requests.push({ request, body: parsed });
+      response.setHeader('content-type', 'application/json');
+      response.end(JSON.stringify({
+        choices: [
+          {
+            message: {
+              content: 'Check whether the API key is present and active. Do not share the full key. See the cited troubleshooting page.',
+            },
+          },
+        ],
+      }));
+    });
+  });
+  return new Promise((resolve) => {
+    server.listen(0, '127.0.0.1', () => {
+      const address = server.address();
+      resolve({
+        baseUrl: `http://127.0.0.1:${address.port}`,
+        close: () => new Promise((done) => server.close(done)),
+        requests,
+      });
+    });
   });
 }
 
@@ -147,10 +192,62 @@ test('Phase 5C answer context flags support handoff questions', () => {
   assert.ok(context.instructions.mustNot.some((rule) => /settlement|结算|結算/i.test(rule)));
 });
 
+test('Phase 5D OpenAI-compatible adapter sends answer context and returns model text', async () => {
+  const server = await startMockOpenAICompatibleServer();
+
+  try {
+    const answer = await callOpenAICompatible({
+      baseUrl: server.baseUrl,
+      model: 'test-model',
+      apiKey: 'test-key',
+    }, {
+      prompt: '[Source 1] API request returns 401\nURL: /troubleshooting/api-401\nCheck auth headers.',
+    });
+
+    assert.match(answer, /API key/i);
+    assert.equal(server.requests.length, 1);
+    assert.equal(server.requests[0].request.headers.authorization, 'Bearer test-key');
+    assert.equal(server.requests[0].body.model, 'test-model');
+    assert.ok(server.requests[0].body.messages.some((message) => message.content.includes('[Source 1]')));
+  } finally {
+    await server.close();
+  }
+});
+
+test('Phase 5D ask CLI returns cited answer JSON from a mock provider', () => {
+  const tempDir = mkdtempSync(join(tmpdir(), 'kyren-copilot-ask-dry-'));
+  const outputPath = join(tempDir, 'knowledge-index.json');
+  runScript('scripts/build-copilot-index.mjs', ['--out', outputPath]);
+
+  const output = runScriptWithEnv('scripts/ask-copilot.mjs', [
+    '--index',
+    outputPath,
+    '--lang',
+    'en',
+    '--query',
+    'My API call returns 401. What should I check?',
+    '--json',
+    '--dry-run-answer',
+    'Check whether the API key is present and active.',
+  ], {
+    APP_ASSISTANT_PROVIDER: 'openai-compatible',
+    APP_ASSISTANT_BASE_URL: 'http://127.0.0.1:1',
+    APP_ASSISTANT_MODEL: 'test-model',
+    APP_ASSISTANT_API_KEY: 'test-key',
+  });
+  const result = JSON.parse(output);
+
+  assert.equal(result.provider.provider, 'openai-compatible');
+  assert.equal(result.provider.model, 'test-model');
+  assert.match(result.answer, /API key/i);
+  assert.ok(result.citations.some((citation) => citation.url === '/troubleshooting/api-401'));
+});
+
 test('local validation scripts are committed source files', () => {
   assert.equal(existsSync(new URL('../scripts/validate-copilot-sources.mjs', import.meta.url)), true);
   assert.equal(existsSync(new URL('../scripts/evaluate-copilot-retrieval.mjs', import.meta.url)), true);
   assert.equal(existsSync(new URL('../scripts/build-copilot-index.mjs', import.meta.url)), true);
   assert.equal(existsSync(new URL('../scripts/query-copilot-index.mjs', import.meta.url)), true);
   assert.equal(existsSync(new URL('../scripts/build-copilot-answer-context.mjs', import.meta.url)), true);
+  assert.equal(existsSync(new URL('../scripts/ask-copilot.mjs', import.meta.url)), true);
 });

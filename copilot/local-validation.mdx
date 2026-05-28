@@ -86,6 +86,38 @@ The answer context package is the handoff object for a future Copilot answer API
 
 This command still does not call an LLM. It validates that the retrieval output can be transformed into a safe, cited answer context before adding model generation.
 
+## Ask Copilot locally
+
+Set the OpenAI-compatible provider environment variables in the shell that runs the command:
+
+```bash
+export APP_ASSISTANT_PROVIDER=openai-compatible
+export APP_ASSISTANT_BASE_URL=https://sub.aclaw.ai
+export APP_ASSISTANT_MODEL=openai/GPT-5.5
+export APP_ASSISTANT_API_KEY=...
+```
+
+Then ask a merchant-style question:
+
+```bash
+node scripts/ask-copilot.mjs \
+  --index generated/copilot-knowledge-index.json \
+  --lang en \
+  --query "My API call returns 401. What should I check?"
+```
+
+Use `--json` when you want to inspect the raw answer, citations, answer mode, retrieved chunks, and provider metadata:
+
+```bash
+node scripts/ask-copilot.mjs \
+  --index generated/copilot-knowledge-index.json \
+  --lang en \
+  --query "My API call returns 401. What should I check?" \
+  --json
+```
+
+The command sends only the generated answer context to the configured provider. It does not print the API key.
+
 ## Run tests
 
 ```bash

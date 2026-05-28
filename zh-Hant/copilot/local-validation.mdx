@@ -86,6 +86,38 @@ node scripts/build-copilot-answer-context.mjs \
 
 該命令仍然不會呼叫 LLM。它用於驗證在加入模型生成前，檢索結果能否被轉換成安全、帶引用的回答上下文。
 
+## 本地向 Copilot 提問
+
+在執行命令的同一個 shell 中設定 OpenAI-compatible provider 環境變數：
+
+```bash
+export APP_ASSISTANT_PROVIDER=openai-compatible
+export APP_ASSISTANT_BASE_URL=https://sub.aclaw.ai
+export APP_ASSISTANT_MODEL=openai/GPT-5.5
+export APP_ASSISTANT_API_KEY=...
+```
+
+然後用商戶問題進行測試：
+
+```bash
+node scripts/ask-copilot.mjs \
+  --index generated/copilot-knowledge-index.json \
+  --lang zh-Hant \
+  --query "API 請求返回 401，應該檢查什麼？"
+```
+
+需要檢查原始回答、引用、回答模式、檢索 chunk 和 provider metadata 時，使用 `--json`：
+
+```bash
+node scripts/ask-copilot.mjs \
+  --index generated/copilot-knowledge-index.json \
+  --lang zh-Hant \
+  --query "API 請求返回 401，應該檢查什麼？" \
+  --json
+```
+
+該命令只會把生成的回答上下文發送給配置的 provider，不會列印 API key。
+
 ## 執行測試
 
 ```bash

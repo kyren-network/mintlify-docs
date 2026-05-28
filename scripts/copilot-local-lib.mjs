@@ -276,7 +276,7 @@ export function retrieve(query, sources, language, limit = 3) {
 }
 
 export function retrieveFromIndex(query, index, language, limit = 3) {
-  const chunks = index.chunks || [];
+  const chunks = (index.chunks || []).filter((chunk) => chunk.intent !== 'retrieval_evaluation');
   return retrieve(query, chunks, language, Math.max(limit * 4, limit))
     .reduce((unique, chunk) => {
       if (!unique.some((item) => item.url === chunk.url)) unique.push(chunk);
