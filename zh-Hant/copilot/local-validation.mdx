@@ -88,7 +88,7 @@ node scripts/build-copilot-answer-context.mjs \
 
 ## 本地向 Copilot 提問
 
-在執行命令的同一個 shell 中設定 OpenAI-compatible provider 環境變數：
+在執行命令的同一個 shell 中設定 OpenAI-compatible provider 環境變數，或放在倉庫根目錄的 `.env.staging` / `.env.prod`：
 
 ```bash
 export APP_ASSISTANT_PROVIDER=openai-compatible
@@ -101,15 +101,19 @@ export APP_ASSISTANT_API_KEY=...
 
 ```bash
 node scripts/ask-copilot.mjs \
+  --env-file ../.env.staging \
   --index generated/copilot-knowledge-index.json \
   --lang zh-Hant \
   --query "API 請求返回 401，應該檢查什麼？"
 ```
 
+使用 `--env-file ../.env.prod` 可以測試生產 provider 配置。
+
 需要檢查原始回答、引用、回答模式、檢索 chunk 和 provider metadata 時，使用 `--json`：
 
 ```bash
 node scripts/ask-copilot.mjs \
+  --env-file ../.env.staging \
   --index generated/copilot-knowledge-index.json \
   --lang zh-Hant \
   --query "API 請求返回 401，應該檢查什麼？" \

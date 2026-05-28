@@ -9,7 +9,7 @@ function readArg(argv, name, fallback = null) {
 }
 
 export function loadAssistantEnv(env = process.env, cwd = process.cwd()) {
-  for (const file of [path.join(cwd, '.env'), path.join(cwd, '..', '.env')]) {
+  for (const file of defaultEnvFiles(cwd)) {
     if (!existsSync(file)) continue;
     for (const line of readFileSync(file, 'utf8').split(/\r?\n/)) {
       const match = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
@@ -20,7 +20,30 @@ export function loadAssistantEnv(env = process.env, cwd = process.cwd()) {
   }
 }
 
-export function readConfig(env = process.env, cwd = process.cwd()) {
+function defaultEnvFiles(cwd) {
+  return [
+    path.join(cwd, '.env'),
+    path.join(cwd, '.env.staging'),
+    path.join(cwd, '.env.prod'),
+    path.join(cwd, '..', '.env'),
+    path.join(cwd, '..', '.env.staging'),
+    path.join(cwd, '..', '.env.prod'),
+  ];
+}
+
+export function loadAssistantEnvFile(file, env = process.env) {
+  if (!existsSync(file)) throw new Error(`Env file not found: ${file}`);
+  for (const line of readFileSync(file, 'utf8').split(/\r?\n/)) {
+    const match = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
+    if (!match || match[1].startsWith('#')) continue;
+    env[match[1]] = match[2].replace(/^['"]|['"]$/g, '');
+  }
+}
+
+export function readConfig(env = process.env, cwd = process.cwd(), envFile = null) {
+  if (envFile) {
+    loadAssistantEnvFile(path.resolve(cwd, envFile), env);
+  }
   loadAssistantEnv(env, cwd);
   const provider = env.APP_ASSISTANT_PROVIDER || 'openai-compatible';
   const baseUrl = env.APP_ASSISTANT_BASE_URL;
@@ -81,6 +104,7 @@ export async function runAskCopilot(argv = process.argv) {
   const language = readArg(argv, '--lang', 'en');
   const limit = Number(readArg(argv, '--limit', '3'));
   const dryRunAnswer = readArg(argv, '--dry-run-answer');
+  const envFile = readArg(argv, '--env-file');
   const json = argv.includes('--json');
 
   if (!query) {
@@ -95,7 +119,7 @@ export async function runAskCopilot(argv = process.argv) {
         baseUrl: process.env.APP_ASSISTANT_BASE_URL || 'dry-run',
         model: process.env.APP_ASSISTANT_MODEL || 'dry-run',
       }
-    : readConfig();
+    : readConfig(process.env, process.cwd(), envFile);
   const answer = dryRunAnswer || await callOpenAICompatible(config, context);
   return {
     query,

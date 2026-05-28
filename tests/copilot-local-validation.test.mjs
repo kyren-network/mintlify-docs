@@ -262,6 +262,34 @@ test('Phase 5D config loader reads assistant variables from parent .env', () => 
   assert.equal(config.apiKey, 'test-secret');
 });
 
+test('Phase 5D config loader reads parent staging dotenv and explicit env file', () => {
+  const tempRoot = mkdtempSync(join(tmpdir(), 'kyren-env-stage-root-'));
+  const docsDir = join(tempRoot, 'kyren-pay-docs');
+  mkdirSync(docsDir);
+  writeFileSync(join(tempRoot, '.env.staging'), [
+    'APP_ASSISTANT_PROVIDER=openai-compatible',
+    'APP_ASSISTANT_BASE_URL=https://staging.example.test',
+    'APP_ASSISTANT_MODEL=staging-model',
+    'APP_ASSISTANT_API_KEY=staging-secret',
+    '',
+  ].join('\n'));
+  writeFileSync(join(tempRoot, '.env.prod'), [
+    'APP_ASSISTANT_PROVIDER=openai-compatible',
+    'APP_ASSISTANT_BASE_URL=https://prod.example.test',
+    'APP_ASSISTANT_MODEL=prod-model',
+    'APP_ASSISTANT_API_KEY=prod-secret',
+    '',
+  ].join('\n'));
+
+  const stagingConfig = readConfig({}, docsDir);
+  const prodConfig = readConfig({}, docsDir, '../.env.prod');
+
+  assert.equal(stagingConfig.baseUrl, 'https://staging.example.test');
+  assert.equal(stagingConfig.model, 'staging-model');
+  assert.equal(prodConfig.baseUrl, 'https://prod.example.test');
+  assert.equal(prodConfig.model, 'prod-model');
+});
+
 test('local validation scripts are committed source files', () => {
   assert.equal(existsSync(new URL('../scripts/validate-copilot-sources.mjs', import.meta.url)), true);
   assert.equal(existsSync(new URL('../scripts/evaluate-copilot-retrieval.mjs', import.meta.url)), true);

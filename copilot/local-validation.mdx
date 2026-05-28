@@ -88,7 +88,7 @@ This command still does not call an LLM. It validates that the retrieval output 
 
 ## Ask Copilot locally
 
-Set the OpenAI-compatible provider environment variables in the shell that runs the command:
+Set the OpenAI-compatible provider environment variables in the shell that runs the command, or place them in `.env.staging` or `.env.prod` in the repository root:
 
 ```bash
 export APP_ASSISTANT_PROVIDER=openai-compatible
@@ -101,15 +101,19 @@ Then ask a merchant-style question:
 
 ```bash
 node scripts/ask-copilot.mjs \
+  --env-file ../.env.staging \
   --index generated/copilot-knowledge-index.json \
   --lang en \
   --query "My API call returns 401. What should I check?"
 ```
 
+Use `--env-file ../.env.prod` to test the production provider configuration.
+
 Use `--json` when you want to inspect the raw answer, citations, answer mode, retrieved chunks, and provider metadata:
 
 ```bash
 node scripts/ask-copilot.mjs \
+  --env-file ../.env.staging \
   --index generated/copilot-knowledge-index.json \
   --lang en \
   --query "My API call returns 401. What should I check?" \
