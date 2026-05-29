@@ -1,46 +1,44 @@
 #!/usr/bin/env node
 import {
-  assertFilesExist,
-  extractCopilotGroups,
   loadPublicSources,
   readDocsConfig,
 } from './copilot-local-lib.mjs';
 
 const root = process.cwd();
 const config = readDocsConfig(root);
-const groups = extractCopilotGroups(config);
 const sources = loadPublicSources(root);
 const errors = [];
 
-if (groups.length !== 3) {
-  errors.push(`Expected 3 localized Copilot navigation groups, found ${groups.length}.`);
-}
-
-for (const group of groups) {
-  if (group.pages.length !== 7) {
-    errors.push(`${group.language} Copilot group should contain 7 pages, found ${group.pages.length}.`);
-  }
-  const missing = assertFilesExist(root, group.pages);
-  if (missing.length) {
-    errors.push(`${group.language} Copilot group references missing pages: ${missing.join(', ')}`);
-  }
+const navigationText = JSON.stringify(config.navigation);
+if (/Copilot/.test(navigationText) || /copilot\//.test(navigationText)) {
+  errors.push('Copilot source pages must not be exposed in public documentation navigation.');
 }
 
 const sourceFiles = new Set(sources.map((source) => source.file));
-for (const expected of [
+const expectedSources = [
+  'copilot/answer-boundaries.mdx',
+  'copilot/question-routing.mdx',
+  'copilot/support-escalation.mdx',
   'copilot/retrieval-index.mdx',
   'copilot/chunking-and-citations.mdx',
   'copilot/retrieval-evaluation.mdx',
   'copilot/local-validation.mdx',
+  'zh/copilot/answer-boundaries.mdx',
+  'zh/copilot/question-routing.mdx',
+  'zh/copilot/support-escalation.mdx',
   'zh/copilot/retrieval-index.mdx',
   'zh/copilot/chunking-and-citations.mdx',
   'zh/copilot/retrieval-evaluation.mdx',
   'zh/copilot/local-validation.mdx',
+  'zh-Hant/copilot/answer-boundaries.mdx',
+  'zh-Hant/copilot/question-routing.mdx',
+  'zh-Hant/copilot/support-escalation.mdx',
   'zh-Hant/copilot/retrieval-index.mdx',
   'zh-Hant/copilot/chunking-and-citations.mdx',
   'zh-Hant/copilot/retrieval-evaluation.mdx',
   'zh-Hant/copilot/local-validation.mdx',
-]) {
+];
+for (const expected of expectedSources) {
   if (!sourceFiles.has(expected)) errors.push(`Expected indexed source file is missing: ${expected}`);
 }
 
@@ -61,7 +59,9 @@ if (errors.length) {
 }
 
 console.log('Copilot source validation passed');
-for (const group of groups) {
-  console.log(`${group.language}: ${group.pages.length} Copilot pages`);
+for (const language of ['en', 'zh', 'zh-Hant']) {
+  const prefix = language === 'en' ? 'copilot/' : `${language}/copilot/`;
+  const count = expectedSources.filter((file) => file.startsWith(prefix)).length;
+  console.log(`${language}: ${count} private Copilot source files`);
 }
 console.log(`Indexed source files: ${sources.length}`);

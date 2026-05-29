@@ -76,9 +76,9 @@ test('Copilot source validator reports indexed sources and language coverage', (
   const output = runScript('scripts/validate-copilot-sources.mjs');
 
   assert.match(output, /Copilot source validation passed/);
-  assert.match(output, /en: 7 Copilot pages/);
-  assert.match(output, /zh: 7 Copilot pages/);
-  assert.match(output, /zh-Hant: 7 Copilot pages/);
+  assert.match(output, /en: 7 private Copilot source files/);
+  assert.match(output, /zh: 7 private Copilot source files/);
+  assert.match(output, /zh-Hant: 7 private Copilot source files/);
   assert.match(output, /Indexed source files:/);
 });
 

@@ -801,31 +801,38 @@ components:
 
     OrderStatus:
       type: string
-      enum: [PENDING, PAID, SETTLED, REFUNDED, DISPUTED, FAILED, CLOSED, REVOKED]
+      enum: [CREATING, PENDING, PAID, SETTLED, REFUNDED, DISPUTED, CHARGEBACK, FAILED, CLOSED, REVOKED]
       description: |
+        - `CREATING` — Order is being created while waiting for gateway result
         - `PENDING` — Order created, awaiting payment confirmation
         - `PAID` — Payment confirmed
         - `SETTLED` — Funds settled to merchant balance
         - `REFUNDED` — Order has been refunded
         - `DISPUTED` — Order is under dispute
+        - `CHARGEBACK` — Card payment was charged back
         - `FAILED` — Payment failed
         - `CLOSED` — Order closed (expired or unpaid)
         - `REVOKED` — Order has been revoked
 
     PaymentMethod:
       type: string
-      enum: [CREDIT_CARD, WECHAT_PAY, ALIPAY, PAYNOW]
+      enum: [CREDIT_CARD, APPLE_PAY, GOOGLE_PAY, WECHAT_PAY, ALIPAY, ALIPAY_HK, BOOST, TOUCH_N_GO_EWALLET, LINE_PAY, KREDIVO, GCASH, PAYNOW, CRYPTO]
       description: The payment method used by the customer
 
     BalanceTransactionType:
       type: string
-      enum: [PAYMENT, SETTLEMENT, PAYOUT, FREEZE, UNFREEZE, CHARGEBACK, REFUND, FEE]
+      enum: [PAYMENT, SETTLEMENT, PAYOUT, FREEZE, UNFREEZE, CHARGEBACK, CHARGEBACK_FEE, ROLLING_RESERVE, ROLLING_RESERVE_RELEASE, ROLLING_RESERVE_OFFSET, ADMIN_RECHARGE, REFUND, FEE]
       description: |
         - `PAYMENT` — Payment received (added to pending)
         - `SETTLEMENT` — Funds settled (pending → available)
         - `PAYOUT` — Payout deducted from available
         - `FREEZE` / `UNFREEZE` — Funds frozen or released
         - `CHARGEBACK` — Chargeback deduction
+        - `CHARGEBACK_FEE` — Chargeback fee deduction
+        - `ROLLING_RESERVE` — Rolling reserve hold
+        - `ROLLING_RESERVE_RELEASE` — Rolling reserve release
+        - `ROLLING_RESERVE_OFFSET` — Rolling reserve used to offset chargeback loss
+        - `ADMIN_RECHARGE` — Manual admin recharge
         - `REFUND` — Refund deduction
         - `FEE` — Fee deduction
 
@@ -1213,6 +1220,9 @@ components:
           description: Exchange rate from payment currency to HKD used by the payment gateway (null for HKD orders)
         paymentMethod:
           $ref: "#/components/schemas/PaymentMethod"
+        type:
+          type: string
+          enum: [PAYMENT, ONBOARDING_FEE]
         status:
           $ref: "#/components/schemas/OrderStatus"
         paidAt:
@@ -1248,7 +1258,39 @@ components:
             gatewayTransactionId:
               type: string
               nullable: true
+            settleDateTime:
+              type: integer
+              format: int64
+              nullable: true
             payerIp:
+              type: string
+              nullable: true
+            gatewayCallbackIp:
+              type: string
+              nullable: true
+            clientUserAgent:
+              type: string
+              nullable: true
+            gatewayPaidAmount:
+              type: string
+              nullable: true
+            gatewayPaidCurrency:
+              type: string
+              nullable: true
+            gatewayPaidAt:
+              type: integer
+              format: int64
+              nullable: true
+            cardNo:
+              type: string
+              nullable: true
+            cardOrgn:
+              type: string
+              nullable: true
+            localCurrency:
+              type: string
+              nullable: true
+            localAmount:
               type: string
               nullable: true
             updatedAt:
@@ -1268,6 +1310,9 @@ components:
         frozen:
           type: string
           description: Funds currently frozen
+        rollingReserve:
+          type: string
+          description: Funds currently held as rolling reserve
         currency:
           type: string
         updatedAt:
@@ -1316,14 +1361,21 @@ components:
           type: string
         frozenAfter:
           type: string
+        rollingReserveAfter:
+          type: string
+          nullable: true
         sourceType:
           type: string
           description: "Type of the source resource (e.g. order, payout)"
         sourceId:
           type: string
           description: ID of the source resource
+        receiptUrl:
+          type: string
+          nullable: true
         description:
           type: string
+          nullable: true
         createdAt:
           type: integer
           format: int64

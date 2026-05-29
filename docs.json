@@ -38,7 +38,11 @@
                   "dashboard/products",
                   "dashboard/checkouts",
                   "dashboard/orders",
-                  "dashboard/developer-settings"
+                  "dashboard/funds",
+                  "dashboard/kyc",
+                  "dashboard/kyb",
+                  "dashboard/developer-settings",
+                  "dashboard/personal-settings"
                 ]
               },
               {
@@ -81,18 +85,6 @@
                 ]
               },
               {
-                "group": "Copilot Sources",
-                "pages": [
-                  "copilot/answer-boundaries",
-                  "copilot/question-routing",
-                  "copilot/support-escalation",
-                  "copilot/retrieval-index",
-                  "copilot/chunking-and-citations",
-                  "copilot/retrieval-evaluation",
-                  "copilot/local-validation"
-                ]
-              },
-              {
                 "group": "References",
                 "pages": [
                   "authentication",
@@ -132,7 +124,11 @@
                   "zh/dashboard/products",
                   "zh/dashboard/checkouts",
                   "zh/dashboard/orders",
-                  "zh/dashboard/developer-settings"
+                  "zh/dashboard/funds",
+                  "zh/dashboard/kyc",
+                  "zh/dashboard/kyb",
+                  "zh/dashboard/developer-settings",
+                  "zh/dashboard/personal-settings"
                 ]
               },
               {
@@ -175,18 +171,6 @@
                 ]
               },
               {
-                "group": "Copilot 数据源",
-                "pages": [
-                  "zh/copilot/answer-boundaries",
-                  "zh/copilot/question-routing",
-                  "zh/copilot/support-escalation",
-                  "zh/copilot/retrieval-index",
-                  "zh/copilot/chunking-and-citations",
-                  "zh/copilot/retrieval-evaluation",
-                  "zh/copilot/local-validation"
-                ]
-              },
-              {
                 "group": "参考",
                 "pages": [
                   "zh/authentication",
@@ -226,7 +210,11 @@
                   "zh-Hant/dashboard/products",
                   "zh-Hant/dashboard/checkouts",
                   "zh-Hant/dashboard/orders",
-                  "zh-Hant/dashboard/developer-settings"
+                  "zh-Hant/dashboard/funds",
+                  "zh-Hant/dashboard/kyc",
+                  "zh-Hant/dashboard/kyb",
+                  "zh-Hant/dashboard/developer-settings",
+                  "zh-Hant/dashboard/personal-settings"
                 ]
               },
               {
@@ -266,18 +254,6 @@
                 "group": "常見問題",
                 "pages": [
                   "zh-Hant/faq/common-questions"
-                ]
-              },
-              {
-                "group": "Copilot 資料源",
-                "pages": [
-                  "zh-Hant/copilot/answer-boundaries",
-                  "zh-Hant/copilot/question-routing",
-                  "zh-Hant/copilot/support-escalation",
-                  "zh-Hant/copilot/retrieval-index",
-                  "zh-Hant/copilot/chunking-and-citations",
-                  "zh-Hant/copilot/retrieval-evaluation",
-                  "zh-Hant/copilot/local-validation"
                 ]
               },
               {

@@ -10,6 +10,8 @@ description: 所有 Webhook 事件類型及其載荷
 | 事件 | 描述 | 觸發條件 |
 | --- | --- | --- |
 | `order.paid` | 付款已確認 | 客戶完成收銀台付款 |
+| `order.refunded` | 訂單退款已生效 | 退款成功 |
+| `order.closed` | 訂單未成功付款並已關閉 | 付款取消、失敗、逾時、授權釋放，或閘道關閉訂單 |
 
 ## 事件物件結構
 
@@ -70,6 +72,76 @@ description: 所有 Webhook 事件類型及其載荷
   這是最重要的事件。用它來完成訂單處理 — 例如，為使用者的帳戶充值額度。
 </Tip>
 
+## order.refunded
+
+訂單退款已生效時發送。你可以用此事件更新權益、餘額或對帳記錄。
+
+```json
+{
+  "id": "evt_refund123",
+  "type": "order.refunded",
+  "created_at": 1736932600000,
+  "data": {
+    "order_id": "order_def456",
+    "refund_id": "refund_abc123",
+    "refund_status": "PARTIAL",
+    "amount": "2.50",
+    "currency": "USD",
+    "refunded_amount": "2.50",
+    "original_amount": "9.99",
+    "reason": "customer_request",
+    "metadata": { "user_id": "u_123" }
+  }
+}
+```
+
+| 欄位 | 類型 | 描述 |
+| --- | --- | --- |
+| `order_id` | string | 訂單 ID |
+| `refund_id` | string | 退款 ID |
+| `refund_status` | string | 訂單退款狀態，例如 `PARTIAL` 或 `FULL` |
+| `amount` | string | 本次事件對應的退款金額 |
+| `currency` | string | 三字母貨幣代碼 |
+| `refunded_amount` | string | 本次退款後訂單累計已退款金額 |
+| `original_amount` | string | 原訂單金額 |
+| `reason` | string \| null | 退款原因 |
+| `metadata` | object \| null | 建立 Checkout Session 時傳入的 metadata |
+
+## order.closed
+
+訂單未成功付款並關閉時發送。
+
+```json
+{
+  "id": "evt_closed123",
+  "type": "order.closed",
+  "created_at": 1736932700000,
+  "data": {
+    "order_id": "order_def456",
+    "product_id": "prod_abc123",
+    "customer_email": "customer@example.com",
+    "amount": "9.99",
+    "currency": "USD",
+    "closed_at": 1736932700000,
+    "close_reason": "payment_timeout",
+    "compat": { "epay_trade_status": "TRADE_CLOSED" },
+    "metadata": { "user_id": "u_123" }
+  }
+}
+```
+
+| 欄位 | 類型 | 描述 |
+| --- | --- | --- |
+| `order_id` | string | 訂單 ID |
+| `product_id` | string | 購買的產品 |
+| `customer_email` | string | 客戶電子郵件地址 |
+| `amount` | string | 訂單總金額 |
+| `currency` | string | 三字母貨幣代碼 |
+| `closed_at` | integer | 訂單關閉時間（Unix 毫秒時間戳） |
+| `close_reason` | string | 關閉原因，例如 `payment_canceled`、`payment_failed`、`payment_timeout`、`authorization_released` 或 `gateway_closed` |
+| `compat` | object | 面向舊處理器的相容欄位 |
+| `metadata` | object \| null | 建立 Checkout Session 時傳入的 metadata |
+
 ## 處理事件
 
 以下是在 Webhook 端點中處理事件的方式：
@@ -83,6 +155,12 @@ app.post('/webhooks/kyren', (req, res) => {
   switch (event.type) {
     case 'order.paid':
       handleOrderPaid(event.data);
+      break;
+    case 'order.refunded':
+      handleOrderRefunded(event.data);
+      break;
+    case 'order.closed':
+      handleOrderClosed(event.data);
       break;
     default:
       console.log(`未處理的事件類型: ${event.type}`);

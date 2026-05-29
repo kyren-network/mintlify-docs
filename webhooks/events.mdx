@@ -10,6 +10,8 @@ Kyren Pay sends webhook notifications for the following event types.
 | Event | Description | Trigger |
 | --- | --- | --- |
 | `order.paid` | A payment has been confirmed | Customer completes checkout |
+| `order.refunded` | A refund has been applied to an order | A refund succeeds |
+| `order.closed` | An order has been closed without successful payment | Payment is canceled, fails, times out, authorization is released, or the gateway closes the order |
 
 ## Event Object Structure
 
@@ -70,6 +72,76 @@ Sent when a customer successfully completes a payment.
   This is the most important event. Use it to fulfill orders — for example, adding credits to a user's account.
 </Tip>
 
+## order.refunded
+
+Sent when a refund has been applied to an order. Use this event to update entitlement, balance, or reconciliation records in your system.
+
+```json
+{
+  "id": "evt_refund123",
+  "type": "order.refunded",
+  "created_at": 1736932600000,
+  "data": {
+    "order_id": "order_def456",
+    "refund_id": "refund_abc123",
+    "refund_status": "PARTIAL",
+    "amount": "2.50",
+    "currency": "USD",
+    "refunded_amount": "2.50",
+    "original_amount": "9.99",
+    "reason": "customer_request",
+    "metadata": { "user_id": "u_123" }
+  }
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `order_id` | string | The order ID |
+| `refund_id` | string | The refund ID |
+| `refund_status` | string | Order refund status, such as `PARTIAL` or `FULL` |
+| `amount` | string | Amount refunded by this event |
+| `currency` | string | Three-letter currency code |
+| `refunded_amount` | string | Total refunded amount on the order after this refund |
+| `original_amount` | string | Original order amount |
+| `reason` | string \| null | Refund reason |
+| `metadata` | object \| null | The metadata you passed when creating the checkout session |
+
+## order.closed
+
+Sent when an order is closed without successful payment.
+
+```json
+{
+  "id": "evt_closed123",
+  "type": "order.closed",
+  "created_at": 1736932700000,
+  "data": {
+    "order_id": "order_def456",
+    "product_id": "prod_abc123",
+    "customer_email": "customer@example.com",
+    "amount": "9.99",
+    "currency": "USD",
+    "closed_at": 1736932700000,
+    "close_reason": "payment_timeout",
+    "compat": { "epay_trade_status": "TRADE_CLOSED" },
+    "metadata": { "user_id": "u_123" }
+  }
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `order_id` | string | The order ID |
+| `product_id` | string | The product that was being purchased |
+| `customer_email` | string | Customer's email address |
+| `amount` | string | Total order amount |
+| `currency` | string | Three-letter currency code |
+| `closed_at` | integer | When the order was closed (Unix timestamp in milliseconds) |
+| `close_reason` | string | Closure reason, such as `payment_canceled`, `payment_failed`, `payment_timeout`, `authorization_released`, or `gateway_closed` |
+| `compat` | object | Compatibility fields for legacy processors |
+| `metadata` | object \| null | The metadata you passed when creating the checkout session |
+
 ## Handling Events
 
 Here's how to handle webhook events in your endpoint:
@@ -83,6 +155,12 @@ app.post('/webhooks/kyren', (req, res) => {
   switch (event.type) {
     case 'order.paid':
       handleOrderPaid(event.data);
+      break;
+    case 'order.refunded':
+      handleOrderRefunded(event.data);
+      break;
+    case 'order.closed':
+      handleOrderClosed(event.data);
       break;
     default:
       console.log(`Unhandled event: ${event.type}`);
