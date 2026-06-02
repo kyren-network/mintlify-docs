@@ -218,6 +218,9 @@ export function tokenize(input) {
   const phraseTokens = [];
   const phraseMap = [
     [/没有收到|未收到|did not receive/, 'webhook-not-received'],
+    [/(request|申请|申請).*(order refund|订单退款|訂單退款|退款)|order refund|订单退款|訂單退款/, 'order-refunds'],
+    [/acquiring currency|settlement currency|收单货币|收單貨幣|结算货币|結算貨幣/, 'funds-currency'],
+    [/webhook.*(event|events)|事件类型|有哪些事件|哪些事件|webhook.*(退款|关单|關單)|事件.*(退款|关单|關單)|order\.refunded|order\.closed/, 'webhook-events'],
     [/簽名|签名|signature/, 'webhook-signature-fails'],
     [/付款|paid|積分|积分|credited|credits/, 'paid-but-not-credited'],
     [/币种|幣種|currency/, 'checkout-session-fails'],
@@ -237,10 +240,17 @@ function sourceBoost(source, queryTokens, query) {
   if (source.language === 'en' && /[\u4e00-\u9fff]/.test(query)) boost -= 8;
   if (source.url.includes('/copilot/support-escalation') && /support|支持|支援/.test(query)) boost += 5;
   if (source.url.includes('/epay-migration/signature') && /sign|签名|簽名/.test(query)) boost += 5;
-  if (source.url.includes('/epay-migration/api-php') && /refund|api_php|退款/.test(query)) boost += 5;
+  if (source.url.includes('/dashboard/order-refunds') && /(order-refunds|order refund|订单退款|訂單退款|申请.*退款|申請.*退款|request.*refund)/.test(query)) boost += 28;
+  const fundsCurrencyQuestion = /(funds-currency|acquiring currency|settlement currency|收单货币|收單貨幣|结算货币|結算貨幣)/.test(query);
+  if (source.url.includes('/dashboard/funds') && fundsCurrencyQuestion) {
+    boost += source.section === 'Currencies' || source.section === '货币' || source.section === '貨幣' ? 40 : 20;
+  }
+  if (source.url.includes('/epay-migration/api-php') && /api_php|api\.php|epay|兼容|相容/.test(query) && /refund|退款/.test(query)) boost += 5;
   if (source.url.endsWith('/start-here') && /integration path|choose|选择|選擇|集成|整合/.test(query)) boost += 5;
   if (source.url.includes('/settlement-eligibility') && /settlement|结算|結算/.test(query)) boost += 5;
   if (source.url.includes('/paid-but-not-credited') && /付款|paid|積分|积分|credited|credits/.test(query)) boost += 20;
+  const webhookEventQuestion = /webhook.*(event|events)|事件类型|有哪些事件|哪些事件|webhook.*(退款|关单|關單)|事件.*(退款|关单|關單)|order\.refunded|order\.closed/.test(query);
+  if (source.url.includes('/webhooks/events') && webhookEventQuestion) boost += source.section === '事件类型' || source.section === '事件類型' || source.section === 'Event Types' ? 36 : 24;
   if (source.url.includes('/webhook-not-received') && /没有收到|未收到|did not receive/.test(query)) boost += 20;
   if (source.url.includes('/webhook-signature-fails') && /簽名|签名|signature/.test(query)) boost += 20;
   for (const token of queryTokens) {

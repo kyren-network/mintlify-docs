@@ -29,8 +29,13 @@ source_owner: product
 3. 檢查你的 Webhook 端點是否收到對應事件。
 4. 如果系統需要自動對帳，使用 Orders API。
 
+## 退款
+
+對於已支付或已結款訂單，已啟用退款權限的商戶可以從訂單詳情頁提交退款申請。對帳退款訂單時，請同時查看退款申請狀態、退款記錄狀態和 `order.refunded` Webhook 事件。
+
 ## 相關頁面
 
 - [訂單列表 API 參考](/api-reference/orders/list-all-orders)
 - [取得訂單 API 參考](/api-reference/orders/retrieve-an-order)
+- [訂單退款](/zh-Hant/dashboard/order-refunds)
 - [Webhook 事件](/zh-Hant/webhooks/events)

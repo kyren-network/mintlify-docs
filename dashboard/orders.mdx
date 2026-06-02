@@ -29,8 +29,13 @@ Use Orders to review payment status, find order identifiers, and reconcile Kyren
 3. Check whether your Webhook endpoint received the corresponding event.
 4. Use the Orders API when your system needs automated reconciliation.
 
+## Refunds
+
+For paid or settled orders, merchants with refund access can submit a refund request from the order detail page. Review the request status, refund record status, and `order.refunded` Webhook event when reconciling refunded orders.
+
 ## Related pages
 
 - [List all orders API reference](/api-reference/orders/list-all-orders)
 - [Retrieve an order API reference](/api-reference/orders/retrieve-an-order)
+- [Order refunds](/dashboard/order-refunds)
 - [Webhook events](/webhooks/events)

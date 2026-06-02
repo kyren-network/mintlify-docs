@@ -29,8 +29,13 @@ source_owner: product
 3. 检查你的 Webhook 端点是否收到对应事件。
 4. 如果系统需要自动对账，使用 Orders API。
 
+## 退款
+
+对于已支付或已结款订单，已启用退款权限的商户可以从订单详情页提交退款申请。对账退款订单时，请同时查看退款申请状态、退款记录状态和 `order.refunded` Webhook 事件。
+
 ## 相关页面
 
 - [订单列表 API 参考](/api-reference/orders/list-all-orders)
 - [获取订单 API 参考](/api-reference/orders/retrieve-an-order)
+- [订单退款](/zh/dashboard/order-refunds)
 - [Webhook 事件](/zh/webhooks/events)

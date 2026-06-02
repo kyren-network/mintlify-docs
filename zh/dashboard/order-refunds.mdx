@@ -1,0 +1,76 @@
+---
+title: 订单退款
+description: 从订单详情页提交退款申请，并跟踪审核、执行和 Webhook 更新
+language: zh
+audience: merchant
+product_area: order
+intent: how-to
+visibility: public
+last_verified_at: 2026-06-02
+source_owner: product
+---
+
+当客户需要对已支付的 Kyren Pay 订单进行全额或部分退款时，使用订单退款流程。退款会先成为商户退款申请，经审核后 Kyren Pay 才会尝试执行退款。
+
+## 什么时候可以申请退款
+
+满足以下条件时，可以从订单详情页申请退款：
+
+- 你的商户账户已启用退款权限。
+- 订单状态为 `PAID` 或 `SETTLED`。
+- 订单不是开户费订单。
+- 退款金额大于 `0`，且不超过剩余可退款金额。
+- 订单当前没有 `PENDING` 或 `REVIEWING` 状态的活跃退款申请。
+
+如果看不到 **申请退款** 按钮，请检查订单状态，以及你的账户是否已启用退款权限。
+
+## 申请退款
+
+1. 打开 **控制台 > 订单**。
+2. 选择需要退款的订单。
+3. 点击 **申请退款**。
+4. 填写退款金额和退款原因。
+5. 提交申请。
+
+提交后，该申请会出现在订单详情页的退款申请表格中。
+
+## 退款申请状态
+
+| 状态 | 含义 |
+| --- | --- |
+| `PENDING` | 申请已提交，等待审核。 |
+| `REVIEWING` | Kyren Pay 正在审核该申请，或正在尝试执行退款。 |
+| `APPROVED` | 申请已通过，并关联到退款记录。 |
+| `REJECTED` | 申请已拒绝。如有审核备注，请查看备注内容。 |
+
+## 退款记录状态
+
+| 状态 | 含义 |
+| --- | --- |
+| `CREATED` | 退款记录已创建。 |
+| `SUBMITTING` | Kyren Pay 正在向支付通道提交退款。 |
+| `PROCESSING` | 支付通道正在处理退款。 |
+| `SUCCEEDED` | 退款已成功。 |
+| `FAILED` | 退款失败。请查看错误信息，或联系支持。 |
+| `UNKNOWN` | 通道最终状态尚未确认。 |
+
+## 资金和对账
+
+退款成功后，Kyren Pay 会在资金中记录退款扣减，并更新订单退款状态。请同时核对订单详情页、交易流水和你自己的履约系统。
+
+如果你的系统会自动履约，请以幂等方式处理退款更新，并根据你自己的产品政策撤销或调整客户权益。
+
+## Webhook 通知
+
+当订单退款生效时，Kyren Pay 会发送 `order.refunded` Webhook 事件。你可以使用该事件更新权益、余额或对账记录。
+
+## Epay 兼容
+
+不要基于 `/epay/api.php?act=refund` 构建新的退款自动化。Epay 兼容退款路径当前不支持，会返回兼容错误。请使用控制台退款申请流程；如果退款依赖账户级审核，请与 Kyren 支持协调。
+
+## 相关页面
+
+- [订单](/zh/dashboard/orders)
+- [资金](/zh/dashboard/funds)
+- [Webhook 事件](/zh/webhooks/events)
+- [api.php 订单查询与退款兼容](/zh/epay-migration/api-php)

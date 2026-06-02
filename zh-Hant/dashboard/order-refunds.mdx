@@ -1,0 +1,76 @@
+---
+title: 訂單退款
+description: 從訂單詳情頁提交退款申請，並追蹤審核、執行和 Webhook 更新
+language: zh-Hant
+audience: merchant
+product_area: order
+intent: how-to
+visibility: public
+last_verified_at: 2026-06-02
+source_owner: product
+---
+
+當客戶需要對已支付的 Kyren Pay 訂單進行全額或部分退款時，使用訂單退款流程。退款會先成為商戶退款申請，經審核後 Kyren Pay 才會嘗試執行退款。
+
+## 什麼時候可以申請退款
+
+滿足以下條件時，可以從訂單詳情頁申請退款：
+
+- 你的商戶帳戶已啟用退款權限。
+- 訂單狀態為 `PAID` 或 `SETTLED`。
+- 訂單不是開戶費訂單。
+- 退款金額大於 `0`，且不超過剩餘可退款金額。
+- 訂單目前沒有 `PENDING` 或 `REVIEWING` 狀態的活躍退款申請。
+
+如果看不到 **申請退款** 按鈕，請檢查訂單狀態，以及你的帳戶是否已啟用退款權限。
+
+## 申請退款
+
+1. 打開 **控制台 > 訂單**。
+2. 選擇需要退款的訂單。
+3. 點擊 **申請退款**。
+4. 填寫退款金額和退款原因。
+5. 提交申請。
+
+提交後，該申請會出現在訂單詳情頁的退款申請表格中。
+
+## 退款申請狀態
+
+| 狀態 | 含義 |
+| --- | --- |
+| `PENDING` | 申請已提交，等待審核。 |
+| `REVIEWING` | Kyren Pay 正在審核該申請，或正在嘗試執行退款。 |
+| `APPROVED` | 申請已通過，並關聯到退款記錄。 |
+| `REJECTED` | 申請已拒絕。如有審核備註，請查看備註內容。 |
+
+## 退款記錄狀態
+
+| 狀態 | 含義 |
+| --- | --- |
+| `CREATED` | 退款記錄已建立。 |
+| `SUBMITTING` | Kyren Pay 正在向支付通道提交退款。 |
+| `PROCESSING` | 支付通道正在處理退款。 |
+| `SUCCEEDED` | 退款已成功。 |
+| `FAILED` | 退款失敗。請查看錯誤資訊，或聯絡支援。 |
+| `UNKNOWN` | 通道最終狀態尚未確認。 |
+
+## 資金和對帳
+
+退款成功後，Kyren Pay 會在資金中記錄退款扣減，並更新訂單退款狀態。請同時核對訂單詳情頁、交易流水和你自己的履約系統。
+
+如果你的系統會自動履約，請以冪等方式處理退款更新，並根據你自己的產品政策撤銷或調整客戶權益。
+
+## Webhook 通知
+
+當訂單退款生效時，Kyren Pay 會發送 `order.refunded` Webhook 事件。你可以使用該事件更新權益、餘額或對帳記錄。
+
+## Epay 相容
+
+不要基於 `/epay/api.php?act=refund` 建立新的退款自動化。Epay 相容退款路徑目前不支援，會返回相容錯誤。請使用控制台退款申請流程；如果退款依賴帳戶級審核，請與 Kyren 支援協調。
+
+## 相關頁面
+
+- [訂單](/zh-Hant/dashboard/orders)
+- [資金](/zh-Hant/dashboard/funds)
+- [Webhook 事件](/zh-Hant/webhooks/events)
+- [api.php 訂單查詢與退款相容](/zh-Hant/epay-migration/api-php)

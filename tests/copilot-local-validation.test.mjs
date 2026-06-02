@@ -142,6 +142,79 @@ test('Phase 5B query CLI retrieves from the built knowledge index', () => {
   assert.ok(result.results[0].citation.title);
 });
 
+test('Phase 5B query CLI prioritizes Webhook event list questions', () => {
+  const tempDir = mkdtempSync(join(tmpdir(), 'kyren-copilot-webhook-events-'));
+  const outputPath = join(tempDir, 'knowledge-index.json');
+  runScript('scripts/build-copilot-index.mjs', ['--out', outputPath]);
+
+  const output = runScript('scripts/query-copilot-index.mjs', [
+    '--index',
+    outputPath,
+    '--lang',
+    'zh',
+    '--query',
+    'Webhook 有哪些事件？退款和关单会通知吗？',
+    '--json',
+  ]);
+  const result = JSON.parse(output);
+
+  assert.ok(result.results.length <= 3);
+  assert.equal(result.results[0].url, '/zh/webhooks/events');
+  assert.match(result.results[0].text, /order\.refunded/);
+  assert.match(result.results[0].text, /order\.closed/);
+});
+
+test('Phase 5B query CLI prioritizes dashboard order refund guide questions', () => {
+  const tempDir = mkdtempSync(join(tmpdir(), 'kyren-copilot-order-refunds-'));
+  const outputPath = join(tempDir, 'knowledge-index.json');
+  runScript('scripts/build-copilot-index.mjs', ['--out', outputPath]);
+
+  const cases = [
+    { lang: 'en', query: 'How do I request a refund for an order?', expected: '/dashboard/order-refunds' },
+    { lang: 'zh', query: '如何申请订单退款？', expected: '/zh/dashboard/order-refunds' },
+    { lang: 'zh-Hant', query: '如何申請訂單退款？', expected: '/zh-Hant/dashboard/order-refunds' },
+  ];
+
+  for (const item of cases) {
+    const output = runScript('scripts/query-copilot-index.mjs', [
+      '--index',
+      outputPath,
+      '--lang',
+      item.lang,
+      '--query',
+      item.query,
+      '--json',
+    ]);
+    const result = JSON.parse(output);
+
+    assert.ok(result.results.length <= 3);
+    assert.equal(result.results[0].url, item.expected);
+  }
+});
+
+test('Phase 5B query CLI prioritizes funds currency questions', () => {
+  const tempDir = mkdtempSync(join(tmpdir(), 'kyren-copilot-funds-currency-'));
+  const outputPath = join(tempDir, 'knowledge-index.json');
+  runScript('scripts/build-copilot-index.mjs', ['--out', outputPath]);
+
+  const output = runScript('scripts/query-copilot-index.mjs', [
+    '--index',
+    outputPath,
+    '--lang',
+    'zh',
+    '--query',
+    '支持哪些收单货币？商户结算货币是什么？',
+    '--json',
+  ]);
+  const result = JSON.parse(output);
+
+  assert.ok(result.results.length <= 3);
+  assert.equal(result.results[0].url, '/zh/dashboard/funds');
+  assert.match(result.results[0].text, /CNY/);
+  assert.match(result.results[0].text, /HKD/);
+  assert.match(result.results[0].text, /USD/);
+});
+
 test('retrieval evaluator can validate a built index artifact', () => {
   const tempDir = mkdtempSync(join(tmpdir(), 'kyren-copilot-eval-'));
   const outputPath = join(tempDir, 'knowledge-index.json');

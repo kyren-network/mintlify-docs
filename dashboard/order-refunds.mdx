@@ -1,0 +1,76 @@
+---
+title: Order refunds
+description: Request refunds from the order detail page and track review, execution, and Webhook updates
+language: en
+audience: merchant
+product_area: order
+intent: how-to
+visibility: public
+last_verified_at: 2026-06-02
+source_owner: product
+---
+
+Use order refunds when a customer needs a full or partial refund for a paid Kyren Pay order. Refunds start as a merchant refund request and are reviewed before Kyren Pay attempts the refund.
+
+## When you can request a refund
+
+You can request a refund from the order detail page when all of these are true:
+
+- Your merchant account has refund access enabled.
+- The order status is `PAID` or `SETTLED`.
+- The order is not an onboarding fee order.
+- The refund amount is greater than `0` and does not exceed the remaining refundable amount.
+- The order does not already have an active refund request in `PENDING` or `REVIEWING`.
+
+If the **Request refund** button is not visible, check the order status and whether refund access is enabled for your account.
+
+## Request a refund
+
+1. Open **Dashboard > Orders**.
+2. Select the order you want to refund.
+3. Click **Request refund**.
+4. Enter the refund amount and reason.
+5. Submit the request.
+
+After submission, the request appears in the refund request table on the order detail page.
+
+## Refund request statuses
+
+| Status | Meaning |
+| --- | --- |
+| `PENDING` | The request has been submitted and is waiting for review. |
+| `REVIEWING` | Kyren Pay is reviewing the request or attempting to execute the refund. |
+| `APPROVED` | The request was approved and linked to a refund record. |
+| `REJECTED` | The request was rejected. Review the admin note when available. |
+
+## Refund record statuses
+
+| Status | Meaning |
+| --- | --- |
+| `CREATED` | The refund record has been created. |
+| `SUBMITTING` | Kyren Pay is submitting the refund to the payment provider. |
+| `PROCESSING` | The payment provider is processing the refund. |
+| `SUCCEEDED` | The refund succeeded. |
+| `FAILED` | The refund failed. Check the error message or contact support. |
+| `UNKNOWN` | The final provider status is not confirmed yet. |
+
+## Balance and reconciliation
+
+When a refund succeeds, Kyren Pay records a refund deduction in your funds and updates the order refund status. Review the order detail page, transaction records, and your own fulfillment system together.
+
+If your system fulfills automatically, handle refund updates idempotently and reverse or adjust the customer entitlement according to your own product policy.
+
+## Webhook notification
+
+When a refund is applied to an order, Kyren Pay sends the `order.refunded` Webhook event. Use this event to update entitlement, balance, or reconciliation records in your system.
+
+## Epay compatibility
+
+Do not build new refund automation against `/epay/api.php?act=refund`. The Epay compatibility refund path is currently unsupported and returns a compatibility error. Use the dashboard refund request flow, or coordinate with Kyren support when the request depends on account-specific review.
+
+## Related pages
+
+- [Orders](/dashboard/orders)
+- [Funds](/dashboard/funds)
+- [Webhook events](/webhooks/events)
+- [api.php order query and refund compatibility](/epay-migration/api-php)
