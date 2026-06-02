@@ -219,7 +219,8 @@ export function tokenize(input) {
   const phraseMap = [
     [/没有收到|未收到|did not receive/, 'webhook-not-received'],
     [/(request|申请|申請).*(order refund|订单退款|訂單退款|退款)|order refund|订单退款|訂單退款/, 'order-refunds'],
-    [/acquiring currency|settlement currency|收单货币|收單貨幣|结算货币|結算貨幣/, 'funds-currency'],
+    [/acquiring currency|settlement currency|收单货币|收單貨幣|结算货币|結算貨幣|收款.*(货币|貨幣|币种|幣種)|收单.*(货币|貨幣|币种|幣種)|收單.*(貨幣|幣種)/, 'funds-currency'],
+    [/fixed fee.*currency|per transaction fee.*currency|固定手续费.*(币种|货币)|固定手續費.*(幣種|貨幣)|单笔固定手续费|單筆固定手續費|拒付固定手续费|拒付固定手續費/, 'funds-fixed-fee-currency'],
     [/webhook.*(event|events)|事件类型|有哪些事件|哪些事件|webhook.*(退款|关单|關單)|事件.*(退款|关单|關單)|order\.refunded|order\.closed/, 'webhook-events'],
     [/簽名|签名|signature/, 'webhook-signature-fails'],
     [/付款|paid|積分|积分|credited|credits/, 'paid-but-not-credited'],
@@ -241,9 +242,12 @@ function sourceBoost(source, queryTokens, query) {
   if (source.url.includes('/copilot/support-escalation') && /support|支持|支援/.test(query)) boost += 5;
   if (source.url.includes('/epay-migration/signature') && /sign|签名|簽名/.test(query)) boost += 5;
   if (source.url.includes('/dashboard/order-refunds') && /(order-refunds|order refund|订单退款|訂單退款|申请.*退款|申請.*退款|request.*refund)/.test(query)) boost += 28;
-  const fundsCurrencyQuestion = /(funds-currency|acquiring currency|settlement currency|收单货币|收單貨幣|结算货币|結算貨幣)/.test(query);
-  if (source.url.includes('/dashboard/funds') && fundsCurrencyQuestion) {
-    boost += source.section === 'Currencies' || source.section === '货币' || source.section === '貨幣' ? 40 : 20;
+  const fundsCurrencyQuestion = /(funds-currency|acquiring currency|settlement currency|收单货币|收單貨幣|结算货币|結算貨幣|收款.*(货币|貨幣|币种|幣種)|收单.*(货币|貨幣|币种|幣種)|收單.*(貨幣|幣種))/.test(query);
+  const fundsFixedFeeCurrencyQuestion = /(funds-fixed-fee-currency|fixed fee.*currency|per transaction fee.*currency|固定手续费.*(币种|货币)|固定手續費.*(幣種|貨幣)|单笔固定手续费|單筆固定手續費|拒付固定手续费|拒付固定手續費)/.test(query);
+  if (source.url.includes('/dashboard/funds') && fundsFixedFeeCurrencyQuestion) {
+    boost += ['Acquiring Fees', '收单费率', '收單費率'].includes(source.section) ? 48 : 16;
+  } else if (source.url.includes('/dashboard/funds') && fundsCurrencyQuestion) {
+    boost += ['Currencies', '货币', '貨幣'].includes(source.section) ? 40 : 20;
   }
   if (source.url.includes('/epay-migration/api-php') && /api_php|api\.php|epay|兼容|相容/.test(query) && /refund|退款/.test(query)) boost += 5;
   if (source.url.endsWith('/start-here') && /integration path|choose|选择|選擇|集成|整合/.test(query)) boost += 5;

@@ -215,6 +215,29 @@ test('Phase 5B query CLI prioritizes funds currency questions', () => {
   assert.match(result.results[0].text, /USD/);
 });
 
+test('Phase 5B query CLI prioritizes acquiring fixed fee currency questions', () => {
+  const tempDir = mkdtempSync(join(tmpdir(), 'kyren-copilot-fixed-fee-currency-'));
+  const outputPath = join(tempDir, 'knowledge-index.json');
+  runScript('scripts/build-copilot-index.mjs', ['--out', outputPath]);
+
+  const output = runScript('scripts/query-copilot-index.mjs', [
+    '--index',
+    outputPath,
+    '--lang',
+    'zh',
+    '--query',
+    '固定手续费的币种是订单币种吗？',
+    '--json',
+  ]);
+  const result = JSON.parse(output);
+
+  assert.ok(result.results.length <= 3);
+  assert.equal(result.results[0].url, '/zh/dashboard/funds');
+  assert.equal(result.results[0].section, '收单费率');
+  assert.match(result.results[0].text, /USD/);
+  assert.match(result.results[0].text, /不跟随订单币种/);
+});
+
 test('retrieval evaluator can validate a built index artifact', () => {
   const tempDir = mkdtempSync(join(tmpdir(), 'kyren-copilot-eval-'));
   const outputPath = join(tempDir, 'knowledge-index.json');

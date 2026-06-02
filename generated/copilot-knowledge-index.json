@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "generator": "kyren-pay-docs/scripts/build-copilot-index.mjs",
-  "generatedAt": "2026-06-02T01:30:20.368Z",
+  "generatedAt": "2026-06-02T02:50:48.441Z",
   "sourceCount": 135,
-  "chunkCount": 819,
+  "chunkCount": 822,
   "languages": [
     "en",
     "zh",
@@ -6888,7 +6888,55 @@
       }
     },
     {
-      "id": "86b541ccc57c7a27",
+      "id": "113a51e5e40c9ceb",
+      "sourcePath": "dashboard/funds.mdx",
+      "url": "/dashboard/funds",
+      "title": "Funds",
+      "section": "Acquiring Fees",
+      "language": "en",
+      "productArea": "funds",
+      "intent": "how-to",
+      "audience": "merchant",
+      "visibility": "public",
+      "lastVerifiedAt": "2026-05-28",
+      "sourceOwner": "product",
+      "text": "Percentage fee rates apply to the order amount. Per-transaction fixed fees and chargeback fixed fees are configured in USD ; they do not follow the order currency.",
+      "tokens": [
+        "funds",
+        "acquiring",
+        "fees",
+        "percentage",
+        "fee",
+        "rates",
+        "apply",
+        "order",
+        "amount",
+        "per",
+        "transaction",
+        "fixed",
+        "fees",
+        "chargeback",
+        "fixed",
+        "fees",
+        "configured",
+        "in",
+        "usd",
+        "they",
+        "not",
+        "follow",
+        "order",
+        "currency",
+        "funds-fixed-fee-currency",
+        "checkout-session-fails"
+      ],
+      "citation": {
+        "url": "/dashboard/funds",
+        "title": "Funds",
+        "section": "Acquiring Fees"
+      }
+    },
+    {
+      "id": "aab00cc05c24e4d3",
       "sourcePath": "dashboard/funds.mdx",
       "url": "/dashboard/funds",
       "title": "Funds",
@@ -6946,7 +6994,7 @@
       }
     },
     {
-      "id": "ef19b73907ba3fa1",
+      "id": "4732b0dcaf7ddb78",
       "sourcePath": "dashboard/funds.mdx",
       "url": "/dashboard/funds",
       "title": "Funds",
@@ -21391,7 +21439,39 @@
       }
     },
     {
-      "id": "ec9216c7a73b8749",
+      "id": "cadba6a8200d30c8",
+      "sourcePath": "zh-Hant/dashboard/funds.mdx",
+      "url": "/zh-Hant/dashboard/funds",
+      "title": "資金",
+      "section": "收單費率",
+      "language": "zh-Hant",
+      "productArea": "funds",
+      "intent": "how-to",
+      "audience": "merchant",
+      "visibility": "public",
+      "lastVerifiedAt": "2026-05-28",
+      "sourceOwner": "product",
+      "text": "百分比費率按訂單金額計算。單筆固定手續費和拒付固定手續費均以 USD 配置，不跟隨訂單幣種。",
+      "tokens": [
+        "usd",
+        "資金",
+        "收單費率",
+        "百分比費率按訂單金額計算",
+        "單筆固定手續費和拒付固定手續費均以",
+        "配置",
+        "不跟隨訂單幣種",
+        "funds-currency",
+        "funds-fixed-fee-currency",
+        "checkout-session-fails"
+      ],
+      "citation": {
+        "url": "/zh-Hant/dashboard/funds",
+        "title": "資金",
+        "section": "收單費率"
+      }
+    },
+    {
+      "id": "6a29464e880e6069",
       "sourcePath": "zh-Hant/dashboard/funds.mdx",
       "url": "/zh-Hant/dashboard/funds",
       "title": "資金",
@@ -21423,7 +21503,7 @@
       }
     },
     {
-      "id": "3cdd2df2fc59262f",
+      "id": "c9b6cec1fa0ded11",
       "sourcePath": "zh-Hant/dashboard/funds.mdx",
       "url": "/zh-Hant/dashboard/funds",
       "title": "資金",
@@ -32541,7 +32621,39 @@
       }
     },
     {
-      "id": "fbd63f06fdc7a7ec",
+      "id": "e98ce5f66edf04da",
+      "sourcePath": "zh/dashboard/funds.mdx",
+      "url": "/zh/dashboard/funds",
+      "title": "资金",
+      "section": "收单费率",
+      "language": "zh",
+      "productArea": "funds",
+      "intent": "how-to",
+      "audience": "merchant",
+      "visibility": "public",
+      "lastVerifiedAt": "2026-05-28",
+      "sourceOwner": "product",
+      "text": "百分比费率按订单金额计算。单笔固定手续费和拒付固定手续费均以 USD 配置，不跟随订单币种。",
+      "tokens": [
+        "usd",
+        "资金",
+        "收单费率",
+        "百分比费率按订单金额计算",
+        "单笔固定手续费和拒付固定手续费均以",
+        "配置",
+        "不跟随订单币种",
+        "funds-currency",
+        "funds-fixed-fee-currency",
+        "checkout-session-fails"
+      ],
+      "citation": {
+        "url": "/zh/dashboard/funds",
+        "title": "资金",
+        "section": "收单费率"
+      }
+    },
+    {
+      "id": "098df650f6b1375a",
       "sourcePath": "zh/dashboard/funds.mdx",
       "url": "/zh/dashboard/funds",
       "title": "资金",
@@ -32573,7 +32685,7 @@
       }
     },
     {
-      "id": "c226f966f89b9a43",
+      "id": "87e4f56d98dc78a8",
       "sourcePath": "zh/dashboard/funds.mdx",
       "url": "/zh/dashboard/funds",
       "title": "资金",
