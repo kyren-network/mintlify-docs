@@ -240,7 +240,7 @@ paths:
       summary: Create a checkout session
       description: |
         Creates a new checkout session for a product. Returns a URL where you can redirect
-        your customer to complete the payment. Checkout sessions expire after 30 minutes.
+        your customer to complete the payment. Checkout sessions expire after 24 hours.
       requestBody:
         required: true
         content:
@@ -797,7 +797,7 @@ components:
       description: |
         - `OPEN` — Checkout session is awaiting payment
         - `COMPLETE` — Payment has been completed
-        - `EXPIRED` — Checkout session has expired (30 minutes)
+        - `EXPIRED` — Checkout session has expired (24 hours)
 
     OrderStatus:
       type: string

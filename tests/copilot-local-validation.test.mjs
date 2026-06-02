@@ -238,6 +238,29 @@ test('Phase 5B query CLI prioritizes acquiring fixed fee currency questions', ()
   assert.match(result.results[0].text, /不跟随订单币种/);
 });
 
+test('Phase 5B query CLI prioritizes 2FA setup questions', () => {
+  const tempDir = mkdtempSync(join(tmpdir(), 'kyren-copilot-2fa-setup-'));
+  const outputPath = join(tempDir, 'knowledge-index.json');
+  runScript('scripts/build-copilot-index.mjs', ['--out', outputPath]);
+
+  const output = runScript('scripts/query-copilot-index.mjs', [
+    '--index',
+    outputPath,
+    '--lang',
+    'zh',
+    '--query',
+    '如何设置启润支付的 2FA ？',
+    '--json',
+  ]);
+  const result = JSON.parse(output);
+
+  assert.ok(result.results.length <= 3);
+  assert.equal(result.results[0].url, '/zh/dashboard/personal-settings');
+  assert.equal(result.results[0].section, '设置 2FA');
+  assert.match(result.results[0].text, /个人设置/);
+  assert.match(result.results[0].text, /验证器应用/);
+});
+
 test('retrieval evaluator can validate a built index artifact', () => {
   const tempDir = mkdtempSync(join(tmpdir(), 'kyren-copilot-eval-'));
   const outputPath = join(tempDir, 'knowledge-index.json');
