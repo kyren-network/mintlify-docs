@@ -37,6 +37,7 @@ source_owner: engineering
 | `return_url` | 渠道需要支付页时使用的浏览器返回 URL。 |
 | `money_type` | 你的现有集成传入的币种或金额类型。 |
 | `device` | 你的现有集成传入的设备上下文。 |
+| `display_merchant_name` | 本次支付在 Kyren 中间页展示的商户名称。 |
 | `param` | 商户透传元数据，会在通知中返回。 |
 | `channel_param` | 渠道相关扩展数据。 |
 
@@ -51,6 +52,7 @@ curl -X POST https://api.kyren.top/epay/mapi.php \
   --data-urlencode "notify_url=https://merchant.example.com/notify" \
   --data-urlencode "name=AI credits" \
   --data-urlencode "money=9.99" \
+  --data-urlencode "display_merchant_name=Campaign Store" \
   --data-urlencode "clientip=203.0.113.10" \
   --data-urlencode "sign=lowercase_md5_signature" \
   --data-urlencode "sign_type=MD5"

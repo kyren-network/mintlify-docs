@@ -37,6 +37,7 @@ Optional parameters:
 | `return_url` | Browser return URL when the channel uses a payment page. |
 | `money_type` | Currency or money type if provided by your existing integration. |
 | `device` | Device context from your existing integration. |
+| `display_merchant_name` | Per-payment merchant display name shown on Kyren intermediate payment pages. |
 | `param` | Passthrough merchant metadata returned in notifications. |
 | `channel_param` | Channel-specific extension data. |
 
@@ -51,6 +52,7 @@ curl -X POST https://api.kyren.top/epay/mapi.php \
   --data-urlencode "notify_url=https://merchant.example.com/notify" \
   --data-urlencode "name=AI credits" \
   --data-urlencode "money=9.99" \
+  --data-urlencode "display_merchant_name=Campaign Store" \
   --data-urlencode "clientip=203.0.113.10" \
   --data-urlencode "sign=lowercase_md5_signature" \
   --data-urlencode "sign_type=MD5"

@@ -35,6 +35,7 @@ Optional parameters:
 | Parameter | Description |
 | --- | --- |
 | `money_type` | Currency or money type if provided by your existing integration. |
+| `display_merchant_name` | Per-payment merchant display name shown on Kyren intermediate payment pages. |
 | `param` | Passthrough merchant metadata returned in notifications. |
 
 ## Example form
@@ -48,6 +49,7 @@ Optional parameters:
   <input type="hidden" name="return_url" value="https://merchant.example.com/return" />
   <input type="hidden" name="name" value="AI credits" />
   <input type="hidden" name="money" value="9.99" />
+  <input type="hidden" name="display_merchant_name" value="Campaign Store" />
   <input type="hidden" name="param" value="account_123" />
   <input type="hidden" name="sign" value="lowercase_md5_signature" />
   <input type="hidden" name="sign_type" value="MD5" />

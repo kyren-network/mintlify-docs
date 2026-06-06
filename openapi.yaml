@@ -252,6 +252,7 @@ paths:
               successUrl: "https://example.com/success"
               cancelUrl: "https://example.com/cancel"
               customerEmail: "customer@example.com"
+              displayMerchantName: "Campaign Store"
               metadata:
                 userId: "user_456"
       responses:
@@ -558,6 +559,7 @@ paths:
               name: "Pro Plan Subscription"
               money: "99.00"
               money_type: "CNY"
+              display_merchant_name: "Campaign Store"
               param: "user_42"
               sign: "fb7f5f742f89eb1f137fbc293f2bf42a"
               sign_type: "MD5"
@@ -611,6 +613,7 @@ paths:
               name: "AI Credits 1000"
               money: "9.99"
               money_type: "CNY"
+              display_merchant_name: "Campaign Store"
               param: "user_42"
               clientip: "203.0.113.9"
               device: "pc"
@@ -909,6 +912,10 @@ components:
         customerName:
           type: string
           description: Pre-fill the customer's name on the checkout page
+        displayMerchantName:
+          type: string
+          maxLength: 80
+          description: Optional per-checkout merchant display name shown on the hosted checkout page. Also accepted as `display_merchant_name`.
         metadata:
           type: object
           additionalProperties:
@@ -958,6 +965,10 @@ components:
         param:
           type: string
           description: Pass-through parameter returned in callbacks and order queries
+        display_merchant_name:
+          type: string
+          maxLength: 80
+          description: Optional per-payment merchant display name shown on Kyren intermediate payment pages
         sign:
           type: string
           description: Lowercase MD5 signature
@@ -997,6 +1008,10 @@ components:
         param:
           type: string
           description: Pass-through parameter returned in callbacks and order queries
+        display_merchant_name:
+          type: string
+          maxLength: 80
+          description: Optional per-payment merchant display name shown on Kyren intermediate payment pages
         clientip:
           type: string
           description: Client IP address

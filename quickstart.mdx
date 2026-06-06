@@ -54,9 +54,12 @@ curl -X POST https://api.kyren.top/v1/checkouts \
   -d '{
     "productId": "prod_abc123",
     "successUrl": "https://yoursite.com/success",
-    "cancelUrl": "https://yoursite.com/cancel"
+    "cancelUrl": "https://yoursite.com/cancel",
+    "displayMerchantName": "Campaign Store"
   }'
 ```
+
+Use `displayMerchantName` when this checkout should show a campaign, store, or app name that differs from your account name.
 
 The response includes a `url` field — redirect your customer to this URL to complete payment.
 

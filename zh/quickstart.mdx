@@ -54,9 +54,12 @@ curl -X POST https://api.kyren.top/v1/checkouts \
   -d '{
     "productId": "prod_abc123",
     "successUrl": "https://yoursite.com/success",
-    "cancelUrl": "https://yoursite.com/cancel"
+    "cancelUrl": "https://yoursite.com/cancel",
+    "displayMerchantName": "Campaign Store"
   }'
 ```
+
+当本次 Checkout 需要展示不同于商户账户名称的活动、店铺或应用名称时，可以传入 `displayMerchantName`。
 
 响应中包含 `url` 字段 — 将客户重定向到该 URL 即可完成付款。
 
