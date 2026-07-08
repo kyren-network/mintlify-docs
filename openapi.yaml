@@ -463,8 +463,6 @@ paths:
                   id: "refund_abc123"
                   merchantId: "merch_001"
                   orderId: "order_def456"
-                  providerCode: "STRIPE"
-                  paymentGateway: "stripe"
                   status: "PROCESSING"
                   amount: "9.99"
                   currency: "USD"
@@ -1492,10 +1490,6 @@ components:
         merchantId:
           type: string
         orderId:
-          type: string
-        providerCode:
-          type: string
-        paymentGateway:
           type: string
         status:
           $ref: "#/components/schemas/RefundStatus"
