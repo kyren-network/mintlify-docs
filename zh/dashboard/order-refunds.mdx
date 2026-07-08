@@ -66,7 +66,7 @@ source_owner: product
 
 ## Epay 兼容
 
-不要基于 `/epay/api.php?act=refund` 构建新的退款自动化。Epay 兼容退款路径当前不支持，会返回兼容错误。请使用控制台退款申请流程；如果退款依赖账户级审核，请与 Kyren 支持协调。
+`/epay/api.php?act=refund` 仅用于通过 Epay 兼容端点创建的订单，且商户账户必须已开通退款权限。原生 Kyren API 订单应使用原生退款 API；人工运营退款仍可在控制台处理。
 
 ## 相关页面
 

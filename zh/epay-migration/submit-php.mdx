@@ -6,7 +6,7 @@ audience: developer
 product_area: epay
 intent: migration
 visibility: public
-last_verified_at: 2026-05-26
+last_verified_at: 2026-07-08
 source_owner: engineering
 ---
 
@@ -37,6 +37,9 @@ source_owner: engineering
 | `money_type` | 你的现有集成传入的币种或金额类型。 |
 | `display_merchant_name` | 本次支付在 Kyren 中间页展示的商户名称。 |
 | `param` | 商户透传元数据，会在通知中返回。 |
+| `userId` | 可选的商户用户标识；渠道支持时会传给支付网关。 |
+| `device` | 可选设备提示：`pc` 或 `mobile`。同一订单号复用到不同支付宝/微信设备支付形态时可能被拒绝。 |
+| `channel_param` | 可选的渠道扩展 JSON 字符串。 |
 
 ## 表单示例
 

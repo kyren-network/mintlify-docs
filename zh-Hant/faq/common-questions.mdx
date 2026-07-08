@@ -6,7 +6,7 @@ audience: merchant
 product_area: faq
 intent: support_deflection
 visibility: public
-last_verified_at: 2026-05-27
+last_verified_at: 2026-07-08
 source_owner: support
 ---
 
@@ -86,6 +86,6 @@ source_owner: support
 
 ### 可以使用 `api.php?act=refund` 嗎？
 
-相容退款路徑目前不支援，會返回相容錯誤。退款處理需與 Kyren 平台協助另行協調。
+可以，但僅適用於透過 Epay 相容端點建立且符合條件的訂單。商戶帳戶必須已開通退款權限；請求需傳 `pid`、原始商戶 `key`、`money`，以及 `out_trade_no` 或 `trade_no` 之一。建議使用 `refund_no` 做冪等。
 
 閱讀：[api.php 訂單查詢與退款相容](/zh-Hant/epay-migration/api-php)。

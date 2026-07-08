@@ -6,7 +6,7 @@ audience: merchant
 product_area: faq
 intent: support_deflection
 visibility: public
-last_verified_at: 2026-05-27
+last_verified_at: 2026-07-08
 source_owner: support
 ---
 
@@ -86,6 +86,6 @@ source_owner: support
 
 ### 可以使用 `api.php?act=refund` 吗？
 
-兼容退款路径当前不支持，会返回兼容错误。退款处理需与 Kyren 平台协助另行协调。
+可以，但仅适用于通过 Epay 兼容端点创建且符合条件的订单。商户账户必须已开通退款权限；请求需传 `pid`、原始商户 `key`、`money`，以及 `out_trade_no` 或 `trade_no` 之一。建议使用 `refund_no` 做幂等。
 
 阅读：[api.php 订单查询与退款兼容](/zh/epay-migration/api-php)。

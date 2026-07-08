@@ -6,7 +6,7 @@ audience: developer
 product_area: epay
 intent: migration
 visibility: public
-last_verified_at: 2026-05-26
+last_verified_at: 2026-07-08
 source_owner: engineering
 ---
 
@@ -17,13 +17,13 @@ Use this checklist when replacing an existing Epay-style integration with Kyren 
 - Replace the old Epay base URL with the Kyren Pay API base URL and keep the compatible paths you use.
 - Set the Kyren-issued `pid` and merchant key for the merchant account.
 - Verify the [Epay MD5 signature](/epay-migration/signature) implementation before sending live traffic.
-- Map payment type values to supported values: `alipay`, `wxpay`, `creditcard`, `crypto`, and `paynow`.
+- Map payment type values to supported values such as `alipay`, `wxpay`, `creditcard`, `crypto`, and `paynow`.
 - Confirm `notify_url` is reachable and can verify the Epay-compatible notification signature.
 - Confirm `return_url` behavior for browser redirect checkout.
 - Return the plain string `success` after processing each payment result notification.
 - Verify [`submit.php`](/epay-migration/submit-php) browser checkout or [`mapi.php`](/epay-migration/mapi-php) direct payment creation, depending on your integration path.
 - Verify [`api.php?act=order`](/epay-migration/api-php) queries by `out_trade_no` or `trade_no`.
-- Account for the unsupported `api.php?act=refund` compatibility endpoint and coordinate refund handling separately with Kyren platform assistance.
+- If you need automated refunds for Epay-source orders, verify `api.php?act=refund` with an eligible paid order, refund access enabled, and an idempotent `refund_no`.
 - Reconcile migrated Epay source orders in Kyren orders and settlements.
 
 For testing, use Kyren-issued credentials. Low-risk live checks should only be performed when approved by Kyren or support.

@@ -66,7 +66,7 @@ When a refund is applied to an order, Kyren Pay sends the `order.refunded` Webho
 
 ## Epay compatibility
 
-Do not build new refund automation against `/epay/api.php?act=refund`. The Epay compatibility refund path is currently unsupported and returns a compatibility error. Use the dashboard refund request flow, or coordinate with Kyren support when the request depends on account-specific review.
+Use `/epay/api.php?act=refund` only for orders created through Epay compatibility endpoints and only when your merchant account has refund access enabled. Native Kyren API orders should use the native refund API, while manual operational refunds can still be handled from the dashboard.
 
 ## Related pages
 

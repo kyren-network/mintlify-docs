@@ -66,7 +66,7 @@ source_owner: product
 
 ## Epay 相容
 
-不要基於 `/epay/api.php?act=refund` 建立新的退款自動化。Epay 相容退款路徑目前不支援，會返回相容錯誤。請使用控制台退款申請流程；如果退款依賴帳戶級審核，請與 Kyren 支援協調。
+`/epay/api.php?act=refund` 僅用於透過 Epay 相容端點建立的訂單，且商戶帳戶必須已開通退款權限。原生 Kyren API 訂單應使用原生退款 API；人工營運退款仍可在控制台處理。
 
 ## 相關頁面
 

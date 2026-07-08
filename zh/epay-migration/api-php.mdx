@@ -6,11 +6,11 @@ audience: developer
 product_area: epay
 intent: migration
 visibility: public
-last_verified_at: 2026-05-26
+last_verified_at: 2026-07-08
 source_owner: engineering
 ---
 
-`/epay/api.php` 提供 Epay 兼容的运维动作。使用 `act=order` 查询迁移后的 Epay 风格订单。`act=refund` 当前不支持，会返回兼容错误；退款需通过平台协助另行处理。
+`/epay/api.php` 提供 Epay 兼容的运维动作。使用 `act=order` 查询迁移后的 Epay 风格订单。使用 `act=refund` 为符合条件的 Epay 来源订单提交退款。
 
 ## 订单查询
 
@@ -55,14 +55,28 @@ curl "https://api.kyren.top/epay/api.php?act=order&pid=10001&key=merchant_secret
 
 ## 退款兼容
 
-`GET` 或 `POST` `/epay/api.php?act=refund` 当前不支持，会返回兼容错误。不要基于此路径构建自动退款逻辑。请与 Kyren 平台协助单独协调退款处理。
+调用 `GET` 或 `POST` `/epay/api.php?act=refund`，传入 `pid`、原始商户 `key`、`money`，以及 `out_trade_no` 或 `trade_no` 之一。
+
+该路径只用于通过 Epay 兼容端点创建的订单。原生 Kyren API 订单应使用原生退款 API。商户账户必须已开通退款权限，且订单仍有足够的可退金额。
+
+可选的 `refund_no` 用于幂等。如果不传，Kyren 会使用订单 ID 和标准化后的退款金额生成兼容幂等键。
+
+```bash
+curl "https://api.kyren.top/epay/api.php?act=refund&pid=10001&key=merchant_secret&trade_no=K202605260001&money=9.99&refund_no=REFUND_10002"
+```
 
 响应示例：
 
 ```json
 {
-  "code": 0,
-  "msg": "refund compatibility endpoint is currently unsupported"
+  "code": 1,
+  "msg": "退款提交成功",
+  "trade_no": "K202605260001",
+  "out_trade_no": "ORDER_10002",
+  "refund_no": "REFUND_10002",
+  "refund_id": "refund_abc123",
+  "money": "9.99",
+  "status": "PROCESSING"
 }
 ```
 

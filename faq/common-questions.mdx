@@ -6,7 +6,7 @@ audience: merchant
 product_area: faq
 intent: support_deflection
 visibility: public
-last_verified_at: 2026-05-27
+last_verified_at: 2026-07-08
 source_owner: support
 ---
 
@@ -86,6 +86,6 @@ Read: [Epay MD5 signature](/epay-migration/signature).
 
 ### Can I use `api.php?act=refund`?
 
-The compatibility refund path is currently unsupported and returns a compatibility error. Coordinate refund handling separately with Kyren platform assistance.
+Yes, for eligible orders created through Epay compatibility endpoints. The merchant account must have refund access enabled; send `pid`, raw merchant `key`, `money`, and one of `out_trade_no` or `trade_no`. Use `refund_no` for idempotency.
 
 Read: [api.php order query and refund compatibility](/epay-migration/api-php).

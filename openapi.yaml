@@ -35,6 +35,8 @@ tags:
     description: Create checkout sessions to collect payments from your customers.
   - name: Orders
     description: View and manage orders created from completed checkout sessions.
+  - name: Refunds
+    description: Create and retrieve refunds for eligible paid Kyren API orders.
   - name: Balance
     description: View your account balance and transaction history.
   - name: Epay Compatibility
@@ -51,6 +53,7 @@ paths:
       description: |
         Returns the list of currencies supported by the platform and the default currency.
         Use this when creating products or configuring pricing to ensure you use a supported currency.
+      security: []
       responses:
         "200":
           description: Supported currencies and default currency
@@ -70,9 +73,6 @@ paths:
                     - code: "HKD"
                       label: "HKD"
                   defaultCurrency: "USD"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-
   /v1/products:
     post:
       operationId: createProduct
@@ -424,6 +424,90 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  /v1/orders/{orderId}/refunds:
+    post:
+      operationId: createRefund
+      tags: [Refunds]
+      summary: Create a refund
+      description: |
+        Creates a full or partial refund for an eligible paid order created through the native Kyren API.
+        Epay-source orders must be refunded through the Epay compatibility API.
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The Kyren order ID to refund
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRefundRequest"
+            example:
+              amount: "9.99"
+              reason: "Customer requested refund"
+              refundNo: "refund_20260708001"
+      responses:
+        "200":
+          description: Refund request accepted or processed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RefundResponseWrapper"
+              example:
+                code: 0
+                message: "success"
+                data:
+                  id: "refund_abc123"
+                  merchantId: "merch_001"
+                  orderId: "order_def456"
+                  providerCode: "STRIPE"
+                  paymentGateway: "stripe"
+                  status: "PROCESSING"
+                  amount: "9.99"
+                  currency: "USD"
+                  userRefundAmountUsd: "9.99"
+                  merchantDebitUsd: "9.99"
+                  reason: "Customer requested refund"
+                  errorMessage: null
+                  createdAt: 1783526400000
+                  updatedAt: 1783526400000
+                  succeededAt: null
+                  failedAt: null
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /v1/refunds/{refundId}:
+    get:
+      operationId: getRefund
+      tags: [Refunds]
+      summary: Retrieve a refund
+      description: Retrieves a refund created for one of your orders.
+      parameters:
+        - name: refundId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The Kyren refund ID
+      responses:
+        "200":
+          description: The refund object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RefundResponseWrapper"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   /v1/orders/export:
     get:
       operationId: exportOrders
@@ -656,7 +740,7 @@ paths:
       description: |
         Executes compatibility operations with `act`.
         - `act=order`: query order status/result.
-        - `act=refund`: currently not supported; returns compatibility error message.
+        - `act=refund`: submit a refund for an eligible Epay-source order.
 
         This endpoint also accepts GET with the same parameters.
       security: []
@@ -675,12 +759,15 @@ paths:
                   key: "merchant_raw_api_key"
                   out_trade_no: "order_20260409002"
               refund:
-                summary: Refund (unsupported currently)
+                summary: Refund by trade_no
                 value:
                   act: "refund"
                   pid: "merch_001"
                   key: "merchant_raw_api_key"
                   trade_no: "order_epay_001"
+                  money: "9.99"
+                  refund_no: "refund_20260708001"
+                  reason: "Customer requested refund"
       responses:
         "200":
           description: Epay-compatible operation result
@@ -705,11 +792,17 @@ paths:
                     status: 1
                     param: "user_42"
                     buyer: ""
-                refundUnsupported:
-                  summary: Refund not supported
+                refundAccepted:
+                  summary: Refund accepted
                   value:
-                    code: 0
-                    msg: "退款功能暂不支持，请联系客服"
+                    code: 1
+                    msg: "退款提交成功"
+                    trade_no: "order_epay_001"
+                    out_trade_no: "order_20260409002"
+                    refund_no: "refund_20260708001"
+                    refund_id: "refund_abc123"
+                    money: "9.99"
+                    status: "PROCESSING"
                 error:
                   summary: Generic error
                   value:
@@ -819,8 +912,19 @@ components:
 
     PaymentMethod:
       type: string
-      enum: [CREDIT_CARD, APPLE_PAY, GOOGLE_PAY, WECHAT_PAY, ALIPAY, ALIPAY_HK, BOOST, TOUCH_N_GO_EWALLET, LINE_PAY, KREDIVO, GCASH, PAYNOW, CRYPTO]
+      enum: [CREDIT_CARD, WECHAT_PAY, ALIPAY, PAYNOW, CRYPTO]
       description: The payment method used by the customer
+
+    RefundStatus:
+      type: string
+      enum: [CREATED, SUBMITTING, PROCESSING, SUCCEEDED, FAILED, UNKNOWN]
+      description: |
+        - `CREATED` — Refund record has been created
+        - `SUBMITTING` — Refund is being submitted to the provider
+        - `PROCESSING` — Provider is processing the refund
+        - `SUCCEEDED` — Refund succeeded
+        - `FAILED` — Refund failed
+        - `UNKNOWN` — Final provider status is not confirmed yet
 
     BalanceTransactionType:
       type: string
@@ -922,6 +1026,22 @@ components:
             type: string
           description: Arbitrary key-value pairs attached to the checkout and resulting order
 
+    CreateRefundRequest:
+      type: object
+      required: [amount]
+      properties:
+        amount:
+          type: string
+          description: Refund amount as a decimal string. Must be greater than 0 and not exceed the remaining refundable amount.
+        reason:
+          type: string
+          nullable: true
+          description: Optional refund reason.
+        refundNo:
+          type: string
+          nullable: true
+          description: Optional merchant refund number used for idempotency.
+
     EpaySignType:
       type: string
       enum: [MD5]
@@ -969,6 +1089,16 @@ components:
           type: string
           maxLength: 80
           description: Optional per-payment merchant display name shown on Kyren intermediate payment pages
+        userId:
+          type: string
+          description: Optional merchant user identifier passed to the payment gateway when supported.
+        device:
+          type: string
+          enum: [pc, mobile]
+          description: Optional device hint. For Alipay/WeChat, reusing the same `out_trade_no` with a different device flow can be rejected.
+        channel_param:
+          type: string
+          description: Optional JSON string for channel-specific fields.
         sign:
           type: string
           description: Lowercase MD5 signature
@@ -1027,6 +1157,9 @@ components:
             `cardNo`, `cardExpireMonth`, `cardExpireYear`, `cardSecurityCode`,
             `billFirstName`, `billLastName`, `billPhone`, `billAddress`,
             `billCountry`, `billState`, `billCity`, `billZip`, `email`.
+        userId:
+          type: string
+          description: Optional merchant user identifier passed to the payment gateway when supported.
         sign:
           type: string
           description: Lowercase MD5 signature
@@ -1040,7 +1173,7 @@ components:
         act:
           type: string
           enum: [order, refund]
-          description: API action. `refund` currently returns unsupported message.
+          description: API action.
         pid:
           type: string
           description: Merchant ID
@@ -1053,6 +1186,15 @@ components:
         trade_no:
           type: string
           description: Platform order ID. Required when `out_trade_no` is not provided.
+        money:
+          type: string
+          description: Required for `act=refund`. Refund amount as a decimal string.
+        refund_no:
+          type: string
+          description: Optional merchant refund number for `act=refund`; used for idempotency when provided.
+        reason:
+          type: string
+          description: Optional refund reason for `act=refund`.
 
     EpaySimpleResponse:
       type: object
@@ -1129,9 +1271,38 @@ components:
           type: string
           description: Reserved field, currently empty string
 
+    EpayRefundSuccessResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          enum: [1]
+        msg:
+          type: string
+          example: 退款提交成功
+        trade_no:
+          type: string
+          description: Platform order ID
+        out_trade_no:
+          type: string
+          description: Merchant order number
+        refund_no:
+          type: string
+          nullable: true
+          description: Merchant refund number when provided
+        refund_id:
+          type: string
+          description: Kyren refund ID
+        money:
+          type: string
+          description: Refund amount
+        status:
+          $ref: "#/components/schemas/RefundStatus"
+
     EpayApiResponse:
       oneOf:
         - $ref: "#/components/schemas/EpayOrderQuerySuccessResponse"
+        - $ref: "#/components/schemas/EpayRefundSuccessResponse"
         - $ref: "#/components/schemas/EpaySimpleResponse"
 
     # --- Response Schemas ---
@@ -1312,6 +1483,55 @@ components:
               type: integer
               format: int64
               description: Unix timestamp in milliseconds
+
+    Refund:
+      type: object
+      properties:
+        id:
+          type: string
+        merchantId:
+          type: string
+        orderId:
+          type: string
+        providerCode:
+          type: string
+        paymentGateway:
+          type: string
+        status:
+          $ref: "#/components/schemas/RefundStatus"
+        amount:
+          type: string
+        currency:
+          type: string
+        userRefundAmountUsd:
+          type: string
+          nullable: true
+        merchantDebitUsd:
+          type: string
+          nullable: true
+        reason:
+          type: string
+        errorMessage:
+          type: string
+          nullable: true
+        createdAt:
+          type: integer
+          format: int64
+          description: Unix timestamp in milliseconds
+        updatedAt:
+          type: integer
+          format: int64
+          description: Unix timestamp in milliseconds
+        succeededAt:
+          type: integer
+          format: int64
+          nullable: true
+          description: Unix timestamp in milliseconds
+        failedAt:
+          type: integer
+          format: int64
+          nullable: true
+          description: Unix timestamp in milliseconds
 
     Balance:
       type: object
@@ -1509,6 +1729,18 @@ components:
           example: "success"
         data:
           $ref: "#/components/schemas/OrderDetail"
+
+    RefundResponseWrapper:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+        message:
+          type: string
+          example: "success"
+        data:
+          $ref: "#/components/schemas/Refund"
 
     BalanceResponseWrapper:
       type: object

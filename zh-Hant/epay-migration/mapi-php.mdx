@@ -6,7 +6,7 @@ audience: developer
 product_area: epay
 intent: migration
 visibility: public
-last_verified_at: 2026-05-26
+last_verified_at: 2026-07-08
 source_owner: engineering
 ---
 
@@ -36,9 +36,11 @@ source_owner: engineering
 | --- | --- |
 | `return_url` | 渠道需要支付頁時使用的瀏覽器返回 URL。 |
 | `money_type` | 你的現有整合傳入的幣種或金額類型。 |
-| `device` | 你的現有整合傳入的裝置上下文。 |
+| `device` | 可選裝置提示：`pc` 或 `mobile`。同一訂單號復用到不同支付寶/微信裝置支付形態時可能被拒絕。 |
+| `display_merchant_name` | 本次支付在 Kyren 中間頁展示的商戶名稱。 |
 | `param` | 商戶透傳中繼資料，會在通知中返回。 |
-| `channel_param` | 渠道相關擴展資料。 |
+| `userId` | 可選的商戶使用者標識；渠道支援時會傳給支付網關。 |
+| `channel_param` | 可選的渠道擴展 JSON 字串。 |
 
 ## 請求範例
 
@@ -51,6 +53,7 @@ curl -X POST https://api.kyren.top/epay/mapi.php \
   --data-urlencode "notify_url=https://merchant.example.com/notify" \
   --data-urlencode "name=AI credits" \
   --data-urlencode "money=9.99" \
+  --data-urlencode "display_merchant_name=Campaign Store" \
   --data-urlencode "clientip=203.0.113.10" \
   --data-urlencode "sign=lowercase_md5_signature" \
   --data-urlencode "sign_type=MD5"

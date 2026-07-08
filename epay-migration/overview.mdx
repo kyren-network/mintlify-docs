@@ -6,7 +6,7 @@ audience: developer
 product_area: epay
 intent: migration
 visibility: public
-last_verified_at: 2026-05-26
+last_verified_at: 2026-07-08
 source_owner: engineering
 ---
 
@@ -21,17 +21,17 @@ Epay source orders created through these compatibility endpoints flow into the s
 | `/epay/submit.php` | `GET` or `POST` | Page redirect checkout | Creates or reuses an order, then returns HTTP `302` to `/epay/redirect/{orderId}` or an upstream payment page. |
 | `/epay/mapi.php` | `POST` | Server-to-server direct payment creation | Creates or reuses an order and returns Epay-style fields such as `payurl`, `qrcode`, `img`, and `trade_no` depending on channel. |
 | `/epay/api.php?act=order` | `GET` or `POST` | Order query | Queries by `out_trade_no` or `trade_no`. |
-| `/epay/api.php?act=refund` | `GET` or `POST` | Refund compatibility path | Currently returns an unsupported compatibility error. Refunds are handled separately with platform assistance. |
+| `/epay/api.php?act=refund` | `GET` or `POST` | Refund compatibility path | Submits refunds for eligible Epay-source orders when refund access is enabled. |
 
 ## Migration flow
 
 1. Replace your Epay base URL with the Kyren Pay API base URL while keeping the compatible path.
 2. Use your Kyren-issued `pid` and merchant key for Epay-compatible signing.
 3. Keep `pid + sign` authentication for Epay-compatible requests. Do not send `x-api-key`.
-4. Map your payment `type` values to supported values: `alipay`, `wxpay`, `creditcard`, `crypto`, or `paynow`.
+4. Map your payment `type` values to supported values such as `alipay`, `wxpay`, `creditcard`, `crypto`, or `paynow`.
 5. Route browser checkout traffic to [`submit.php`](/epay-migration/submit-php) or server-side payment creation to [`mapi.php`](/epay-migration/mapi-php).
 6. Verify payment results from the `notify_url` GET notification and return the plain string `success` after processing.
-7. Use [`api.php?act=order`](/epay-migration/api-php) for compatibility order queries and reconcile the resulting Kyren orders and settlements.
+7. Use [`api.php?act=order`](/epay-migration/api-php) for compatibility order queries, and [`api.php?act=refund`](/epay-migration/api-php) only for Epay-source order refunds.
 
 ## Related pages
 

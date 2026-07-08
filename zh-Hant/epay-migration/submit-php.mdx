@@ -6,7 +6,7 @@ audience: developer
 product_area: epay
 intent: migration
 visibility: public
-last_verified_at: 2026-05-26
+last_verified_at: 2026-07-08
 source_owner: engineering
 ---
 
@@ -35,7 +35,11 @@ source_owner: engineering
 | 參數 | 說明 |
 | --- | --- |
 | `money_type` | 你的現有整合傳入的幣種或金額類型。 |
+| `display_merchant_name` | 本次支付在 Kyren 中間頁展示的商戶名稱。 |
 | `param` | 商戶透傳中繼資料，會在通知中返回。 |
+| `userId` | 可選的商戶使用者標識；渠道支援時會傳給支付網關。 |
+| `device` | 可選裝置提示：`pc` 或 `mobile`。同一訂單號復用到不同支付寶/微信裝置支付形態時可能被拒絕。 |
+| `channel_param` | 可選的渠道擴展 JSON 字串。 |
 
 ## 表單範例
 
@@ -48,6 +52,7 @@ source_owner: engineering
   <input type="hidden" name="return_url" value="https://merchant.example.com/return" />
   <input type="hidden" name="name" value="AI credits" />
   <input type="hidden" name="money" value="9.99" />
+  <input type="hidden" name="display_merchant_name" value="Campaign Store" />
   <input type="hidden" name="param" value="account_123" />
   <input type="hidden" name="sign" value="lowercase_md5_signature" />
   <input type="hidden" name="sign_type" value="MD5" />

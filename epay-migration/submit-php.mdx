@@ -6,7 +6,7 @@ audience: developer
 product_area: epay
 intent: migration
 visibility: public
-last_verified_at: 2026-05-26
+last_verified_at: 2026-07-08
 source_owner: engineering
 ---
 
@@ -37,6 +37,9 @@ Optional parameters:
 | `money_type` | Currency or money type if provided by your existing integration. |
 | `display_merchant_name` | Per-payment merchant display name shown on Kyren intermediate payment pages. |
 | `param` | Passthrough merchant metadata returned in notifications. |
+| `userId` | Optional merchant user identifier passed to the payment gateway when supported. |
+| `device` | Optional device hint: `pc` or `mobile`. Reusing the same order number with a different Alipay/WeChat device flow can be rejected. |
+| `channel_param` | Optional JSON string for channel-specific fields. |
 
 ## Example form
 

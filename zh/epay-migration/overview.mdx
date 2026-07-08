@@ -6,7 +6,7 @@ audience: developer
 product_area: epay
 intent: migration
 visibility: public
-last_verified_at: 2026-05-26
+last_verified_at: 2026-07-08
 source_owner: engineering
 ---
 
@@ -21,17 +21,17 @@ source_owner: engineering
 | `/epay/submit.php` | `GET` 或 `POST` | 页面跳转收银台 | 创建或复用订单，然后返回 HTTP `302` 到 `/epay/redirect/{orderId}` 或上游支付页面。 |
 | `/epay/mapi.php` | `POST` | 服务端直连创建支付 | 创建或复用订单，并根据渠道返回 `payurl`、`qrcode`、`img`、`trade_no` 等 Epay 风格字段。 |
 | `/epay/api.php?act=order` | `GET` 或 `POST` | 订单查询 | 通过 `out_trade_no` 或 `trade_no` 查询。 |
-| `/epay/api.php?act=refund` | `GET` 或 `POST` | 退款兼容路径 | 当前返回不支持的兼容错误。退款需通过平台协助另行处理。 |
+| `/epay/api.php?act=refund` | `GET` 或 `POST` | 退款兼容路径 | 在开通退款权限后，为符合条件的 Epay 来源订单提交退款。 |
 
 ## 迁移流程
 
 1. 将 Epay 基础 URL 替换为 Kyren Pay API 基础 URL，并保留兼容路径。
 2. 使用 Kyren 发放的 `pid` 和商户密钥进行 Epay 兼容签名。
 3. Epay 兼容请求继续使用 `pid + sign` 认证。不要发送 `x-api-key`。
-4. 将支付 `type` 映射到支持值：`alipay`、`wxpay`、`creditcard`、`crypto` 或 `paynow`。
+4. 将支付 `type` 映射到支持值，例如 `alipay`、`wxpay`、`creditcard`、`crypto` 或 `paynow`。
 5. 浏览器收银台流量接入 [`submit.php`](/zh/epay-migration/submit-php)，服务端创建支付接入 [`mapi.php`](/zh/epay-migration/mapi-php)。
 6. 从 `notify_url` 的 GET 通知中校验支付结果，处理完成后返回纯文本 `success`。
-7. 使用 [`api.php?act=order`](/zh/epay-migration/api-php) 做兼容订单查询，并对账 Kyren 订单与结算。
+7. 使用 [`api.php?act=order`](/zh/epay-migration/api-php) 做兼容订单查询；仅对 Epay 来源订单使用 [`api.php?act=refund`](/zh/epay-migration/api-php) 提交退款。
 
 ## 相关页面
 
