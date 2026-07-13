@@ -14,11 +14,11 @@ info:
   version: "1.0.0"
   contact:
     name: Kyren Pay Support
-    email: support@kyren.top
-    url: https://kyren.top
+    email: support@kyrenpay.com
+    url: https://kyrenpay.com
 
 servers:
-  - url: https://api.kyren.top
+  - url: https://api.kyrenpay.com
     description: Production
   - url: https://staging-api.kyren.top
     description: Staging, available only with credentials issued by Kyren

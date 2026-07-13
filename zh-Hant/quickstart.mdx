@@ -9,7 +9,7 @@ description: 5 分鐘內完成第一筆收款
 
 ## 前提條件
 
-- 一個啟潤支付商戶帳號（[點此註冊](https://kyren.top)）
+- 一個啟潤支付商戶帳號（[點此註冊](https://merchant.kyrenpay.com)）
 - 你的 API 密鑰（在控制台的「開發者」頁面取得）
 - 已在控制台或透過 Products API 建立產品
 - 一個可以安全保存 API 密鑰的服務端環境
@@ -30,7 +30,7 @@ description: 5 分鐘內完成第一筆收款
 建立一個代表你所售商品的產品：
 
 ```bash
-curl -X POST https://api.kyren.top/v1/products \
+curl -X POST https://api.kyrenpay.com/v1/products \
   -H "Content-Type: application/json" \
   -H "x-api-key: kyren_live_xxxxxxxxxxxx" \
   -d '{
@@ -48,7 +48,7 @@ curl -X POST https://api.kyren.top/v1/products \
 當客戶要付款時，建立一個 Checkout Session：
 
 ```bash
-curl -X POST https://api.kyren.top/v1/checkouts \
+curl -X POST https://api.kyrenpay.com/v1/checkouts \
   -H "Content-Type: application/json" \
   -H "x-api-key: kyren_live_xxxxxxxxxxxx" \
   -d '{

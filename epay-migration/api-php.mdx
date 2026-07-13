@@ -19,7 +19,7 @@ Call `GET` or `POST` `/epay/api.php?act=order` with `pid`, raw merchant `key`, a
 This endpoint uses the raw merchant `key` with `pid` for compatibility order query. It may be subject to the API IP allowlist when enabled.
 
 ```bash
-curl "https://api.kyren.top/epay/api.php?act=order&pid=10001&key=merchant_secret&out_trade_no=ORDER_10002"
+curl "https://api.kyrenpay.com/epay/api.php?act=order&pid=10001&key=merchant_secret&out_trade_no=ORDER_10002"
 ```
 
 Example success response:
@@ -62,7 +62,7 @@ Refunds through this path are only for orders created by Epay compatibility endp
 Optional `refund_no` is used for idempotency. If omitted, Kyren uses the order ID and normalized refund amount as the compatibility idempotency key.
 
 ```bash
-curl "https://api.kyren.top/epay/api.php?act=refund&pid=10001&key=merchant_secret&trade_no=K202605260001&money=9.99&refund_no=REFUND_10002"
+curl "https://api.kyrenpay.com/epay/api.php?act=refund&pid=10001&key=merchant_secret&trade_no=K202605260001&money=9.99&refund_no=REFUND_10002"
 ```
 
 Example response:

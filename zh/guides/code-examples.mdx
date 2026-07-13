@@ -9,7 +9,7 @@ description: cURL、Python、Node.js 和 Go 的集成示例
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.kyren.top/v1/products \
+curl -X POST https://api.kyrenpay.com/v1/products \
   -H "Content-Type: application/json" \
   -H "x-api-key: kyren_live_xxxxxxxxxxxx" \
   -d '{
@@ -27,7 +27,7 @@ curl -X POST https://api.kyren.top/v1/products \
 import requests
 
 response = requests.post(
-    "https://api.kyren.top/v1/products",
+    "https://api.kyrenpay.com/v1/products",
     headers={
         "Content-Type": "application/json",
         "x-api-key": "kyren_live_xxxxxxxxxxxx",
@@ -48,7 +48,7 @@ print(f"产品已创建: {product['id']}")
 ```javascript Node.js
 const axios = require('axios');
 
-const response = await axios.post('https://api.kyren.top/v1/products', {
+const response = await axios.post('https://api.kyrenpay.com/v1/products', {
   name: '1000 AI Credits',
   description: '充值 1000 个 AI API 额度',
   price: '9.99',
@@ -83,7 +83,7 @@ func createProduct() {
     }
 
     body, _ := json.Marshal(payload)
-    req, _ := http.NewRequest("POST", "https://api.kyren.top/v1/products", bytes.NewBuffer(body))
+    req, _ := http.NewRequest("POST", "https://api.kyrenpay.com/v1/products", bytes.NewBuffer(body))
     req.Header.Set("Content-Type", "application/json")
     req.Header.Set("x-api-key", "kyren_live_xxxxxxxxxxxx")
 
@@ -103,7 +103,7 @@ func createProduct() {
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.kyren.top/v1/checkouts \
+curl -X POST https://api.kyrenpay.com/v1/checkouts \
   -H "Content-Type: application/json" \
   -H "x-api-key: kyren_live_xxxxxxxxxxxx" \
   -d '{
@@ -122,7 +122,7 @@ curl -X POST https://api.kyren.top/v1/checkouts \
 import requests
 
 response = requests.post(
-    "https://api.kyren.top/v1/checkouts",
+    "https://api.kyrenpay.com/v1/checkouts",
     headers={
         "Content-Type": "application/json",
         "x-api-key": "kyren_live_xxxxxxxxxxxx",
@@ -142,7 +142,7 @@ print(f"将客户重定向到: {checkout['url']}")
 ```
 
 ```javascript Node.js
-const response = await axios.post('https://api.kyren.top/v1/checkouts', {
+const response = await axios.post('https://api.kyrenpay.com/v1/checkouts', {
   productId: 'prod_abc123',
   successUrl: 'https://yoursite.com/success',
   cancelUrl: 'https://yoursite.com/cancel',
@@ -169,7 +169,7 @@ func createCheckout() {
     }
 
     body, _ := json.Marshal(payload)
-    req, _ := http.NewRequest("POST", "https://api.kyren.top/v1/checkouts", bytes.NewBuffer(body))
+    req, _ := http.NewRequest("POST", "https://api.kyrenpay.com/v1/checkouts", bytes.NewBuffer(body))
     req.Header.Set("Content-Type", "application/json")
     req.Header.Set("x-api-key", "kyren_live_xxxxxxxxxxxx")
 
@@ -186,13 +186,13 @@ func createCheckout() {
 
 <CodeGroup>
 ```bash cURL
-curl https://api.kyren.top/v1/orders?status=PAID&page=1&size=10 \
+curl https://api.kyrenpay.com/v1/orders?status=PAID&page=1&size=10 \
   -H "x-api-key: kyren_live_xxxxxxxxxxxx"
 ```
 
 ```python Python
 response = requests.get(
-    "https://api.kyren.top/v1/orders",
+    "https://api.kyrenpay.com/v1/orders",
     headers={"x-api-key": "kyren_live_xxxxxxxxxxxx"},
     params={"status": "PAID", "page": 1, "size": 10},
 )
@@ -205,7 +205,7 @@ print(f"总计: {data['pagination']['total']} 笔订单")
 ```
 
 ```javascript Node.js
-const response = await axios.get('https://api.kyren.top/v1/orders', {
+const response = await axios.get('https://api.kyrenpay.com/v1/orders', {
   headers: { 'x-api-key': 'kyren_live_xxxxxxxxxxxx' },
   params: { status: 'PAID', page: 1, size: 10 },
 });
@@ -219,7 +219,7 @@ console.log(`总计: ${pagination.total} 笔订单`);
 
 ```go Go
 func listOrders() {
-    req, _ := http.NewRequest("GET", "https://api.kyren.top/v1/orders?status=PAID&page=1&size=10", nil)
+    req, _ := http.NewRequest("GET", "https://api.kyrenpay.com/v1/orders?status=PAID&page=1&size=10", nil)
     req.Header.Set("x-api-key", "kyren_live_xxxxxxxxxxxx")
 
     resp, _ := http.DefaultClient.Do(req)
@@ -235,13 +235,13 @@ func listOrders() {
 
 <CodeGroup>
 ```bash cURL
-curl https://api.kyren.top/v1/balance \
+curl https://api.kyrenpay.com/v1/balance \
   -H "x-api-key: kyren_live_xxxxxxxxxxxx"
 ```
 
 ```python Python
 response = requests.get(
-    "https://api.kyren.top/v1/balance",
+    "https://api.kyrenpay.com/v1/balance",
     headers={"x-api-key": "kyren_live_xxxxxxxxxxxx"},
 )
 
@@ -251,7 +251,7 @@ print(f"待结算: {balance['pending']} {balance['currency']}")
 ```
 
 ```javascript Node.js
-const response = await axios.get('https://api.kyren.top/v1/balance', {
+const response = await axios.get('https://api.kyrenpay.com/v1/balance', {
   headers: { 'x-api-key': 'kyren_live_xxxxxxxxxxxx' },
 });
 
@@ -262,7 +262,7 @@ console.log(`待结算: ${balance.pending} ${balance.currency}`);
 
 ```go Go
 func getBalance() {
-    req, _ := http.NewRequest("GET", "https://api.kyren.top/v1/balance", nil)
+    req, _ := http.NewRequest("GET", "https://api.kyrenpay.com/v1/balance", nil)
     req.Header.Set("x-api-key", "kyren_live_xxxxxxxxxxxx")
 
     resp, _ := http.DefaultClient.Do(req)

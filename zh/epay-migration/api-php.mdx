@@ -19,7 +19,7 @@ source_owner: engineering
 该端点为了兼容订单查询，使用原始商户 `key` 和 `pid`。开启 API IP 白名单时可能会校验来源 IP。
 
 ```bash
-curl "https://api.kyren.top/epay/api.php?act=order&pid=10001&key=merchant_secret&out_trade_no=ORDER_10002"
+curl "https://api.kyrenpay.com/epay/api.php?act=order&pid=10001&key=merchant_secret&out_trade_no=ORDER_10002"
 ```
 
 成功响应示例：
@@ -62,7 +62,7 @@ curl "https://api.kyren.top/epay/api.php?act=order&pid=10001&key=merchant_secret
 可选的 `refund_no` 用于幂等。如果不传，Kyren 会使用订单 ID 和标准化后的退款金额生成兼容幂等键。
 
 ```bash
-curl "https://api.kyren.top/epay/api.php?act=refund&pid=10001&key=merchant_secret&trade_no=K202605260001&money=9.99&refund_no=REFUND_10002"
+curl "https://api.kyrenpay.com/epay/api.php?act=refund&pid=10001&key=merchant_secret&trade_no=K202605260001&money=9.99&refund_no=REFUND_10002"
 ```
 
 响应示例：

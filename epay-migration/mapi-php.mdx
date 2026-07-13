@@ -45,7 +45,7 @@ Optional parameters:
 ## Example request
 
 ```bash
-curl -X POST https://api.kyren.top/epay/mapi.php \
+curl -X POST https://api.kyrenpay.com/epay/mapi.php \
   -H "Content-Type: application/x-www-form-urlencoded" \
   --data-urlencode "pid=10001" \
   --data-urlencode "type=alipay" \
@@ -66,9 +66,7 @@ curl -X POST https://api.kyren.top/epay/mapi.php \
   "code": 1,
   "trade_no": "K202605260001",
   "out_trade_no": "ORDER_10002",
-  "payurl": "https://api.kyren.top/epay/redirect/order_abc123",
-  "qrcode": "https://api.kyren.top/epay/qr/order_abc123",
-  "img": "https://api.kyren.top/epay/qr/order_abc123.png"
+  "payurl": "https://payment.kyren.io/epay/redirect/order_abc123"
 }
 ```
 

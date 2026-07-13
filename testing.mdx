@@ -9,7 +9,7 @@ Use this page to test your integration without making assumptions about unsuppor
 
 | Item | Current behavior |
 | --- | --- |
-| Production API | `https://api.kyren.top` |
+| Production API | `https://api.kyrenpay.com` |
 | Production API key prefix | `kyren_live_` |
 | Self-service test keys | Not currently exposed in the merchant dashboard |
 | Staging access | Available only with a base URL and credentials issued by Kyren |
@@ -23,7 +23,7 @@ Use this page to test your integration without making assumptions about unsuppor
 Use an API key issued for the target environment:
 
 ```bash
-curl https://api.kyren.top/v1/products \
+curl https://api.kyrenpay.com/v1/products \
   -H "x-api-key: kyren_live_xxxxxxxxxxxxxxxxxxxx"
 ```
 
@@ -75,10 +75,10 @@ Before switching to production, make sure you have:
 
 <Steps>
   <Step title="Replace API keys">
-    Use the production key issued for `api.kyren.top`
+    Use the production key issued for `api.kyrenpay.com`
   </Step>
   <Step title="Update base URL">
-    If Kyren issued a staging base URL, change from that URL to `api.kyren.top`
+    If Kyren issued a staging base URL, change from that URL to `api.kyrenpay.com`
   </Step>
   <Step title="Update webhook URL">
     Set your production webhook endpoint in the Dashboard

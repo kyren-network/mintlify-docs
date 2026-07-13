@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "generator": "kyren-pay-docs/scripts/build-copilot-index.mjs",
-  "generatedAt": "2026-07-08T08:35:51.790Z",
+  "generatedAt": "2026-07-12T23:51:26.115Z",
   "sourceCount": 135,
   "chunkCount": 825,
   "languages": [
@@ -2232,7 +2232,7 @@
       }
     },
     {
-      "id": "8150c06c2f0f9d0e",
+      "id": "5a480ca75687470f",
       "sourcePath": "authentication.mdx",
       "url": "/authentication",
       "title": "Authentication",
@@ -2244,7 +2244,7 @@
       "visibility": "public",
       "lastVerifiedAt": null,
       "sourceOwner": null,
-      "text": "Environment Base URL API Key Prefix --- --- --- Production https://api.kyren.top kyren live Staging Issued by Kyren support Use only the credentials issued for that staging environment The current public production API accepts live API keys with the kyren live prefix. Kyren does not currently expose self-service kyren test keys in the merchant dashboard. Use a staging base URL only when Kyren has issued matching staging credentials to you.",
+      "text": "Environment Base URL API Key Prefix --- --- --- Production https://api.kyrenpay.com kyren live Staging Issued by Kyren support Use only the credentials issued for that staging environment The current public production API accepts live API keys with the kyren live prefix. Kyren does not currently expose self-service kyren test keys in the merchant dashboard. Use a staging base URL only when Kyren has issued matching staging credentials to you.",
       "tokens": [
         "authentication",
         "environments",
@@ -2255,8 +2255,8 @@
         "prefix",
         "production",
         "https",
-        "kyren",
-        "top",
+        "kyrenpay",
+        "com",
         "kyren",
         "live",
         "staging",
@@ -12766,7 +12766,7 @@
       }
     },
     {
-      "id": "2d3c79071f1889d4",
+      "id": "35900f48ea7762f8",
       "sourcePath": "introduction.mdx",
       "url": "/introduction",
       "title": "Introduction",
@@ -12778,7 +12778,7 @@
       "visibility": "public",
       "lastVerifiedAt": null,
       "sourceOwner": null,
-      "text": "Environment URL --- --- Production https://api.kyren.top",
+      "text": "Environment URL --- --- Production https://api.kyrenpay.com",
       "tokens": [
         "introduction",
         "base",
@@ -12787,8 +12787,8 @@
         "url",
         "production",
         "https",
-        "kyren",
-        "top"
+        "kyrenpay",
+        "com"
       ],
       "citation": {
         "url": "/introduction",
@@ -13436,7 +13436,7 @@
       }
     },
     {
-      "id": "7fae9a04d03e7860",
+      "id": "992f290c13ac2fec",
       "sourcePath": "testing.mdx",
       "url": "/testing",
       "title": "Testing",
@@ -13448,7 +13448,7 @@
       "visibility": "public",
       "lastVerifiedAt": null,
       "sourceOwner": null,
-      "text": "Item Current behavior --- --- Production API https://api.kyren.top Production API key prefix kyren live Self-service test keys Not currently exposed in the merchant dashboard Staging access Available only with a base URL and credentials issued by Kyren Do not send test traffic to an arbitrary staging URL unless Kyren has issued credentials for that environment.",
+      "text": "Item Current behavior --- --- Production API https://api.kyrenpay.com Production API key prefix kyren live Self-service test keys Not currently exposed in the merchant dashboard Staging access Available only with a base URL and credentials issued by Kyren Do not send test traffic to an arbitrary staging URL unless Kyren has issued credentials for that environment.",
       "tokens": [
         "testing",
         "current",
@@ -13459,8 +13459,8 @@
         "behavior",
         "production",
         "https",
-        "kyren",
-        "top",
+        "kyrenpay",
+        "com",
         "production",
         "key",
         "prefix",
@@ -13740,7 +13740,7 @@
       }
     },
     {
-      "id": "d738db2adb470905",
+      "id": "88e9c4e774a24cdc",
       "sourcePath": "testing.mdx",
       "url": "/testing",
       "title": "Testing",
@@ -13752,7 +13752,7 @@
       "visibility": "public",
       "lastVerifiedAt": null,
       "sourceOwner": null,
-      "text": "Before switching to production, make sure you have: Use the production key issued for api.kyren.top If Kyren issued a staging base URL, change from that URL to api.kyren.top Set your production webhook endpoint in the Dashboard Ensure your server correctly verifies X-Kyren-Signature headers Test error scenarios and ensure your app handles them properly",
+      "text": "Before switching to production, make sure you have: Use the production key issued for api.kyrenpay.com If Kyren issued a staging base URL, change from that URL to api.kyrenpay.com Set your production webhook endpoint in the Dashboard Ensure your server correctly verifies X-Kyren-Signature headers Test error scenarios and ensure your app handles them properly",
       "tokens": [
         "testing",
         "going",
@@ -13768,8 +13768,8 @@
         "production",
         "key",
         "issued",
-        "kyren",
-        "top",
+        "kyrenpay",
+        "com",
         "if",
         "kyren",
         "issued",
@@ -13780,8 +13780,8 @@
         "from",
         "that",
         "url",
-        "kyren",
-        "top",
+        "kyrenpay",
+        "com",
         "set",
         "your",
         "production",
@@ -18441,7 +18441,7 @@
       }
     },
     {
-      "id": "9d065d0399bccdc4",
+      "id": "cbbcfc7449b92ded",
       "sourcePath": "zh-Hant/authentication.mdx",
       "url": "/zh-Hant/authentication",
       "title": "認證",
@@ -18453,13 +18453,13 @@
       "visibility": "public",
       "lastVerifiedAt": null,
       "sourceOwner": null,
-      "text": "環境 Base URL API 密鑰前綴 --- --- --- 生產環境 https://api.kyren.top kyren live Staging 由 Kyren 支援提供 僅使用 Kyren 為該 Staging 環境提供的憑證 目前公開生產 API 接受 kyren live 前綴的生產密鑰。 商戶控制台目前不提供自助建立 kyren test 測試密鑰。 只有在 Kyren 向你提供對應環境的 Base URL 和憑證時，才應使用 Staging 環境。",
+      "text": "環境 Base URL API 密鑰前綴 --- --- --- 生產環境 https://api.kyrenpay.com kyren live Staging 由 Kyren 支援提供 僅使用 Kyren 為該 Staging 環境提供的憑證 目前公開生產 API 接受 kyren live 前綴的生產密鑰。 商戶控制台目前不提供自助建立 kyren test 測試密鑰。 只有在 Kyren 向你提供對應環境的 Base URL 和憑證時，才應使用 Staging 環境。",
       "tokens": [
         "base",
         "url",
         "https",
-        "kyren",
-        "top",
+        "kyrenpay",
+        "com",
         "kyren",
         "live",
         "staging",
@@ -25773,7 +25773,7 @@
       }
     },
     {
-      "id": "91b8008db460e589",
+      "id": "cebc5eef555e2c0a",
       "sourcePath": "zh-Hant/introduction.mdx",
       "url": "/zh-Hant/introduction",
       "title": "簡介",
@@ -25785,12 +25785,12 @@
       "visibility": "public",
       "lastVerifiedAt": null,
       "sourceOwner": null,
-      "text": "環境 URL --- --- 生產環境 https://api.kyren.top",
+      "text": "環境 URL --- --- 生產環境 https://api.kyrenpay.com",
       "tokens": [
         "url",
         "https",
-        "kyren",
-        "top",
+        "kyrenpay",
+        "com",
         "簡介",
         "介面位址",
         "環境",
@@ -26260,7 +26260,7 @@
       }
     },
     {
-      "id": "f746108d6d6ccbb2",
+      "id": "eba76a01dfbf6c01",
       "sourcePath": "zh-Hant/testing.mdx",
       "url": "/zh-Hant/testing",
       "title": "測試",
@@ -26272,11 +26272,11 @@
       "visibility": "public",
       "lastVerifiedAt": null,
       "sourceOwner": null,
-      "text": "項目 目前行為 --- --- 生產 API https://api.kyren.top 生產 API 密鑰前綴 kyren live 自助測試密鑰 商戶控制台目前不提供 Staging 存取 僅在 Kyren 提供 Base URL 和憑證後可用 除非 Kyren 已向你提供對應環境的憑證，否則不要向任意 Staging URL 傳送測試流量。",
+      "text": "項目 目前行為 --- --- 生產 API https://api.kyrenpay.com 生產 API 密鑰前綴 kyren live 自助測試密鑰 商戶控制台目前不提供 Staging 存取 僅在 Kyren 提供 Base URL 和憑證後可用 除非 Kyren 已向你提供對應環境的憑證，否則不要向任意 Staging URL 傳送測試流量。",
       "tokens": [
         "https",
-        "kyren",
-        "top",
+        "kyrenpay",
+        "com",
         "kyren",
         "live",
         "staging",
@@ -26468,7 +26468,7 @@
       }
     },
     {
-      "id": "00b03beec888f881",
+      "id": "217c86683d7103f6",
       "sourcePath": "zh-Hant/testing.mdx",
       "url": "/zh-Hant/testing",
       "title": "測試",
@@ -26480,16 +26480,16 @@
       "visibility": "public",
       "lastVerifiedAt": null,
       "sourceOwner": null,
-      "text": "切換到生產環境前，請確保你已經完成以下步驟： 使用 api.kyren.top 對應的生產密鑰 如果 Kyren 向你提供了 Staging Base URL，請從該位址切換到 api.kyren.top 在控制台中設定生產環境的 Webhook 端點 確保你的伺服器正確驗證 X-Kyren-Signature 請求標頭 測試各種錯誤場景，確保你的應用能正確處理",
+      "text": "切換到生產環境前，請確保你已經完成以下步驟： 使用 api.kyrenpay.com 對應的生產密鑰 如果 Kyren 向你提供了 Staging Base URL，請從該位址切換到 api.kyrenpay.com 在控制台中設定生產環境的 Webhook 端點 確保你的伺服器正確驗證 X-Kyren-Signature 請求標頭 測試各種錯誤場景，確保你的應用能正確處理",
       "tokens": [
-        "kyren",
-        "top",
+        "kyrenpay",
+        "com",
         "kyren",
         "staging",
         "base",
         "url",
-        "kyren",
-        "top",
+        "kyrenpay",
+        "com",
         "webhook",
         "kyren",
         "signature",
@@ -29769,7 +29769,7 @@
       }
     },
     {
-      "id": "f373ae2fc356b7e3",
+      "id": "8596e208494a3887",
       "sourcePath": "zh/authentication.mdx",
       "url": "/zh/authentication",
       "title": "认证",
@@ -29781,13 +29781,13 @@
       "visibility": "public",
       "lastVerifiedAt": null,
       "sourceOwner": null,
-      "text": "环境 Base URL API 密钥前缀 --- --- --- 生产环境 https://api.kyren.top kyren live Staging 由 Kyren 支持提供 仅使用 Kyren 为该 Staging 环境提供的凭证 当前公开生产 API 接受 kyren live 前缀的生产密钥。 商户控制台目前不提供自助创建 kyren test 测试密钥。 只有在 Kyren 向你提供对应环境的 Base URL 和凭证时，才应使用 Staging 环境。",
+      "text": "环境 Base URL API 密钥前缀 --- --- --- 生产环境 https://api.kyrenpay.com kyren live Staging 由 Kyren 支持提供 仅使用 Kyren 为该 Staging 环境提供的凭证 当前公开生产 API 接受 kyren live 前缀的生产密钥。 商户控制台目前不提供自助创建 kyren test 测试密钥。 只有在 Kyren 向你提供对应环境的 Base URL 和凭证时，才应使用 Staging 环境。",
       "tokens": [
         "base",
         "url",
         "https",
-        "kyren",
-        "top",
+        "kyrenpay",
+        "com",
         "kyren",
         "live",
         "staging",
@@ -37101,7 +37101,7 @@
       }
     },
     {
-      "id": "83aa5e6e681af5be",
+      "id": "d5488a292d6c20a2",
       "sourcePath": "zh/introduction.mdx",
       "url": "/zh/introduction",
       "title": "简介",
@@ -37113,12 +37113,12 @@
       "visibility": "public",
       "lastVerifiedAt": null,
       "sourceOwner": null,
-      "text": "环境 URL --- --- 生产环境 https://api.kyren.top",
+      "text": "环境 URL --- --- 生产环境 https://api.kyrenpay.com",
       "tokens": [
         "url",
         "https",
-        "kyren",
-        "top",
+        "kyrenpay",
+        "com",
         "简介",
         "接口地址",
         "环境",
@@ -37588,7 +37588,7 @@
       }
     },
     {
-      "id": "67377d310e4cfb9b",
+      "id": "0b35fc815f9bae29",
       "sourcePath": "zh/testing.mdx",
       "url": "/zh/testing",
       "title": "测试",
@@ -37600,11 +37600,11 @@
       "visibility": "public",
       "lastVerifiedAt": null,
       "sourceOwner": null,
-      "text": "项目 当前行为 --- --- 生产 API https://api.kyren.top 生产 API 密钥前缀 kyren live 自助测试密钥 商户控制台目前不提供 Staging 访问 仅在 Kyren 提供 Base URL 和凭证后可用 除非 Kyren 已向你提供对应环境的凭证，否则不要向任意 Staging URL 发送测试流量。",
+      "text": "项目 当前行为 --- --- 生产 API https://api.kyrenpay.com 生产 API 密钥前缀 kyren live 自助测试密钥 商户控制台目前不提供 Staging 访问 仅在 Kyren 提供 Base URL 和凭证后可用 除非 Kyren 已向你提供对应环境的凭证，否则不要向任意 Staging URL 发送测试流量。",
       "tokens": [
         "https",
-        "kyren",
-        "top",
+        "kyrenpay",
+        "com",
         "kyren",
         "live",
         "staging",
@@ -37796,7 +37796,7 @@
       }
     },
     {
-      "id": "8583e6b0a25c9755",
+      "id": "107c5786cf61b666",
       "sourcePath": "zh/testing.mdx",
       "url": "/zh/testing",
       "title": "测试",
@@ -37808,16 +37808,16 @@
       "visibility": "public",
       "lastVerifiedAt": null,
       "sourceOwner": null,
-      "text": "切换到生产环境前，请确保你已经完成以下步骤： 使用 api.kyren.top 对应的生产密钥 如果 Kyren 向你提供了 Staging Base URL，请从该地址切换到 api.kyren.top 在控制台中设置生产环境的 Webhook 端点 确保你的服务器正确验证 X-Kyren-Signature 请求头 测试各种错误场景，确保你的应用能正确处理",
+      "text": "切换到生产环境前，请确保你已经完成以下步骤： 使用 api.kyrenpay.com 对应的生产密钥 如果 Kyren 向你提供了 Staging Base URL，请从该地址切换到 api.kyrenpay.com 在控制台中设置生产环境的 Webhook 端点 确保你的服务器正确验证 X-Kyren-Signature 请求头 测试各种错误场景，确保你的应用能正确处理",
       "tokens": [
-        "kyren",
-        "top",
+        "kyrenpay",
+        "com",
         "kyren",
         "staging",
         "base",
         "url",
-        "kyren",
-        "top",
+        "kyrenpay",
+        "com",
         "webhook",
         "kyren",
         "signature",

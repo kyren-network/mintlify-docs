@@ -9,7 +9,7 @@ description: 5 分钟内完成第一笔收款
 
 ## 前提条件
 
-- 一个启润支付商户账号（[点此注册](https://kyren.top)）
+- 一个启润支付商户账号（[点此注册](https://merchant.kyrenpay.com)）
 - 你的 API 密钥（在控制台的「开发者」页面获取）
 - 已在控制台或通过 Products API 创建产品
 - 一个可以安全保存 API 密钥的服务端环境
@@ -30,7 +30,7 @@ description: 5 分钟内完成第一笔收款
 创建一个代表你所售商品的产品：
 
 ```bash
-curl -X POST https://api.kyren.top/v1/products \
+curl -X POST https://api.kyrenpay.com/v1/products \
   -H "Content-Type: application/json" \
   -H "x-api-key: kyren_live_xxxxxxxxxxxx" \
   -d '{
@@ -48,7 +48,7 @@ curl -X POST https://api.kyren.top/v1/products \
 当客户要付款时，创建一个 Checkout Session：
 
 ```bash
-curl -X POST https://api.kyren.top/v1/checkouts \
+curl -X POST https://api.kyrenpay.com/v1/checkouts \
   -H "Content-Type: application/json" \
   -H "x-api-key: kyren_live_xxxxxxxxxxxx" \
   -d '{

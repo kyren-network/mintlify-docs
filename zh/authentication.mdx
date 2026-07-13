@@ -7,7 +7,7 @@ description: 使用 API 密钥认证你的 API 请求
 
 ## API 密钥
 
-启润支付使用 API 密钥来认证请求。你可以在[商户控制台](https://dashboard.kyren.top)中管理你的 API 密钥。
+启润支付使用 API 密钥来认证请求。你可以在[商户控制台](https://merchant.kyrenpay.com)中管理你的 API 密钥。
 
 当前后端实现接受生产 API 密钥：
 
@@ -20,7 +20,7 @@ description: 使用 API 密钥认证你的 API 请求
 在每个请求的 `x-api-key` 请求头中包含你的 API 密钥：
 
 ```bash
-curl https://api.kyren.top/v1/products \
+curl https://api.kyrenpay.com/v1/products \
   -H "x-api-key: kyren_live_xxxxxxxxxxxxxxxxxxxx"
 ```
 
@@ -36,7 +36,7 @@ curl https://api.kyren.top/v1/products \
 
 | 环境 | Base URL | API 密钥前缀 |
 | --- | --- | --- |
-| 生产环境 | `https://api.kyren.top` | `kyren_live_` |
+| 生产环境 | `https://api.kyrenpay.com` | `kyren_live_` |
 | Staging | 由 Kyren 支持提供 | 仅使用 Kyren 为该 Staging 环境提供的凭证 |
 
 <Info>

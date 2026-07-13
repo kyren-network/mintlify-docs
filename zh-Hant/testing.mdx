@@ -9,7 +9,7 @@ description: 上線前測試你的 Kyren Pay 整合
 
 | 項目 | 目前行為 |
 | --- | --- |
-| 生產 API | `https://api.kyren.top` |
+| 生產 API | `https://api.kyrenpay.com` |
 | 生產 API 密鑰前綴 | `kyren_live_` |
 | 自助測試密鑰 | 商戶控制台目前不提供 |
 | Staging 存取 | 僅在 Kyren 提供 Base URL 和憑證後可用 |
@@ -23,7 +23,7 @@ description: 上線前測試你的 Kyren Pay 整合
 使用目標環境實際簽發的 API 密鑰：
 
 ```bash
-curl https://api.kyren.top/v1/products \
+curl https://api.kyrenpay.com/v1/products \
   -H "x-api-key: kyren_live_xxxxxxxxxxxxxxxxxxxx"
 ```
 
@@ -75,10 +75,10 @@ https://abc123.ngrok.io/webhooks/kyren
 
 <Steps>
   <Step title="替換 API 密鑰">
-    使用 `api.kyren.top` 對應的生產密鑰
+    使用 `api.kyrenpay.com` 對應的生產密鑰
   </Step>
   <Step title="更新介面位址">
-    如果 Kyren 向你提供了 Staging Base URL，請從該位址切換到 `api.kyren.top`
+    如果 Kyren 向你提供了 Staging Base URL，請從該位址切換到 `api.kyrenpay.com`
   </Step>
   <Step title="更新 Webhook URL">
     在控制台中設定生產環境的 Webhook 端點

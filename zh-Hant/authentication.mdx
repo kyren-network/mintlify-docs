@@ -7,7 +7,7 @@ description: 使用 API 密鑰認證你的 API 請求
 
 ## API 密鑰
 
-啟潤支付使用 API 密鑰來認證請求。你可以在[商戶控制台](https://dashboard.kyren.top)中管理你的 API 密鑰。
+啟潤支付使用 API 密鑰來認證請求。你可以在[商戶控制台](https://merchant.kyrenpay.com)中管理你的 API 密鑰。
 
 當前後端實作接受生產 API 密鑰：
 
@@ -20,7 +20,7 @@ description: 使用 API 密鑰認證你的 API 請求
 在每個請求的 `x-api-key` 請求標頭中包含你的 API 密鑰：
 
 ```bash
-curl https://api.kyren.top/v1/products \
+curl https://api.kyrenpay.com/v1/products \
   -H "x-api-key: kyren_live_xxxxxxxxxxxxxxxxxxxx"
 ```
 
@@ -36,7 +36,7 @@ curl https://api.kyren.top/v1/products \
 
 | 環境 | Base URL | API 密鑰前綴 |
 | --- | --- | --- |
-| 生產環境 | `https://api.kyren.top` | `kyren_live_` |
+| 生產環境 | `https://api.kyrenpay.com` | `kyren_live_` |
 | Staging | 由 Kyren 支援提供 | 僅使用 Kyren 為該 Staging 環境提供的憑證 |
 
 <Info>

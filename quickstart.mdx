@@ -9,7 +9,7 @@ If you want to learn the dashboard first, start with [Dashboard overview](/dashb
 
 ## Prerequisites
 
-- A Kyren Pay merchant account ([sign up here](https://kyren.top))
+- A Kyren Pay merchant account ([sign up here](https://merchant.kyrenpay.com))
 - Your API key (found in the Developer section of your dashboard)
 - A product created in the dashboard or through the Products API
 - A server-side environment where your API key can be stored securely
@@ -30,7 +30,7 @@ After signing up, navigate to **Dashboard > Developer** and copy your API key.
 Create a product that represents what you're selling:
 
 ```bash
-curl -X POST https://api.kyren.top/v1/products \
+curl -X POST https://api.kyrenpay.com/v1/products \
   -H "Content-Type: application/json" \
   -H "x-api-key: kyren_live_xxxxxxxxxxxx" \
   -d '{
@@ -48,7 +48,7 @@ Save the `id` from the response — you'll need it to create checkout sessions.
 When a customer wants to pay, create a checkout session:
 
 ```bash
-curl -X POST https://api.kyren.top/v1/checkouts \
+curl -X POST https://api.kyrenpay.com/v1/checkouts \
   -H "Content-Type: application/json" \
   -H "x-api-key: kyren_live_xxxxxxxxxxxx" \
   -d '{
