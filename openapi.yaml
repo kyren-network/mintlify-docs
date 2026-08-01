@@ -1350,6 +1350,9 @@ components:
           type: string
         status:
           $ref: "#/components/schemas/CheckoutStatus"
+        orderId:
+          type: string
+          description: Kyren order ID for the final successful payment. Present only after the checkout has been linked to that order.
         url:
           type: string
           format: uri
