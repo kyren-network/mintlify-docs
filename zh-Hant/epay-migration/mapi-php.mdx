@@ -40,7 +40,7 @@ source_owner: engineering
 | `display_merchant_name` | 本次支付在 Kyren 中間頁展示的商戶名稱。 |
 | `param` | 商戶透傳中繼資料，會在通知中返回。 |
 | `userId` | 可選的商戶使用者標識；渠道支援時會傳給支付網關。 |
-| `channel_param` | 可選的渠道擴展 JSON 字串。 |
+| `channel_param` | 非信用卡支付類型可選的渠道擴展 JSON 字串。當 `type=creditcard` 時，其原始值仍參與 Epay 簽名，但 Kyren 在驗簽後會完全忽略該值。禁止透過 `channel_param` 傳入卡號、有效期、CVV、帳單資料或聯絡資訊；買家將在 Kyren 或上游託管頁面輸入卡片資料。頂層 `email`、`phone` 和 `userId` 參數不受影響。 |
 
 ## 請求範例
 
