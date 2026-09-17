@@ -53,6 +53,15 @@ curl "https://api.kyrenpay.com/epay/api.php?act=order&pid=10001&key=merchant_sec
 }
 ```
 
+## Paydify 订单确认
+
+Paydify 易支付订单继续使用本页查询接口，不需要调用 Paydify API。查询结果的 `type` 为 `crypto`，`money` 是原商品计价金额，不是 USDT 付款数量。
+
+- 查询 `code=1` 只表示查询成功。`status=1` 对应已确认的本地 `PAID/SETTLED`；其余状态返回 `0`，不能仅凭 `0` 区分待支付、失败或关闭。
+- 上游回调经验证并主动查询确认金额、币种及订单关联后，才更新本地付款状态并发送既有易支付 GET 通知。通知仍使用 `trade_status=TRADE_SUCCESS`、MD5 签名和原商品金额。
+- 商户应验签、核对订单和金额、幂等处理，再返回纯文本 `success`。浏览器回跳和上游创建成功不是资金到账证据。
+- 本次 Paydify 接入不新增退款能力，不应因存在通用 `act=refund` 就假定该通道支持退款。
+
 ## 退款兼容
 
 调用 `GET` 或 `POST` `/epay/api.php?act=refund`，传入 `pid`、原始商户 `key`、`money`，以及 `out_trade_no` 或 `trade_no` 之一。

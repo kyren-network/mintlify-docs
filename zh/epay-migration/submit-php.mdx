@@ -41,6 +41,17 @@ source_owner: engineering
 | `device` | 可选设备提示：`pc` 或 `mobile`。同一订单号复用到不同支付宝/微信设备支付形态时可能被拒绝。 |
 | `channel_param` | 可选的渠道扩展 JSON 字符串。 |
 
+## Paydify：`type=crypto`
+
+商户的加密货币一次性支付通道绑定 Paydify 后，沿用本页必填参数，将 `type` 设为 `crypto`，并按原规则重新计算 MD5 签名；不要使用 `type=paydify`。`money_type` 表示商品计价币种，省略时为 `CNY`，`money` 不填 USDT 数量。
+
+- 成功响应为 HTTP `302`，目标是 Kyren 本地 `/epay/redirect/{orderId}`，不是 Paydify 托管收银台。
+- 买家在本地页选择后端提供的 App / 网络、确认应付 USDT 报价后才创建上游支付；商户不需要传 App、网络或 `channel_param`。
+- 相同 `out_trade_no` 重试必须保持原金额、币种和支付方式；刷新付款页恢复同一笔支付。不要因暂未完成付款而不断更换订单号。
+- 入口受理和浏览器回跳不作为支付成功凭据；应校验异步通知，或通过鉴权订单查询确认。
+
+渠道开通与环境要求见 [Paydify 接入概览](/zh/epay-migration/overview#paydify-加密货币支付)。
+
 ## 表单示例
 
 ```html

@@ -70,6 +70,27 @@ curl -X POST https://api.kyrenpay.com/epay/mapi.php \
 }
 ```
 
+## Paydify：返回本地支付页，不直接返回付款码
+
+商户一次性加密货币通道绑定 Paydify 时，传 `type=crypto`，沿用标准签名，不新增 App / 网络等商户必填字段。`money` 为商品计价金额，`money_type` 省略时为 `CNY`；应付 USDT 数量由 Kyren 本地页的有效报价确定。
+
+以下是响应结构示例，**不是实际交易回包**：
+
+```json
+{
+  "code": 1,
+  "trade_no": "order_paydify_example",
+  "out_trade_no": "ORDER_PAYDIFY_EXAMPLE",
+  "payurl": "https://payment.kyren.io/epay/redirect/order_paydify_example"
+}
+```
+
+- 此响应不包含 Paydify 上游 `qrcode` 或 `img`；商户应让买家打开 `payurl`。不要把 `payurl` 当成可直接向上游付款的二维码内容。
+- `code=1` 仅说明本地订单受理成功，不代表已创建 Paydify 上游支付或已收款。
+- 买家选择 App / 网络并确认 USDT 报价后才创建上游支付，本地页直接展示该笔上游二维码图片。当前不支持 Paydify USDC。
+- 重复提交相同 `out_trade_no` 时保持原金额、币种和支付方式；未知创建结果由原订单恢复，不通过换订单号重建上游支付。
+- 最终以验签的易支付成功通知或 [`api.php?act=order`](/zh/epay-migration/api-php) 的付款状态为准。环境开通要求见[接入概览](/zh/epay-migration/overview#paydify-加密货币支付)。
+
 ## 失败响应示例
 
 ```json

@@ -620,6 +620,11 @@ paths:
         Creates (or reuses) an Epay-compatible payment and returns HTTP 302 redirect to the hosted payment page.
         This endpoint also accepts GET with the same parameters.
 
+        Paydify：商户一次性加密货币通道绑定 Paydify 时使用 `type=crypto`（不是 `paydify`）。
+        返回 302 到 Kyren 本地 `/epay/redirect/{orderId}`，入口受理时不创建上游支付。
+        买家在本地页选择 App / 网络并确认 USDT 报价后，才创建上游支付和展示二维码。
+        无需商户提交 App、网络或 Paydify 专用 `channel_param`。目标环境须已部署且渠道已开通。
+
         Signature algorithm:
         1. Remove `sign` and `sign_type`, and drop empty values.
         2. Sort parameters by key in ascending order.
@@ -674,6 +679,13 @@ paths:
         For QR-style channels, response includes `qrcode` and `img`.
         For redirect-style channels, response includes `payurl`.
 
+        Paydify：商户一次性加密货币通道绑定 Paydify 时使用 `type=crypto`，沿用 MD5 签名。
+        返回 `code=1/trade_no/out_trade_no/payurl`，其中 `payurl` 指向 Kyren 本地支付页；不返回上游 `qrcode/img`。
+        买家选择 App / 网络并确认有效 USDT 报价后才创建上游支付；不新增商户必填参数，目前不支持 USDC。
+        `money/money_type` 表示原商品计价金额，不是应付 USDT 数量；入口 `code=1` 不代表已付款。
+        同一商户 `out_trade_no` 重试必须保持金额、币种和支付方式一致，不能用重建订单处理未知支付结果。
+        目标环境须已部署且渠道已开通；文档不替代 Sandbox 真付验收。
+
         Signature algorithm:
         1. Remove `sign` and `sign_type`, and drop empty values.
         2. Sort parameters by key in ascending order.
@@ -724,6 +736,13 @@ paths:
                     trade_no: "order_epay_002"
                     out_trade_no: "order_20260409003"
                     payurl: "https://payment.kyren.io/epay/redirect/order_epay_002"
+                successPaydify:
+                  summary: Paydify 本地支付页响应示例（非实际交易回包）
+                  value:
+                    code: 1
+                    trade_no: "order_paydify_example"
+                    out_trade_no: "ORDER_PAYDIFY_EXAMPLE"
+                    payurl: "https://payment.kyren.io/epay/redirect/order_paydify_example"
                 error:
                   summary: Error response
                   value:
@@ -739,6 +758,11 @@ paths:
         Executes compatibility operations with `act`.
         - `act=order`: query order status/result.
         - `act=refund`: submit a refund for an eligible Epay-source order.
+
+        Paydify 订单仍通过 `act=order` 查询本地权威状态，`type=crypto`，`money` 保持原商品计价金额。
+        `code=1` 表示请求成功；只有本地 `PAID/SETTLED` 对应 `status=1`，其余为 `0`。
+        Paydify 经上游验签查询确认后沿用易支付成功通知；浏览器回跳不是付款证据。
+        本次 Paydify 接入不新增退款能力，不能由通用 `act=refund` 推断该渠道支持退款。
 
         This endpoint also accepts GET with the same parameters.
       security: []
@@ -1048,7 +1072,9 @@ components:
     EpayPaymentType:
       type: string
       enum: [alipay, wxpay, creditcard, crypto, paynow]
-      description: Payment channel type in Epay compatibility mode.
+      description: >-
+        Payment channel type in Epay compatibility mode.
+        `crypto` 按商户绑定选择 Satogate 或 Paydify；Paydify 不新增独立 type 值，也不能通过请求参数覆盖绑定。
 
     EpaySubmitRequest:
       type: object
@@ -1075,11 +1101,15 @@ components:
           description: Product name
         money:
           type: string
-          description: Order amount, decimal string, must be greater than 0
+          description: >-
+            Order amount, decimal string, must be greater than 0.
+            Paydify 下此值为 money_type 对应的商品计价金额，不是应付 USDT 数量；买家费用按现有规则计算。
         money_type:
           type: string
           default: CNY
-          description: Currency code. Defaults to CNY when omitted.
+          description: >-
+            Currency code. Defaults to CNY when omitted.
+            Paydify 在本地页按此计价币种锁定有效 USDT 报价，报价不可用时不回退提交 USD。
         param:
           type: string
           description: Pass-through parameter returned in callbacks and order queries
@@ -1128,11 +1158,15 @@ components:
           description: Product name
         money:
           type: string
-          description: Order amount, decimal string, must be greater than 0
+          description: >-
+            Order amount, decimal string, must be greater than 0.
+            Paydify 下此值为 money_type 对应的商品计价金额，不是应付 USDT 数量；买家费用按现有规则计算。
         money_type:
           type: string
           default: CNY
-          description: Currency code. Defaults to CNY when omitted.
+          description: >-
+            Currency code. Defaults to CNY when omitted.
+            Paydify 在本地页按此计价币种锁定有效 USDT 报价，报价不可用时不回退提交 USD。
         param:
           type: string
           description: Pass-through parameter returned in callbacks and order queries
@@ -1218,15 +1252,21 @@ components:
         payurl:
           type: string
           nullable: true
-          description: Redirect URL for browser/app payment flows
+          description: >-
+            Redirect URL for browser/app payment flows.
+            Paydify 返回 Kyren 本地 `/epay/redirect/{orderId}`，不是上游付款二维码内容或已付款凭据。
         qrcode:
           type: string
           nullable: true
-          description: QR code payload or H5 payment URL depending on channel
+          description: >-
+            QR code payload or H5 payment URL depending on channel.
+            Paydify 的 mapi.php 响应不返回此字段，应打开 payurl 完成买家选择与报价确认。
         img:
           type: string
           nullable: true
-          description: QR image URL generated from `qrcode`
+          description: >-
+            QR image URL generated from `qrcode` for channels that return it.
+            Paydify 的 mapi.php 响应不返回此字段；其本地页直接展示上游返回的二维码图片。
 
     EpayMapiResponse:
       oneOf:

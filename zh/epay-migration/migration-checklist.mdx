@@ -26,4 +26,14 @@ source_owner: engineering
 - 如需为 Epay 来源订单自动退款，请使用符合条件的已支付订单、已开通退款权限的账户和幂等 `refund_no` 验证 `api.php?act=refund`。
 - 对账迁移后的 Epay 来源订单、Kyren 订单与结算。
 
+## Paydify 专项检查
+
+- 确认目标环境已发布 Paydify 易支付能力，商户一次性 `crypto` 通道已绑定并启用 Paydify；只传 `type=crypto` 不会切换绑定。
+- 保留原易支付签名协议，不使用 `type=paydify`；`money/money_type` 表达商品计价金额，而非应付 USDT 数量。
+- 验证 `submit.php` 302 与 `mapi.php.payurl` 均进入 Kyren 本地页；不要要求 `mapi.php` 返回 Paydify 上游 `qrcode/img`。
+- 验证动态 App / 网络、有效 USDT 报价、买家确认后创建支付、二维码展示及刷新恢复。报价无效或无可用能力时不得默认当作可收款。
+- 验证相同 `out_trade_no` 重试不重复创建支付，金额、币种或支付方式冲突会拒绝。
+- 验证异步通知签名、原商品金额、幂等处理和鉴权订单查询；不要将入口 `code=1` 或浏览器回跳认作付款成功。
+- 单独确认所需退款能力；本次 Paydify 接入不新增退款支持。文档和自动测试不替代 Sandbox 真付验收。
+
 测试时请使用 Kyren 发放的凭证。低风险真实付款检查仅应在 Kyren 或支持团队批准后进行。
