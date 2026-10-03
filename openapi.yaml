@@ -5,12 +5,18 @@ info:
     The Kyren Pay API enables merchants to accept payments from customers worldwide.
     Integrate checkout sessions, manage products, track orders, and handle webhooks.
 
+    **Authentication**: Server-side merchant integrations use `x-api-key`.
+    Public configuration operations have no authentication requirement.
+    `/v1/merchant/**` dashboard operations use a merchant login JWT and are not part of this API reference.
+    Epay compatibility operations use their documented `pid` and signature/key parameters.
+
     **Data types**: The API uses the following types for request/response data:
     - **string**: For text, identifiers, and **all amount/price fields** (e.g. `price`, `amount`, `platformFee`, `available`)
       to avoid floating-point precision issues. Use decimal format like `"9.99"`.
     - **integer**: For counts, pagination, and timestamps
     - **timestamp**: Unix timestamp in milliseconds (integer) for all time fields (e.g. `createdAt`, `paidAt`, `expiresAt`).
       Time parameters (e.g. `startDate`, `endDate`) also use Unix milliseconds.
+    - **calendar date**: Agreement `effectiveDate` uses a `YYYY-MM-DD` string; it is a calendar date, not an event timestamp.
   version: "1.0.0"
   contact:
     name: Kyren Pay Support
@@ -73,6 +79,111 @@ paths:
                     - code: "HKD"
                       label: "HKD"
                   defaultCurrency: "USD"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+  /v1/config/settlement:
+    get:
+      operationId: getSettlementConfig
+      tags: [Config]
+      summary: Get settlement configuration
+      description: |
+        Returns the platform-wide settlement period in business days.
+        Individual orders may use their channel's period captured at creation.
+        Use order `settleDateTime` for the expected eligibility time and `settledAt` for actual settlement.
+        This configuration does not guarantee payout timing.
+      security: []
+      responses:
+        "200":
+          description: Platform settlement configuration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SettlementConfigResponseWrapper"
+              example:
+                code: 0
+                message: success
+                data:
+                  settlementDays: 1
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+
+  /v1/config/legal:
+    get:
+      operationId: getLegalConfig
+      tags: [Config]
+      summary: Get legal configuration
+      description: Returns the current legal terms version and public document URLs. Reading these documents does not record merchant agreement acceptance.
+      security: []
+      responses:
+        "200":
+          description: Current legal document links
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LegalConfigResponseWrapper"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+
+  /v1/config/legal/merchant-services-agreement:
+    get:
+      operationId: getCurrentMerchantServicesAgreement
+      tags: [Config]
+      summary: Get current merchant services agreement
+      description: |
+        Returns the current rendered agreement, its version, effective date, hashes, and public URL.
+        Retrieve it without an API key. Complete acceptance in the merchant dashboard;
+        downloading this document does not sign it or change the account's agreement status.
+      security: []
+      responses:
+        "200":
+          description: Current merchant services agreement
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+              description: Always `no-store` for the current agreement.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MerchantAgreementDocumentResponseWrapper"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+
+  /v1/config/legal/merchant-services-agreement/{version}:
+    get:
+      operationId: getHistoricalMerchantServicesAgreement
+      tags: [Config]
+      summary: Get historical merchant services agreement
+      description: Returns the agreement for an explicit version and effective date. Reading a historical document does not complete acceptance of the current agreement.
+      security: []
+      parameters:
+        - name: version
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Agreement version to retrieve.
+        - name: effectiveDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Agreement effective calendar date in `YYYY-MM-DD` format, not an event timestamp.
+      responses:
+        "200":
+          description: Historical merchant services agreement
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MerchantAgreementDocumentResponseWrapper"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+
   /v1/products:
     post:
       operationId: createProduct
@@ -118,6 +229,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
     get:
       operationId: listProducts
@@ -163,6 +276,8 @@ paths:
                     totalPages: 1
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   /v1/products/{id}:
     get:
@@ -183,6 +298,8 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
     patch:
       operationId: updateProduct
@@ -213,6 +330,8 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
     delete:
       operationId: archiveProduct
@@ -232,6 +351,8 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   /v1/checkouts:
     post:
@@ -278,6 +399,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   /v1/checkouts/{id}:
     get:
@@ -298,13 +421,15 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   /v1/orders:
     get:
       operationId: listOrders
       tags: [Orders]
       summary: List all orders
-      description: Returns a paginated list of your orders. Orders are created when a checkout session is completed.
+      description: Returns a paginated list of your orders. An order may exist before payment completes; use its status to decide whether to fulfill.
       parameters:
         - name: status
           in: query
@@ -357,7 +482,7 @@ paths:
                       netAmount: "9.59"
                       settledAmount: "9.59"
                       settledCurrency: "USD"
-                      exchangeRate: null
+                      exchangeRate: "1"
                       hkdExchangeRate: null
                       paymentMethod: "CREDIT_CARD"
                       status: "PAID"
@@ -373,13 +498,15 @@ paths:
                     totalPages: 1
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   /v1/orders/{id}:
     get:
       operationId: getOrder
       tags: [Orders]
       summary: Retrieve an order
-      description: Retrieves the full details of an existing order, including payment gateway information.
+      description: Retrieves merchant-visible order details, including original and payable amounts, fee sharing, refund status, and rolling reserve information.
       parameters:
         - $ref: "#/components/parameters/ResourceId"
       responses:
@@ -405,12 +532,13 @@ paths:
                   netAmount: "9.59"
                   settledAmount: "9.59"
                   settledCurrency: "USD"
-                  exchangeRate: null
+                  exchangeRate: "1"
                   hkdExchangeRate: null
                   paymentMethod: "CREDIT_CARD"
-                  paymentGateway: "allinpay"
-                  gatewayOrderId: "gw_001"
-                  gatewayTransactionId: "txn_001"
+                  baseAmount: "9.99"
+                  payableAmount: "9.99"
+                  refundStatus: "NONE"
+                  refundedAmount: "0"
                   status: "PAID"
                   paidAt: 1736932500000
                   settledAt: null
@@ -423,6 +551,8 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   /v1/orders/{orderId}/refunds:
     post:
@@ -480,6 +610,8 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   /v1/refunds/{refundId}:
     get:
@@ -505,6 +637,8 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   /v1/orders/export:
     get:
@@ -539,6 +673,8 @@ paths:
                 format: binary
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   /v1/balance:
     get:
@@ -564,6 +700,8 @@ paths:
                   updatedAt: 1736932500000
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   /v1/balance/transactions:
     get:
@@ -610,6 +748,8 @@ paths:
                     totalPages: 1
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   /epay/submit.php:
     post:
@@ -638,7 +778,7 @@ paths:
               out_trade_no: "order_20260409001"
               notify_url: "https://merchant.example.com/pay/notify"
               return_url: "https://merchant.example.com/pay/return"
-              name: "Pro Plan Subscription"
+              name: "AI Credits Package"
               money: "99.00"
               money_type: "CNY"
               display_merchant_name: "Campaign Store"
@@ -663,6 +803,8 @@ paths:
               example:
                 code: 0
                 msg: "签名验证失败"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   /epay/mapi.php:
     post:
@@ -729,6 +871,8 @@ paths:
                   value:
                     code: 0
                     msg: "订单 order_20260409002 正在创建中，请稍后重试"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   /epay/api.php:
     post:
@@ -806,6 +950,8 @@ paths:
                   value:
                     code: 0
                     msg: "订单不存在"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
 components:
   securitySchemes:
@@ -852,20 +998,13 @@ components:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
           example:
-            code: 400
-            message: "Bad Request"
+            code: 40001
+            message: "Validation failed"
             error:
               field: "productId"
               reason: "Product ID is required"
     Unauthorized:
-      description: Unauthorized — missing or invalid API key
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ErrorResponse"
-          example:
-            code: 401
-            message: "Unauthorized"
+      description: Unauthorized — missing or invalid API key. Authentication middleware may return an empty body; inspect the HTTP status before parsing JSON.
     NotFound:
       description: Not found — the requested resource does not exist
       content:
@@ -873,8 +1012,38 @@ components:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
           example:
-            code: 404
+            code: 40401
             message: "Not Found"
+
+    Conflict:
+      description: Conflicting state or idempotency request. Reconcile the existing resource before retrying.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            code: 40901
+            message: "Conflict"
+
+    TooManyRequests:
+      description: Rate limit exceeded. Ordinary API requests default to 100 per minute per IP; checkout creation defaults to 60 per minute per merchant. Deployment settings may differ.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            code: 42901
+            message: "Too many requests"
+
+    ServiceUnavailable:
+      description: External service is unavailable. Retry with backoff and reconcile payment requests before creating replacements.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            code: 50002
+            message: "External service unavailable"
 
   schemas:
     # --- Enums ---
@@ -926,7 +1095,7 @@ components:
 
     BalanceTransactionType:
       type: string
-      enum: [PAYMENT, SETTLEMENT, PAYOUT, FREEZE, UNFREEZE, CHARGEBACK, CHARGEBACK_FEE, ROLLING_RESERVE, ROLLING_RESERVE_RELEASE, ROLLING_RESERVE_OFFSET, ADMIN_RECHARGE, REFUND, FEE]
+      enum: [PAYMENT, SETTLEMENT, PAYOUT, FREEZE, UNFREEZE, CHARGEBACK, CHARGEBACK_FEE, CHARGEBACK_RECOVERY, ROLLING_RESERVE_RECOVERY, ROLLING_RESERVE, ROLLING_RESERVE_RELEASE, ROLLING_RESERVE_OFFSET, ADMIN_RECHARGE, REFUND, FEE, BALANCE_CORRECTION]
       description: |
         - `PAYMENT` — Payment received (added to pending)
         - `SETTLEMENT` — Funds settled (pending → available)
@@ -934,12 +1103,15 @@ components:
         - `FREEZE` / `UNFREEZE` — Funds frozen or released
         - `CHARGEBACK` — Chargeback deduction
         - `CHARGEBACK_FEE` — Chargeback fee deduction
+        - `CHARGEBACK_RECOVERY` — Chargeback recovery credit
+        - `ROLLING_RESERVE_RECOVERY` — Reserve restored after chargeback recovery
         - `ROLLING_RESERVE` — Rolling reserve hold
         - `ROLLING_RESERVE_RELEASE` — Rolling reserve release
         - `ROLLING_RESERVE_OFFSET` — Rolling reserve used to offset chargeback loss
         - `ADMIN_RECHARGE` — Manual admin recharge
         - `REFUND` — Refund deduction
         - `FEE` — Fee deduction
+        - `BALANCE_CORRECTION` — Administrative duplicate-payment balance correction
 
     # --- Request Schemas ---
     CreateProductRequest:
@@ -1032,12 +1204,10 @@ components:
           type: string
           description: Refund amount as a decimal string. Must be greater than 0 and not exceed the remaining refundable amount.
         reason:
-          type: string
-          nullable: true
+          type: ["string","null"]
           description: Optional refund reason.
         refundNo:
-          type: string
-          nullable: true
+          type: ["string","null"]
           description: Optional merchant refund number used for idempotency.
 
     EpaySignType:
@@ -1096,7 +1266,7 @@ components:
           description: Optional device hint. For Alipay/WeChat, reusing the same `out_trade_no` with a different device flow can be rejected.
         channel_param:
           type: string
-          description: Optional JSON string for channel-specific fields.
+          description: Optional JSON string for non-card channel-specific fields. For `type=creditcard`, the raw value participates in signature verification but is ignored after verification. Do not send card details or billing/contact data in this field; the buyer enters card information on a hosted payment page.
         sign:
           type: string
           description: Lowercase MD5 signature
@@ -1150,11 +1320,10 @@ components:
         channel_param:
           type: string
           description: |
-            Optional JSON string for channel-specific fields.
-            Credit card mode supports fields such as:
-            `cardNo`, `cardExpireMonth`, `cardExpireYear`, `cardSecurityCode`,
-            `billFirstName`, `billLastName`, `billPhone`, `billAddress`,
-            `billCountry`, `billState`, `billCity`, `billZip`, `email`.
+            Optional JSON string for non-card channel-specific fields.
+            For `type=creditcard`, the raw value participates in signature verification
+            but is ignored after verification. Do not send card details or billing/contact
+            data in this field; the buyer enters card information on a hosted payment page.
         userId:
           type: string
           description: Optional merchant user identifier passed to the payment gateway when supported.
@@ -1196,6 +1365,7 @@ components:
 
     EpaySimpleResponse:
       type: object
+      required: [code]
       properties:
         code:
           type: integer
@@ -1205,6 +1375,7 @@ components:
 
     EpayMapiSuccessResponse:
       type: object
+      required: [code]
       properties:
         code:
           type: integer
@@ -1216,16 +1387,13 @@ components:
           type: string
           description: Merchant order number
         payurl:
-          type: string
-          nullable: true
+          type: ["string","null"]
           description: Redirect URL for browser/app payment flows
         qrcode:
-          type: string
-          nullable: true
+          type: ["string","null"]
           description: QR code payload or H5 payment URL depending on channel
         img:
-          type: string
-          nullable: true
+          type: ["string","null"]
           description: QR image URL generated from `qrcode`
 
     EpayMapiResponse:
@@ -1235,6 +1403,7 @@ components:
 
     EpayOrderQuerySuccessResponse:
       type: object
+      required: [code, status]
       properties:
         code:
           type: integer
@@ -1271,6 +1440,7 @@ components:
 
     EpayRefundSuccessResponse:
       type: object
+      required: [code, status]
       properties:
         code:
           type: integer
@@ -1285,8 +1455,7 @@ components:
           type: string
           description: Merchant order number
         refund_no:
-          type: string
-          nullable: true
+          type: ["string","null"]
           description: Merchant refund number when provided
         refund_id:
           type: string
@@ -1313,9 +1482,9 @@ components:
         name:
           type: string
         description:
-          type: string
+          type: [string, "null"]
         image:
-          type: string
+          type: [string, "null"]
         price:
           type: string
         currency:
@@ -1323,7 +1492,7 @@ components:
         status:
           $ref: "#/components/schemas/ProductStatus"
         metadata:
-          type: object
+          type: [object, "null"]
           additionalProperties:
             type: string
         createdAt:
@@ -1366,19 +1535,47 @@ components:
           format: int64
           description: Unix timestamp in milliseconds
 
+    OrderProductSnapshot:
+      type: object
+      description: Product information captured when the order was created. Historical orders may have no snapshot.
+      properties:
+        name:
+          type: string
+        description:
+          type: ["string","null"]
+        image:
+          type: ["string","null"]
+        price:
+          type: string
+        currency:
+          type: string
+
+    OrderRefundStatus:
+      type: string
+      enum: [NONE, PARTIAL, FULL]
+      description: Cumulative successful refund state of the order, distinct from an individual refund record's status.
+
     Order:
       type: object
       properties:
         id:
           type: string
+        checkoutSessionId:
+          type: ["string","null"]
+          description: Related checkout session, if present.
         productId:
           type: string
+        productSnapshot:
+          anyOf:
+            - $ref: "#/components/schemas/OrderProductSnapshot"
+            - type: "null"
         customerEmail:
-          type: string
+          type: [string, "null"]
         customerName:
-          type: string
+          type: [string, "null"]
         amount:
           type: string
+          description: Original merchant order amount, before any fee charged to the customer.
         currency:
           type: string
         platformFeeRate:
@@ -1386,24 +1583,24 @@ components:
           description: Platform fee rate (e.g. "0.04" for 4%)
         platformFee:
           type: string
-          description: Platform fee charged by Kyren Pay
+          description: Total platform fee in the order currency. Use detail fee-sharing fields to distinguish customer and merchant portions.
+        platformFeeUsd:
+          type: ["string","null"]
+          description: Total platform fee in USD, when the financial snapshot is available.
         netAmount:
           type: string
-          description: Net amount after fees (amount - platformFee - paymentFee)
+          description: Original merchant amount minus the merchant's allocated fee, in the order currency. Reserve holds are recorded separately. Do not subtract the entire platform fee when part of the fee is charged to the customer.
         settledAmount:
-          type: string
-          nullable: true
+          type: ["string","null"]
           description: Net amount converted to USD for settlement
         settledCurrency:
           type: string
           description: Settlement currency, always "USD"
         exchangeRate:
-          type: string
-          nullable: true
-          description: Exchange rate used for currency conversion (null if payment currency is USD)
+          type: ["string","null"]
+          description: Exchange rate used for settlement conversion. A captured USD snapshot uses `"1"`; null indicates that the rate is not available.
         hkdExchangeRate:
-          type: string
-          nullable: true
+          type: ["string","null"]
           description: Exchange rate from payment currency to HKD used by the payment gateway (null for HKD orders)
         paymentMethod:
           $ref: "#/components/schemas/PaymentMethod"
@@ -1412,18 +1609,21 @@ components:
           enum: [PAYMENT, ONBOARDING_FEE]
         status:
           $ref: "#/components/schemas/OrderStatus"
+        refundStatus:
+          $ref: "#/components/schemas/OrderRefundStatus"
+        refundedAmount:
+          type: string
+          description: Cumulative successful refund amount in the order currency.
         paidAt:
-          type: integer
+          type: ["integer","null"]
           format: int64
-          nullable: true
           description: Unix timestamp in milliseconds, null if not paid
         settledAt:
-          type: integer
+          type: ["integer","null"]
           format: int64
-          nullable: true
           description: Unix timestamp in milliseconds, null if not settled
         metadata:
-          type: object
+          type: [object, "null"]
           additionalProperties:
             type: string
         createdAt:
@@ -1438,48 +1638,57 @@ components:
           properties:
             checkoutSessionId:
               type: string
-            paymentGateway:
+            baseAmount:
               type: string
-            gatewayOrderId:
+              description: Original merchant order amount; the same amount presented by `amount`.
+            payableAmount:
               type: string
-            gatewayTransactionId:
+              description: Final amount charged to the customer, including their allocated fee when applicable.
+            grossAmountUsd:
+              type: ["string","null"]
+              description: Final gross payment amount converted to USD in the financial snapshot.
+            perTransactionFee:
               type: string
-              nullable: true
+              description: Total fixed fee configured in USD.
+            payerFeeRate:
+              type: string
+              description: Decimal rate allocated to the customer, such as `0.02` for 2%.
+            merchantFeeRate:
+              type: string
+              description: Decimal rate allocated to the merchant.
+            payerPerTransactionFee:
+              type: string
+              description: Fixed fee allocated to the customer, configured in USD.
+            merchantPerTransactionFee:
+              type: string
+              description: Fixed fee allocated to the merchant, configured in USD.
+            payerFee:
+              type: ["string","null"]
+              description: Customer fee in the order currency.
+            payerFeeUsd:
+              type: ["string","null"]
+              description: Customer fee in USD.
+            merchantFee:
+              type: ["string","null"]
+              description: Merchant fee in the order currency.
+            merchantFeeUsd:
+              type: ["string","null"]
+              description: Merchant fee in USD.
+            rollingReserveAmount:
+              type: ["string","null"]
+              description: Reserve withheld in the order currency.
+            rollingReserveReleaseAt:
+              type: ["integer","null"]
+              format: int64
+              description: Expected reserve release time in Unix milliseconds.
             settleDateTime:
-              type: integer
+              type: ["integer","null"]
               format: int64
-              nullable: true
+              description: Expected settlement eligibility time in Unix milliseconds; not a guarantee of actual settlement or payout.
             payerIp:
-              type: string
-              nullable: true
-            gatewayCallbackIp:
-              type: string
-              nullable: true
+              type: ["string","null"]
             clientUserAgent:
-              type: string
-              nullable: true
-            gatewayPaidAmount:
-              type: string
-              nullable: true
-            gatewayPaidCurrency:
-              type: string
-              nullable: true
-            gatewayPaidAt:
-              type: integer
-              format: int64
-              nullable: true
-            cardNo:
-              type: string
-              nullable: true
-            cardOrgn:
-              type: string
-              nullable: true
-            localCurrency:
-              type: string
-              nullable: true
-            localAmount:
-              type: string
-              nullable: true
+              type: ["string","null"]
             updatedAt:
               type: integer
               format: int64
@@ -1501,16 +1710,13 @@ components:
         currency:
           type: string
         userRefundAmountUsd:
-          type: string
-          nullable: true
+          type: ["string","null"]
         merchantDebitUsd:
-          type: string
-          nullable: true
+          type: ["string","null"]
         reason:
           type: string
         errorMessage:
-          type: string
-          nullable: true
+          type: ["string","null"]
         createdAt:
           type: integer
           format: int64
@@ -1520,14 +1726,12 @@ components:
           format: int64
           description: Unix timestamp in milliseconds
         succeededAt:
-          type: integer
+          type: ["integer","null"]
           format: int64
-          nullable: true
           description: Unix timestamp in milliseconds
         failedAt:
-          type: integer
+          type: ["integer","null"]
           format: int64
-          nullable: true
           description: Unix timestamp in milliseconds
 
     Balance:
@@ -1574,6 +1778,62 @@ components:
           type: string
           description: The default currency code used when none is specified
 
+    SettlementConfig:
+      type: object
+      required: [settlementDays]
+      properties:
+        settlementDays:
+          type: integer
+          description: Platform-wide settlement period in business days. An order's captured channel period may differ.
+
+    LegalConfig:
+      type: object
+      required: [legalTermsVersion, legalUserAgreementUrl, legalPrivacyPolicyUrl, legalDisclaimerUrl, legalAupUrl]
+      properties:
+        legalTermsVersion:
+          type: string
+        legalUserAgreementUrl:
+          type: string
+          format: uri
+        legalPrivacyPolicyUrl:
+          type: string
+          format: uri
+        legalDisclaimerUrl:
+          type: string
+          format: uri
+        legalAupUrl:
+          type: string
+          format: uri
+
+    MerchantAgreementDocument:
+      type: object
+      required: [agreementVersion, effectiveDate, effectiveDateDisplay, templateSha256, renderedDocumentSha256, markdownContent, acceptanceStatement, actionLabel, documentUrl]
+      properties:
+        agreementVersion:
+          type: string
+          description: Version identifier, such as `1.0`.
+        effectiveDate:
+          type: string
+          format: date
+          description: Rendered document's effective calendar date (`YYYY-MM-DD`), distinct from a millisecond event timestamp.
+        effectiveDateDisplay:
+          type: string
+        templateSha256:
+          type: string
+          description: SHA-256 digest of the agreement template.
+        renderedDocumentSha256:
+          type: string
+          description: SHA-256 digest of the rendered agreement text.
+        markdownContent:
+          type: string
+        acceptanceStatement:
+          type: string
+        actionLabel:
+          type: string
+        documentUrl:
+          type: string
+          format: uri
+
     BalanceTransaction:
       type: object
       properties:
@@ -1593,21 +1853,19 @@ components:
           type: string
         frozenAfter:
           type: string
-        rollingReserveAfter:
-          type: string
-          nullable: true
         sourceType:
-          type: string
+          type: ["string","null"]
           description: "Type of the source resource (e.g. order, payout)"
         sourceId:
-          type: string
+          type: ["string","null"]
           description: ID of the source resource
+        relatedOrderId:
+          type: ["string","null"]
+          description: Related order ID when this transaction is linked to an order.
         receiptUrl:
-          type: string
-          nullable: true
+          type: ["string","null"]
         description:
-          type: string
-          nullable: true
+          type: ["string","null"]
         createdAt:
           type: integer
           format: int64
@@ -1633,6 +1891,7 @@ components:
       properties:
         code:
           type: integer
+          description: Kyren business error code, not the HTTP status. For example, HTTP 400 may contain code 40001.
         message:
           type: string
         error:
@@ -1762,6 +2021,42 @@ components:
           example: "success"
         data:
           $ref: "#/components/schemas/CurrenciesResponse"
+
+    SettlementConfigResponseWrapper:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+        message:
+          type: string
+          example: success
+        data:
+          $ref: "#/components/schemas/SettlementConfig"
+
+    LegalConfigResponseWrapper:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+        message:
+          type: string
+          example: success
+        data:
+          $ref: "#/components/schemas/LegalConfig"
+
+    MerchantAgreementDocumentResponseWrapper:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+        message:
+          type: string
+          example: success
+        data:
+          $ref: "#/components/schemas/MerchantAgreementDocument"
 
     BalanceTransactionListResponseWrapper:
       type: object

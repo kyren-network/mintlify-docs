@@ -6,7 +6,7 @@ audience: merchant
 product_area: funds
 intent: how-to
 visibility: public
-last_verified_at: 2026-05-28
+last_verified_at: 2026-10-01
 source_owner: product
 ---
 
@@ -31,6 +31,12 @@ Kyren Pay 支持 `CNY`、`HKD` 和 `USD` 收单。商户结算货币为 `USD`。
 
 百分比费率按订单金额计算。单笔固定手续费和拒付固定手续费均以 `USD` 配置，不跟随订单币种。
 
+在[支付方式](/zh/dashboard/payment-methods)中设置客户和商户承担部分。客户应付金额可能高于原始订单金额；商户收入还反映商户手续费及适用保证金。对账以订单费用快照和结算记录为准。
+
+## 争议资金
+
+争议资金处理启用时，案件可能冻结受影响资金、释放符合条件的冻结资金，或扣除本金和拒付费。[争议案件](/zh/dashboard/disputes)展示已记录的冻结本金、准备金分配、已扣本金、准备金抵扣及拒付费。请与交易流水及可用资金核对。案件胜诉或关闭本身不能证明释放已完成，也不能证明已拒付资金已经恢复。
+
 ## 管理结款账户前
 
 1. 确认所需 KYC 或 KYB 验证已完成。
@@ -38,8 +44,13 @@ Kyren Pay 支持 `CNY`、`HKD` 和 `USD` 收单。商户结算货币为 `USD`。
 3. 检查近期订单和交易流水，完成对账。
 4. 在结款处理前保持结款账户信息准确。
 
+[商户服务协议](/zh/dashboard/merchant-agreement)宽限期逾期时，协议门禁仍允许访问余额、结款及结款账户；原有余额、账户及认证条件仍然适用。
+
 ## 相关页面
 
 - [订单](/zh/dashboard/orders)
+- [支付方式](/zh/dashboard/payment-methods)
+- [争议案件](/zh/dashboard/disputes)
+- [商户服务协议](/zh/dashboard/merchant-agreement)
 - [KYC](/zh/dashboard/kyc)
 - [KYB](/zh/dashboard/kyb)

@@ -6,7 +6,7 @@ audience: merchant
 product_area: funds
 intent: how-to
 visibility: public
-last_verified_at: 2026-05-28
+last_verified_at: 2026-10-01
 source_owner: product
 ---
 
@@ -31,6 +31,12 @@ Kyren Pay 支援 `CNY`、`HKD` 和 `USD` 收單。商戶結算貨幣為 `USD`。
 
 百分比費率按訂單金額計算。單筆固定手續費和拒付固定手續費均以 `USD` 配置，不跟隨訂單幣種。
 
+在[支付方式](/zh-Hant/dashboard/payment-methods)中設定客戶和商戶承擔部分。客戶應付金額可能高於原始訂單金額；商戶收入還反映商戶手續費及適用保證金。對帳以訂單費用快照和結算記錄為準。
+
+## 爭議資金
+
+爭議資金處理啟用時，案件可能凍結受影響資金、釋放符合條件的凍結資金，或扣除本金和拒付費。[爭議案件](/zh-Hant/dashboard/disputes)展示已記錄的凍結本金、準備金分配、已扣本金、準備金抵扣及拒付費。請與交易流水及可用資金核對。案件勝訴或關閉本身不能證明釋放已完成，也不能證明已拒付資金已經恢復。
+
 ## 管理結款帳戶前
 
 1. 確認所需 KYC 或 KYB 驗證已完成。
@@ -38,8 +44,13 @@ Kyren Pay 支援 `CNY`、`HKD` 和 `USD` 收單。商戶結算貨幣為 `USD`。
 3. 檢查近期訂單和交易流水，完成對帳。
 4. 在結款處理前保持結款帳戶資訊準確。
 
+[商戶服務協議](/zh-Hant/dashboard/merchant-agreement)寬限期逾期時，協議門禁仍允許存取餘額、結款及結款帳戶；原有餘額、帳戶及認證條件仍然適用。
+
 ## 相關頁面
 
 - [訂單](/zh-Hant/dashboard/orders)
+- [支付方式](/zh-Hant/dashboard/payment-methods)
+- [爭議案件](/zh-Hant/dashboard/disputes)
+- [商戶服務協議](/zh-Hant/dashboard/merchant-agreement)
 - [KYC](/zh-Hant/dashboard/kyc)
 - [KYB](/zh-Hant/dashboard/kyb)

@@ -1,0 +1,79 @@
+---
+title: "Configure new-api"
+description: "Connect new-api balance top-ups to Kyren Pay through Epay settings."
+language: en
+audience: developer
+product_area: epay
+intent: how-to
+visibility: public
+last_verified_at: 2026-10-01
+source_owner: engineering
+---
+
+Use new-api's built-in **Epay** integration to collect balance top-ups with Kyren Pay. This guide applies to [QuantumNous/new-api at commit `56758ed`](https://github.com/QuantumNous/new-api/tree/56758edf95ec162033a6b73b553ac789404f87c9), verified on October 1, 2026, using `go-epay v0.0.4`. Older releases and forks may use different menus or amount calculations.
+
+## Before you start
+
+- Prepare a Kyren merchant account with the required payment provider bound and credentials active. Enable only methods available to that account.
+- Obtain the merchant account ID and the complete, current API key beginning with `kyren_live_`. The raw API key, including its prefix, is the Epay merchant secret; a masked key or Webhook secret will not work.
+- Deploy new-api behind a public HTTPS domain, for example `https://ai.example.com`, with its API callback routed to the backend.
+
+See [Developer settings](/dashboard/developer-settings) and [Epay compatibility](/epay-migration/overview).
+
+## Configure Epay
+
+Open **System Settings > Billing > Payment** (`/system-settings/billing/payment`). Complete any payment-enablement requirements shown by your installed version. Under **Epay**, enter the credentials; under **General**, configure the amount, payment methods and callback address. Save the settings.
+
+| new-api setting | Value |
+| --- | --- |
+| Payment address (`PayAddress`) | `https://api.kyrenpay.com/epay/` |
+| Merchant ID (`EpayId`) | Your Kyren merchant account ID (`pid`) |
+| Merchant key (`EpayKey`) | Your complete current `kyren_live_...` API key |
+| Custom callback address (`CustomCallbackAddress`) | `https://ai.example.com` |
+| Server address (`ServerAddress`) | Your public new-api origin |
+| Price (`Price`) | Your chosen Epay base amount in CNY per USD of balance |
+| Minimum top-up (`MinTopUp`) | Your chosen minimum recharge amount |
+
+If the custom callback address is empty, new-api uses `ServerAddress`. It appends `/api/user/epay/notify`; enter the origin rather than the full callback path. The SDK appends `submit.php` to the payment address while retaining `/epay`, resulting in `https://api.kyrenpay.com/epay/submit.php`. [Settings UI](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/web/src/features/system-settings/integrations/payment-settings-section.tsx), [callback origin](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/service/epay.go), [SDK URL construction](https://github.com/Calcium-Ion/go-epay/blob/d8c8810761402e9de0320c4b7eed3cfd7fa94461/epay/order.go).
+
+## Configure payment methods
+
+The General settings offer a visual editor and JSON editor for `PayMethods`. The `type` is sent to Epay. Start with the methods enabled for your merchant, for example:
+
+```json
+[
+  { "name": "Alipay", "type": "alipay", "icon": "SiAlipay" },
+  { "name": "WeChat Pay", "type": "wxpay", "icon": "SiWechat" }
+]
+```
+
+This verified version accepts custom Epay method types. You can add entries with `type` equal to `creditcard`, `crypto` or `paynow`, and a suitable display name, when those methods are enabled for your Kyren account. Do not use another gateway's aliases. The documented Kyren codes here are `alipay`, `wxpay`, `creditcard`, `crypto` and `paynow`. [Payment-method settings](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/web/src/features/system-settings/integrations/payment-settings-section.tsx), [method passed to Epay](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/controller/topup.go).
+
+## Set the amount and credited balance
+
+The built-in client does not send `money_type`, so Kyren charges **CNY**. A USD or CNY display preference does not change that request currency.
+
+For USD display with a requested balance amount `A`, the Epay base amount in CNY is `A × Price × user-group recharge ratio × preset discount`, formatted to two decimals. The credited internal quota is `A × QuotaPerUnit`. For an initial check, use USD display, group ratio `1` and discount `1`. If you deliberately configure `Price = 7.00`, requesting **USD 10.00** balance sends an Epay base amount of **CNY 70.00** and credits **USD 10.00** balance. `7.00` is an example configuration, not a current exchange-rate quote.
+
+The Epay base amount is not always the final checkout total. Kyren may add a customer-paid fee according to your payment channel's fee-sharing settings. The example total is exactly **CNY 70.00** only when no Kyren customer-paid fee applies. Epay notification and order-query `money` report the base amount; new-api credits the quota from its stored recharge amount, rather than any additional fee. Compare the base amount, displayed checkout total and expected credited balance separately.
+
+In TOKENS display mode, the request is converted through `QuotaPerUnit`; check the installed version's rounding and recharge presets before using that mode. Confirm the charge and credited balance in a small payment before enabling public top-ups. [Amount calculation and request](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/controller/topup.go), [credit calculation](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/model/topup.go).
+
+## Verify payment and crediting
+
+1. Sign in as a test user, record the starting balance and create a small recharge. Record `out_trade_no`, the Epay base amount and the displayed CNY checkout total.
+2. Complete payment and confirm the corresponding Kyren order is paid. Confirm the new-api recharge record is successful and the intended balance increase is present.
+3. Check that the public backend receives Kyren's signed GET notification at `https://ai.example.com/api/user/epay/notify`. The built-in handler verifies Epay MD5, handles `TRADE_SUCCESS`, credits the stored recharge order and returns the plain text `success`.
+4. Confirm a repeated notification for that order does not add quota again. The verified implementation uses a database transaction and order-state check to prevent duplicate crediting. Do not credit from the browser return URL or treat a return-page visit as payment proof.
+
+[Callback implementation](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/controller/topup.go), [transactional crediting](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/model/topup.go). See [Epay MD5 signatures](/epay-migration/signature) and [Paid but not credited](/troubleshooting/paid-but-not-credited).
+
+## Common configuration problems
+
+- **Wrong payment URL:** preserve `/epay/` in `PayAddress`; the SDK adds `submit.php` itself.
+- **Wrong charge:** check `Price`, group recharge ratio, preset discounts, quota display mode and Kyren customer-paid fees together. Display currency does not select Kyren's charge currency.
+- **Paid but not credited:** check callback origin, public HTTPS access, GET query forwarding and backend logs. The callback must not redirect to login or require a browser challenge.
+- **IP allowlist:** this built-in purchase flow uses browser `submit.php`. Do not add customer IPs to the server API allowlist; server-side `mapi.php` calls require the calling server's outbound IP when the allowlist is enabled.
+- **Key rotation:** regenerating the Kyren API key invalidates the old Epay secret. Update `EpayKey` immediately, then check a new payment and pending callbacks. Keep secrets out of logs and support tickets.
+
+These instructions were checked against source code; they do not represent a live payment test on your deployment.

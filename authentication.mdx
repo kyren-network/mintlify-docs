@@ -3,7 +3,18 @@ title: Authentication
 description: Authenticate your API requests with API keys
 ---
 
-All API requests must be authenticated using an API key passed in the `x-api-key` header.
+Public merchant integration endpoints, such as `/v1/products`, `/v1/checkouts`, and `/v1/orders`, use an API key passed in the `x-api-key` header.
+
+Authentication depends on the endpoint:
+
+| Endpoint | Authentication |
+| --- | --- |
+| Public merchant integration API | `x-api-key` |
+| Public `/v1/config/*` configuration endpoints | No authentication required |
+| Merchant Dashboard `/v1/merchant/*` endpoints | Dashboard login JWT in `Authorization: Bearer <token>`; an API key does not replace this login |
+| Epay compatibility API | `pid` plus the endpoint's MD5 `sign`, or `pid` plus the raw `key` for `/epay/api.php` |
+
+See [Epay signatures](/epay-migration/signature) for its separate signing rules.
 
 ## API Keys
 
@@ -17,7 +28,7 @@ The current backend implementation accepts live API keys:
 
 ## Making Authenticated Requests
 
-Include your API key in the `x-api-key` header of every request:
+Include your API key in the `x-api-key` header when calling a protected public merchant integration endpoint:
 
 ```bash
 curl https://api.kyrenpay.com/v1/products \
@@ -59,16 +70,10 @@ If your API key is compromised, you can regenerate it from the Dashboard:
 
 ## Error Responses
 
-If authentication fails, the API returns a `401 Unauthorized` response:
-
-```json
-{
-  "code": 401,
-  "message": "Unauthorized"
-}
-```
+Missing or rejected API credentials on a protected endpoint return HTTP `401 Unauthorized`. Authentication middleware does not guarantee a JSON response body. Check the HTTP status before attempting to parse JSON. Application-level JSON error codes are described in [Errors](/errors).
 
 Common causes:
 - Missing `x-api-key` header
-- Invalid or expired API key
+- Invalid or regenerated API key
 - Using an API key prefix not accepted by the current environment
+- A blocked merchant account or a request IP outside your configured API IP allowlist

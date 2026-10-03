@@ -209,6 +209,7 @@ export function parseEvaluationCases(content) {
 export function tokenize(input) {
   const normalized = input
     .toLowerCase()
+    .replace(/\bnew[ -]?api\b/g, 'new_api')
     .replace(/checkout session/g, 'checkout_session')
     .replace(/api\.php/g, 'api_php')
     .replace(/submit\.php/g, 'submit_php')
@@ -234,7 +235,7 @@ export function tokenize(input) {
   return [...ascii, ...cjk, ...phraseTokens].filter((token) => token.length > 1 && !STOP_WORDS.has(token));
 }
 
-function sourceBoost(source, queryTokens, query) {
+function sourceBoost(source, queryTokens, query, language) {
   let boost = 0;
   if (source.url.includes('/troubleshooting/')) boost += 3;
   if (source.language !== 'en') boost += 2;
@@ -250,6 +251,11 @@ function sourceBoost(source, queryTokens, query) {
     boost += ['Currencies', '货币', '貨幣'].includes(source.section) ? 40 : 20;
   }
   if (source.url.includes('/epay-migration/api-php') && /api_php|api\.php|epay|兼容|相容/.test(query) && /refund|退款/.test(query)) boost += 5;
+  const systemGuide = /\bsub2api\b/.test(query) ? 'sub2api'
+    : /\bnew[ _-]?api\b/.test(query) ? 'new-api' : null;
+  if (systemGuide && source.url.endsWith(`/integrations/${systemGuide}`)) {
+    boost += source.language === language ? 64 : 24;
+  }
   if (source.url.endsWith('/start-here') && /integration path|choose|选择|選擇|集成|整合/.test(query)) boost += 5;
   if (source.url.includes('/settlement-eligibility') && /settlement|结算|結算/.test(query)) boost += 5;
   if (source.url.includes('/paid-but-not-credited') && /付款|paid|積分|积分|credited|credits/.test(query)) boost += 20;
@@ -277,7 +283,7 @@ export function retrieve(query, sources, language, limit = 3) {
   return candidates
     .map((source) => {
       const haystack = textForRetrieval(source);
-      let score = sourceBoost(source, queryTokens, queryText);
+      let score = sourceBoost(source, queryTokens, queryText, language);
       for (const token of queryTokens) {
         const escaped = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         score += (haystack.match(new RegExp(escaped, 'g')) || []).length;

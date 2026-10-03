@@ -3,7 +3,7 @@ title: Webhook 概述
 description: 透過 Webhook 接收即時支付通知
 ---
 
-Webhook 允許啟潤支付在你的帳戶中發生事件時（如支付成功或結款完成）向你的伺服器發送即時通知。
+Webhook 允許啟潤支付在付款或退款成功時向你的伺服器發送通知。支援的事件及可選爭議通知見[事件類型](/zh-Hant/webhooks/events)。
 
 ## 工作原理
 
@@ -17,14 +17,16 @@ sequenceDiagram
     KyrenPay->>KyrenPay: 處理付款
     KyrenPay->>YourServer: POST Webhook（已簽名）
     YourServer->>YourServer: 驗證簽名
-    YourServer->>YourServer: 處理事件
+    YourServer->>YourServer: 將事件持久化到接收表
     YourServer-->>KyrenPay: 200 OK
+    YourServer->>YourServer: 工作程序處理事件並負責重試
 ```
 
 1. 事件發生（如客戶完成付款）
 2. 啟潤支付向你配置的 Webhook URL 發送 HTTP POST 請求
 3. 請求中包含用於驗證的簽名
-4. 你的伺服器處理事件並返回 `200` 回應
+4. 你的伺服器驗證簽名、持久化事件，並在 10 秒內返回 `200`
+5. 工作程序冪等處理已持久化的事件，並負責自己的重試
 
 ## 配置 Webhook
 
@@ -38,7 +40,7 @@ sequenceDiagram
   你的 Webhook URL 必須：
   - 使用 HTTPS（生產環境必須）
   - 可公開存取
-  - 在 30 秒內返回 `2xx` 回應
+  - 持久化成功後，在 10 秒內完成 `2xx` 回應
 </Warning>
 
 ## Webhook 載荷
@@ -66,7 +68,7 @@ sequenceDiagram
     "currency": "USD",
     "net_amount": "9.29",
     "paid_at": 1736932500000,
-    "metadata": {}
+    "metadata": null
   }
 }
 ```
@@ -78,13 +80,13 @@ sequenceDiagram
     始終驗證 `X-Kyren-Signature` 請求標頭以確保 Webhook 的真實性。參見 [Webhook 簽名驗證](/zh-Hant/webhooks/signatures)。
   </Card>
   <Card title="快速返回 200" icon="clock">
-    收到 Webhook 後立即返回 `200` 回應。如果處理需要較長時間，請非同步處理。
+    驗證簽名並持久化事件後再返回 `200`。持久化失敗時返回非 `2xx`，讓 Kyren 重試。
   </Card>
   <Card title="處理重複事件" icon="copy">
     使用事件 `id` 進行去重。由於重試機制，你的端點可能會收到同一事件多次。
   </Card>
   <Card title="使用訊息佇列" icon="list">
-    在生產環境中，考慮將 Webhook 事件推送到訊息佇列（如 RabbitMQ、SQS）以實現可靠處理。
+    非同步處理時，將事件儲存到持久化接收表或佇列，儲存成功後才確認。Kyren 收到 `2xx` 後，工作程序需要負責自己的重試。
   </Card>
 </CardGroup>
 

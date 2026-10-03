@@ -7,26 +7,25 @@ description: 启润支付如何重试失败的 Webhook 投递
 
 ## 重试计划
 
-启润支付最多重试 **7 次**：
+对于本文档中的订单和争议事件，启润支付最多进行 **7 次投递：首次投递加 6 次重试**。
 
 | 重试次数 | 失败后等待时间 |
 | --- | --- |
-| 第 1 次重试 | 30 秒 |
-| 第 2 次重试 | 30 秒 |
-| 第 3 次重试 | 1 分钟 |
-| 第 4 次重试 | 1 分钟 |
-| 第 5 次重试 | 30 分钟 |
-| 第 6 次重试 | 30 分钟 |
-| 第 7 次重试 | 30 分钟 |
+| 第 1 次重试 | 1 分钟 |
+| 第 2 次重试 | 5 分钟 |
+| 第 3 次重试 | 15 分钟 |
+| 第 4 次重试 | 1 小时 |
+| 第 5 次重试 | 6 小时 |
+| 第 6 次重试 | 24 小时 |
 
-7 次重试失败后，Webhook 将被标记为**失败**，不再继续重试。
+等待时间从前一次投递失败时计算，实际投递可能稍晚。累计 7 次投递失败后，Webhook 被标记为**失败**并停止自动重试。
 
 ## 什么算作失败
 
 以下情况 Webhook 投递被视为失败：
 
 - 你的端点返回非 `2xx` HTTP 状态码（如 `400`、`500`）
-- 你的端点在 **30 秒**内未响应
+- 你的端点在 **10 秒**内未完成响应
 - 无法连接到你的服务器（DNS 错误、连接被拒绝、超时）
 
 <Info>
@@ -39,53 +38,48 @@ description: 启润支付如何重试失败的 Webhook 投递
 
 ### 使用事件 ID 去重
 
-每个 Webhook 事件都有唯一的 `id` 字段。存储已处理的事件 ID 并跳过重复事件：
+每个 Webhook 事件都有唯一的 `id` 字段。通过唯一约束持久化已处理的事件 ID，并在同一事务中提交业务变更和处理标记：
 
 ```javascript
-const processedEvents = new Set(); // 生产环境请使用数据库
-
-app.post('/webhooks/kyren', (req, res) => {
+app.post('/webhooks/kyren', async (req, res) => {
   // ... 验证签名 ...
 
   const event = JSON.parse(req.body.toString());
 
-  // 检查是否已处理过此事件
-  if (processedEvents.has(event.id)) {
-    console.log(`重复事件 ${event.id}，跳过`);
-    return res.status(200).send('OK');
+  try {
+    await database.transaction(async tx => {
+      // 按唯一事件 ID 原子插入；重复事件返回 false。
+      if (!await tx.processedEvents.insertIfAbsent(event.id)) return;
+      await processEvent(tx, event);
+    });
+    res.status(200).send('OK');
+  } catch (error) {
+    res.status(500).send('Retry later');
   }
-
-  // 处理事件
-  processEvent(event);
-
-  // 标记为已处理
-  processedEvents.add(event.id);
-
-  res.status(200).send('OK');
 });
 ```
 
 <Tip>
-  在生产环境中，将已处理的事件 ID 存储在数据库（如 Redis 或你的主数据库）中，而不是内存中。
+  上述数据库方法用于说明事务要求，请按你的存储系统实现。业务操作也应以稳定标识保护，例如付款履约使用 `order_id`，退款使用 `refund_id`。争议更新不能仅按案件 ID 去重，因为一个案件可能产生多次更新。
 </Tip>
 
 ### 快速返回 200
 
-收到并验证 Webhook 后立即返回 `200` 响应。如果处理需要较长时间，请异步执行：
+处理时间较长时，应先验证签名，将事件持久化到接收表或队列，再返回 `200`。工作进程随后处理并负责自己的重试。若持久化失败，请返回非 `2xx` 响应，让 Kyren 重试：
 
 ```javascript
-app.post('/webhooks/kyren', (req, res) => {
+app.post('/webhooks/kyren', async (req, res) => {
   // ... 验证签名 ...
 
   const event = JSON.parse(req.body.toString());
 
-  // 立即响应
-  res.status(200).send('OK');
-
-  // 异步处理
-  processEventAsync(event).catch(err => {
-    console.error('处理事件失败:', err);
-  });
+  try {
+    // 只有持久化完成后才返回；event.id 具有唯一约束。
+    await webhookInbox.insertIfAbsent(event.id, event);
+    res.status(200).send('OK');
+  } catch (error) {
+    res.status(503).send('Retry later');
+  }
 });
 ```
 
@@ -106,5 +100,5 @@ app.post('/webhooks/kyren', (req, res) => {
 | --- | --- |
 | 未收到 Webhook | 检查 Webhook URL 是否正确且可公开访问 |
 | 签名验证失败 | 确保使用原始请求体（未解析的 JSON）进行验证 |
-| 频繁超时 | 立即返回 `200`，异步处理事件 |
+| 频繁超时 | 持久化到接收表或队列，在 10 秒内返回 `200`，由工作进程处理并重试 |
 | 重复事件 | 使用事件 `id` 字段实现幂等性 |

@@ -3,7 +3,18 @@ title: 認證
 description: 使用 API 密鑰認證你的 API 請求
 ---
 
-所有 API 請求必須透過在 `x-api-key` 請求標頭中傳遞 API 密鑰來進行認證。
+公開商戶整合介面（如 `/v1/products`、`/v1/checkouts` 和 `/v1/orders`）透過 `x-api-key` 請求標頭中的 API 密鑰認證。
+
+不同介面使用不同認證方式：
+
+| 介面 | 認證方式 |
+| --- | --- |
+| 公開商戶整合 API | `x-api-key` |
+| 公開 `/v1/config/*` 配置介面 | 無需認證 |
+| 商戶控制台 `/v1/merchant/*` 介面 | 登入 JWT：`Authorization: Bearer <token>`；API 密鑰不能代替控制台登入 |
+| Epay 相容 API | `pid` 加介面要求的 MD5 `sign`；`/epay/api.php` 使用 `pid` 加原始 `key` |
+
+Epay 的獨立簽名規則見 [Epay 簽名](/zh-Hant/epay-migration/signature)。
 
 ## API 密鑰
 
@@ -17,7 +28,7 @@ description: 使用 API 密鑰認證你的 API 請求
 
 ## 發送認證請求
 
-在每個請求的 `x-api-key` 請求標頭中包含你的 API 密鑰：
+呼叫需要認證的公開商戶整合介面時，在 `x-api-key` 請求標頭中包含你的 API 密鑰：
 
 ```bash
 curl https://api.kyrenpay.com/v1/products \
@@ -59,16 +70,10 @@ curl https://api.kyrenpay.com/v1/products \
 
 ## 錯誤回應
 
-認證失敗時，API 返回 `401 Unauthorized` 回應：
-
-```json
-{
-  "code": 401,
-  "message": "Unauthorized"
-}
-```
+需要認證的介面在缺少或拒絕 API 憑證時返回 HTTP `401 Unauthorized`。認證中介軟體不保證返回 JSON 回應本體，請先檢查 HTTP 狀態，再嘗試解析 JSON。應用層 JSON 錯誤碼見[錯誤處理](/zh-Hant/errors)。
 
 常見原因：
 - 缺少 `x-api-key` 請求標頭
-- API 密鑰無效或已過期
+- API 密鑰無效或已被重新產生
 - 使用了當前環境不接受的 API Key 前綴
+- 商戶帳戶被停用，或請求 IP 不在配置的 API IP 白名單內

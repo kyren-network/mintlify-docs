@@ -12,6 +12,7 @@ import {
   readConfig,
   responsesUrl,
 } from '../scripts/ask-copilot.mjs';
+import { buildKnowledgeIndex, loadPublicSources, retrieve, retrieveFromIndex } from '../scripts/copilot-local-lib.mjs';
 
 const node = process.execPath;
 
@@ -86,7 +87,7 @@ test('retrieval evaluator checks the Phase 5A evaluation set', () => {
   const output = runScript('scripts/evaluate-copilot-retrieval.mjs');
 
   assert.match(output, /Copilot retrieval evaluation passed/);
-  assert.match(output, /Total cases: 30/);
+  assert.match(output, /Total cases: 36/);
   assert.match(output, /Failures: 0/);
   assert.match(output, /Top-3/);
 });
@@ -95,7 +96,7 @@ test('retrieval evaluator can emit JSON results for CI consumers', () => {
   const output = runScript('scripts/evaluate-copilot-retrieval.mjs', ['--json']);
   const result = JSON.parse(output);
 
-  assert.equal(result.totalCases, 30);
+  assert.equal(result.totalCases, 36);
   assert.equal(result.failures, 0);
   assert.ok(Array.isArray(result.cases));
   assert.ok(result.cases.every((entry) => entry.pass === true));
@@ -192,6 +193,28 @@ test('Phase 5B query CLI prioritizes dashboard order refund guide questions', ()
   }
 });
 
+test('system configuration questions retrieve the matching guide in each language', () => {
+  const root = new URL('..', import.meta.url).pathname;
+  const sources = loadPublicSources(root).filter((source) => !source.url.includes('/copilot/'));
+  const index = buildKnowledgeIndex(root);
+  const cases = [
+    { lang: 'en', query: 'How do I configure KyrenPay payments in sub2api?', page: 'sub2api' },
+    { lang: 'zh', query: 'sub2api 如何配置 KyrenPay 易支付充值？', page: 'sub2api' },
+    { lang: 'zh-Hant', query: 'sub2api 如何設定 KyrenPay 易支付儲值？', page: 'sub2api' },
+    { lang: 'en', query: 'How do I configure KyrenPay payments in new api?', page: 'new-api' },
+    { lang: 'zh', query: 'new-api 如何配置 KyrenPay 易支付充值？', page: 'new-api' },
+    { lang: 'zh-Hant', query: 'new-api 如何設定 KyrenPay 易支付儲值？', page: 'new-api' },
+  ];
+
+  for (const item of cases) {
+    const prefix = item.lang === 'en' ? '' : `${item.lang}/`;
+    const expected = `/${prefix}integrations/${item.page}`;
+    for (const results of [retrieve(item.query, sources, item.lang, 3), retrieveFromIndex(item.query, index, item.lang, 3)]) {
+      assert.equal(results[0].url, expected, `${item.lang}: ${item.query}`);
+    }
+  }
+});
+
 test('Phase 5B query CLI prioritizes funds currency questions', () => {
   const tempDir = mkdtempSync(join(tmpdir(), 'kyren-copilot-funds-currency-'));
   const outputPath = join(tempDir, 'knowledge-index.json');
@@ -269,7 +292,7 @@ test('retrieval evaluator can validate a built index artifact', () => {
   const output = runScript('scripts/evaluate-copilot-retrieval.mjs', ['--index', outputPath, '--json']);
   const result = JSON.parse(output);
 
-  assert.equal(result.totalCases, 30);
+  assert.equal(result.totalCases, 36);
   assert.equal(result.failures, 0);
   assert.equal(result.indexPath, outputPath);
 });

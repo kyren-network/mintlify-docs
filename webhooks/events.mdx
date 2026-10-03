@@ -11,7 +11,8 @@ Kyren Pay sends webhook notifications for the following event types.
 | --- | --- | --- |
 | `order.paid` | A payment has been confirmed | Customer completes checkout |
 | `order.refunded` | A refund has been applied to an order | A refund succeeds |
-| `order.closed` | An order has been closed without successful payment | Payment is canceled, fails, times out, authorization is released, or the gateway closes the order |
+
+The current order integration does not emit an `order.closed` webhook. Query `GET /v1/orders/{orderId}` to reconcile unpaid terminal states such as `FAILED`, `CLOSED`, or `REVOKED`; see [Orders](/dashboard/orders).
 
 ## Event Object Structure
 
@@ -60,13 +61,13 @@ Sent when a customer successfully completes a payment.
 | Field | Type | Description |
 | --- | --- | --- |
 | `order_id` | string | The order ID |
-| `product_id` | string | The product that was purchased |
-| `customer_email` | string | Customer's email address |
-| `amount` | string | Total payment amount |
+| `product_id` | string | The product that was purchased; may be empty for orders without a product |
+| `customer_email` | string \| null | Customer's email address, if available |
+| `amount` | string | Original/base order amount; excludes an additional fee charged to the payer |
 | `currency` | string | Three-letter currency code |
 | `net_amount` | string | Amount after fees |
-| `paid_at` | integer | When the payment was confirmed (Unix timestamp in milliseconds) |
-| `metadata` | object \| null | The metadata you passed when creating the checkout session |
+| `paid_at` | integer \| null | When the payment was confirmed (Unix timestamp in milliseconds), if available |
+| `metadata` | object \| null | Merchant metadata from the checkout session; internal provider fields are filtered out |
 
 <Tip>
   This is the most important event. Use it to fulfill orders — for example, adding credits to a user's account.
@@ -105,69 +106,75 @@ See [Order refunds](/dashboard/order-refunds) for the dashboard refund request f
 | `amount` | string | Amount refunded by this event |
 | `currency` | string | Three-letter currency code |
 | `refunded_amount` | string | Total refunded amount on the order after this refund |
-| `original_amount` | string | Original order amount |
+| `original_amount` | string | Original/base order amount; excludes an additional fee charged to the payer |
 | `reason` | string \| null | Refund reason |
-| `metadata` | object \| null | The metadata you passed when creating the checkout session |
+| `metadata` | object \| null | Merchant metadata from the checkout session; internal provider fields are filtered out |
 
-## order.closed
+## Dispute Events (When Available)
 
-Sent when an order is closed without successful payment.
+If dispute processing is supported and enabled for your account, you may also receive these notifications. Availability depends on the provider and operational configuration; confirm it with Kyren support. See [Disputes](/dashboard/disputes).
 
-```json
-{
-  "id": "evt_closed123",
-  "type": "order.closed",
-  "created_at": 1736932700000,
-  "data": {
-    "order_id": "order_def456",
-    "product_id": "prod_abc123",
-    "customer_email": "customer@example.com",
-    "amount": "9.99",
-    "currency": "USD",
-    "closed_at": 1736932700000,
-    "close_reason": "payment_timeout",
-    "compat": { "epay_trade_status": "TRADE_CLOSED" },
-    "metadata": { "user_id": "u_123" }
-  }
-}
-```
+| Event | Trigger |
+| --- | --- |
+| `dispute.created` | A dispute case is first matched to your order and becomes visible to you |
+| `dispute.updated` | Merchant-visible case details or financial projection change |
+
+Both use the same event envelope. Their `data` contains the following case snapshot; nullable values may be unavailable:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `order_id` | string | The order ID |
-| `product_id` | string | The product that was being purchased |
-| `customer_email` | string | Customer's email address |
-| `amount` | string | Total order amount |
-| `currency` | string | Three-letter currency code |
-| `closed_at` | integer | When the order was closed (Unix timestamp in milliseconds) |
-| `close_reason` | string | Closure reason, such as `payment_canceled`, `payment_failed`, `payment_timeout`, `authorization_released`, or `gateway_closed` |
-| `compat` | object | Compatibility fields for legacy processors |
-| `metadata` | object \| null | The metadata you passed when creating the checkout session |
+| `id` | string | Dispute case ID, distinct from the top-level event ID |
+| `provider` | string | Payment provider |
+| `provider_dispute_id` | string \| null | Provider's dispute ID |
+| `order_id` | string \| null | Related order ID |
+| `type`, `status` | string | Case type and normalized status |
+| `provider_status` | string \| null | Provider status |
+| `amount`, `currency` | string | Case amount and currency |
+| `reason_code`, `reason` | string \| null | Dispute reason |
+| `defendable` | boolean \| null | Whether defense is available, if known |
+| `response_due_at`, `occurred_at` | integer \| null | Unix timestamps in milliseconds |
+| `updated_at` | integer | Case update time in milliseconds |
+| `financial_status`, `financial_allocation_status` | string | Case financial processing and allocation status |
+| `settlement_currency` | string \| null | Currency of the financial amounts below |
+| `allocated_merchant_principal`, `allocated_rolling_reserve` | string | Principal and reserve allocated to this case |
+| `frozen_principal`, `charged_back_principal` | string | Principal frozen or charged back for this case |
+| `offset_rolling_reserve`, `chargeback_fee` | string | Reserve offset and merchant chargeback fee for this case |
+| `projection_state` | string \| null | State of the related order's financial projection |
+| `related_case_count` | integer | Number of cases sharing the order projection |
+| `shared_order_projection` | boolean | Whether multiple cases share that projection |
+
+These are operational case notifications. A change to `status` alone does not prove a balance movement; use the financial fields and dashboard records for reconciliation. Financial amounts are scoped to the individual case, even when `shared_order_projection` is true.
 
 ## Handling Events
 
 Here's how to handle webhook events in your endpoint:
 
 ```javascript
-app.post('/webhooks/kyren', (req, res) => {
+app.post('/webhooks/kyren', async (req, res) => {
   // ... verify signature first ...
 
   const event = JSON.parse(req.body.toString());
 
-  switch (event.type) {
-    case 'order.paid':
-      handleOrderPaid(event.data);
-      break;
-    case 'order.refunded':
-      handleOrderRefunded(event.data);
-      break;
-    case 'order.closed':
-      handleOrderClosed(event.data);
-      break;
-    default:
-      console.log(`Unhandled event: ${event.type}`);
+  try {
+    switch (event.type) {
+      case 'order.paid':
+        await handleOrderPaidIdempotently(event.id, event.data);
+        break;
+      case 'order.refunded':
+        await handleOrderRefundedIdempotently(event.id, event.data);
+        break;
+      case 'dispute.created':
+      case 'dispute.updated':
+        await handleDisputeIdempotently(event.id, event.data);
+        break;
+      default:
+        console.log(`Unhandled event: ${event.type}`);
+    }
+    res.status(200).send('OK');
+  } catch (error) {
+    res.status(500).send('Retry later');
   }
-
-  res.status(200).send('OK');
 });
 ```
+
+The handlers must durably complete their work before acknowledging the event. For longer processing, use the [durable queue pattern](/webhooks/retries) and return `2xx` only after persistence succeeds.

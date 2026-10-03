@@ -1,0 +1,79 @@
+---
+title: "設定 new-api"
+description: "透過 new-api 內建易支付設定接入啟潤支付，完成餘額儲值。"
+language: zh-Hant
+audience: developer
+product_area: epay
+intent: how-to
+visibility: public
+last_verified_at: 2026-10-01
+source_owner: engineering
+---
+
+使用 new-api 內建 **Epay（易支付）** 接入啟潤支付，收取餘額儲值款。本指南適用於 [QuantumNous/new-api 提交 `56758ed`](https://github.com/QuantumNous/new-api/tree/56758edf95ec162033a6b73b553ac789404f87c9)，核驗日期為 2026 年 10 月 1 日，使用的 SDK 為 `go-epay v0.0.4`。舊版本和分支可能使用不同選單或金額計算方式。
+
+## 接入準備
+
+- 啟潤商戶已綁定所需支付服務商，相關憑據有效。僅啟用該商戶實際開通的支付方式。
+- 取得商戶帳號 ID 和目前完整的 `kyren_live_...` API Key。包含前綴的原始 API Key 是 Epay 商戶密鑰，遮罩值和 Webhook Secret 不能使用。
+- 為 new-api 設定公網 HTTPS 網域，例如 `https://ai.example.com`，並將 API 通知路徑轉發到後端。
+
+參見[開發者設定](/zh-Hant/dashboard/developer-settings)和 [Epay 相容接入](/zh-Hant/epay-migration/overview)。
+
+## 設定易支付
+
+進入**系統設定 > 計費 > 支付**（`/system-settings/billing/payment`），按已安裝版本的介面要求啟用支付。在 **Epay** 頁籤填寫憑據，在**通用**頁籤設定金額、支付方式和通知基礎位址，然後儲存。
+
+| new-api 設定 | 填寫值 |
+| --- | --- |
+| 支付位址（`PayAddress`） | `https://api.kyrenpay.com/epay/` |
+| 商戶 ID（`EpayId`） | 啟潤商戶帳號 ID，即 `pid` |
+| 商戶密鑰（`EpayKey`） | 目前完整的 `kyren_live_...` API Key |
+| 自訂回呼位址（`CustomCallbackAddress`） | `https://ai.example.com` |
+| 伺服器位址（`ServerAddress`） | new-api 公網網域 |
+| 儲值價格（`Price`） | 每 USD 餘額對應的 Epay 基礎金額（CNY），由你設定 |
+| 最低儲值（`MinTopUp`） | 你設定的最低儲值金額 |
+
+自訂回呼位址為空時使用 `ServerAddress`，後端會追加 `/api/user/epay/notify`；只填寫基礎網域，不填寫完整通知路徑。SDK 保留支付位址的 `/epay` 並追加 `submit.php`，最終使用 `https://api.kyrenpay.com/epay/submit.php`。[設定介面](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/web/src/features/system-settings/integrations/payment-settings-section.tsx)、[通知基礎位址](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/service/epay.go)、[SDK 位址拼接](https://github.com/Calcium-Ion/go-epay/blob/d8c8810761402e9de0320c4b7eed3cfd7fa94461/epay/order.go)。
+
+## 設定支付方式
+
+通用設定的 `PayMethods` 提供視覺化與 JSON 編輯器，`type` 會傳送給 Epay。先填寫商戶已開通的方式，例如：
+
+```json
+[
+  { "name": "支付寶", "type": "alipay", "icon": "SiAlipay" },
+  { "name": "微信支付", "type": "wxpay", "icon": "SiWechat" }
+]
+```
+
+核驗版本支援自訂 Epay 類型。商戶已開通對應方式時，可以新增 `type` 為 `creditcard`、`crypto` 或 `paynow` 的項目，並填寫合適的顯示名稱。不要使用其他網關的別名。此處記錄的啟潤類型為 `alipay`、`wxpay`、`creditcard`、`crypto`、`paynow`。[支付方式設定](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/web/src/features/system-settings/integrations/payment-settings-section.tsx)、[類型傳給 Epay](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/controller/topup.go)。
+
+## 設定付款金額與入帳餘額
+
+內建客戶端不傳送 `money_type`，啟潤因此按 **CNY** 收款。介面的 USD 或 CNY 顯示偏好不會改變請求幣別。
+
+USD 顯示模式下，請求儲值餘額 `A` 的 Epay 基礎金額（CNY）為 `A × Price × 使用者群組儲值倍率 × 預設優惠折扣`，格式化為兩位小數；入帳內部額度為 `A × QuotaPerUnit`。首次驗證可使用 USD 顯示、使用者群組倍率 `1`、折扣 `1`。假設你主動設定 `Price = 7.00`，儲值 **USD 10.00** 餘額將傳送 **CNY 70.00** 的 Epay 基礎金額，入帳 **USD 10.00**。`7.00` 僅為設定範例，不代表目前匯率。
+
+Epay 基礎金額不一定等於最終收銀總額。啟潤可能按支付渠道的費用分擔設定增加客戶承擔的費用；只有不增加此類費用時，範例的最終總額才是 **CNY 70.00**。Epay 通知和訂單查詢的 `money` 返回基礎金額，new-api 根據已儲存的儲值金額計算額度，不會把額外費用計入餘額。應分別核對基礎金額、收銀台總額和預期入帳餘額。
+
+TOKENS 顯示模式會透過 `QuotaPerUnit` 換算請求；使用前應核對已安裝版本的取整和儲值預設。向使用者開放前，透過小額付款確認實付金額與入帳額度。[金額計算和請求](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/controller/topup.go)、[額度入帳計算](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/model/topup.go)。
+
+## 驗證付款和入帳
+
+1. 使用測試使用者記錄原餘額並建立小額儲值，記錄 `out_trade_no`、Epay 基礎金額和收銀台顯示的 CNY 總額。
+2. 完成付款，確認啟潤對應訂單已付款，同時確認 new-api 儲值記錄成功、餘額增加符合預期。
+3. 確認公網後端在 `https://ai.example.com/api/user/epay/notify` 收到啟潤的簽名 GET 通知。內建處理器校驗 Epay MD5、處理 `TRADE_SUCCESS`、為已儲存的儲值訂單入帳，並返回純文字 `success`。
+4. 確認同一訂單的重複通知不會再次增加額度。核驗版本使用資料庫交易和訂單狀態校驗防止重複入帳。不要從瀏覽器返回位址增加額度，也不要將返回頁面當成付款證明。
+
+[通知實作](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/controller/topup.go)、[交易入帳](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/model/topup.go)。參見 [Epay MD5 簽名](/zh-Hant/epay-migration/signature)和[已付款但未入帳](/zh-Hant/troubleshooting/paid-but-not-credited)。
+
+## 常見設定問題
+
+- **支付位址錯誤：** `PayAddress` 保留 `/epay/`，SDK 會自行追加 `submit.php`。
+- **實付金額錯誤：** 同時檢查 `Price`、使用者群組儲值倍率、預設折扣、額度顯示模式和啟潤客戶承擔的費用。顯示幣別不會選擇啟潤收款幣別。
+- **已付款但未入帳：** 檢查通知基礎位址、公網 HTTPS、GET 參數轉發和後端日誌。通知不能跳轉登入頁或要求瀏覽器驗證。
+- **IP 白名單：** 內建購買流程使用瀏覽器 `submit.php`，無需把客戶 IP 加入伺服器端 API 白名單；啟用白名單後，伺服器端 `mapi.php` 呼叫需要允許伺服器出口 IP。
+- **密鑰輪換：** 重新產生啟潤 API Key 會使舊 Epay 密鑰失效。立即更新 `EpayKey`，檢查新付款和待處理通知，避免密鑰進入日誌或工單。
+
+本指南已核對原始碼，尚不代表在你的部署上完成了真實付款測試。

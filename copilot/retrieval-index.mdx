@@ -6,7 +6,7 @@ audience: copilot
 product_area: copilot
 intent: retrieval_index
 visibility: public
-last_verified_at: 2026-05-27
+last_verified_at: 2026-10-01
 source_owner: support
 ---
 
@@ -27,6 +27,8 @@ Use this page as the Phase 5A retrieval index contract. It defines which documen
 | --- | --- | --- |
 | Integration path | [Start here](/start-here), [Quickstart](/quickstart), [Collect your first payment](/guides/collect-first-payment) | Best sources for first-use and onboarding questions. |
 | Dashboard workflows | [Products](/dashboard/products), [Checkouts](/dashboard/checkouts), [Orders](/dashboard/orders), [Developer settings](/dashboard/developer-settings) | Best sources for merchants using the console. |
+| System integrations | [sub2api](/integrations/sub2api), [new-api](/integrations/new-api) | Configuration, callback, and amount-unit instructions for existing AI gateways. |
+| Account operations | [Payment methods](/dashboard/payment-methods), [Merchant agreement](/dashboard/merchant-agreement), [Disputes](/dashboard/disputes) | Payment method settings, agreement acceptance, and dispute handling. |
 | API basics | [Authentication](/authentication), [Errors](/errors), [Testing](/testing), [Code examples](/guides/code-examples) | Best sources for API setup and general integration details. |
 | Webhooks | [Webhook overview](/webhooks/overview), [Events](/webhooks/events), [Signatures](/webhooks/signatures), [Retries](/webhooks/retries) | Best sources for event handling and webhook verification. |
 | Troubleshooting | All [Troubleshooting](/troubleshooting/api-401) pages | Best sources for diagnosis, likely causes, safe fixes, and support handoff. |
@@ -40,7 +42,7 @@ Index these generated API reference pages with high precision and lower recall p
 
 | API area | Pages |
 | --- | --- |
-| Config | [Get supported currencies](/api-reference/config/get-supported-currencies) |
+| Config | [Get supported currencies](/api-reference/config/get-supported-currencies), [Settlement configuration](/api-reference/config/get-settlement-configuration), [Legal configuration](/api-reference/config/get-legal-configuration), [Current merchant services agreement](/api-reference/config/get-current-merchant-services-agreement), [Historical merchant services agreement](/api-reference/config/get-historical-merchant-services-agreement) |
 | Products | [List products](/api-reference/products/list-all-products), [Create product](/api-reference/products/create-a-product), [Retrieve product](/api-reference/products/retrieve-a-product), [Archive product](/api-reference/products/archive-a-product), [Update product](/api-reference/products/update-a-product) |
 | Checkouts | [Create checkout session](/api-reference/checkouts/create-a-checkout-session), [Retrieve checkout session](/api-reference/checkouts/retrieve-a-checkout-session) |
 | Orders | [List orders](/api-reference/orders/list-all-orders), [Retrieve order](/api-reference/orders/retrieve-an-order), [Export orders as CSV](/api-reference/orders/export-orders-as-csv) |

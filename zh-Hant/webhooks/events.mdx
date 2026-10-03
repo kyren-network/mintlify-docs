@@ -11,7 +11,8 @@ description: 所有 Webhook 事件類型及其載荷
 | --- | --- | --- |
 | `order.paid` | 付款已確認 | 客戶完成收銀台付款 |
 | `order.refunded` | 訂單退款已生效 | 退款成功 |
-| `order.closed` | 訂單未成功付款並已關閉 | 付款取消、失敗、逾時、授權釋放，或閘道關閉訂單 |
+
+目前訂單整合不會發送 `order.closed` Webhook。請呼叫 `GET /v1/orders/{orderId}` 核對 `FAILED`、`CLOSED` 或 `REVOKED` 等未付款終態，參見[訂單管理](/zh-Hant/dashboard/orders)。
 
 ## 事件物件結構
 
@@ -60,13 +61,13 @@ description: 所有 Webhook 事件類型及其載荷
 | 欄位 | 類型 | 描述 |
 | --- | --- | --- |
 | `order_id` | string | 訂單 ID |
-| `product_id` | string | 購買的產品 |
-| `customer_email` | string | 客戶電子郵件地址 |
-| `amount` | string | 總支付金額 |
+| `product_id` | string | 購買的產品；無關聯產品時可能為空字串 |
+| `customer_email` | string \| null | 客戶電子郵件地址（如有） |
+| `amount` | string | 原始/基礎訂單金額，不含另向付款人收取的手續費 |
 | `currency` | string | 三字母貨幣代碼 |
 | `net_amount` | string | 扣除手續費後的金額 |
-| `paid_at` | integer | 付款確認時間（Unix 毫秒時間戳） |
-| `metadata` | object \| null | 建立 Checkout Session 時傳入的 metadata |
+| `paid_at` | integer \| null | 付款確認時間（Unix 毫秒時間戳，如有） |
+| `metadata` | object \| null | Checkout Session 的商戶 metadata；內部支付渠道欄位會被過濾 |
 
 <Tip>
   這是最重要的事件。用它來完成訂單處理 — 例如，為使用者的帳戶充值額度。
@@ -105,69 +106,75 @@ description: 所有 Webhook 事件類型及其載荷
 | `amount` | string | 本次事件對應的退款金額 |
 | `currency` | string | 三字母貨幣代碼 |
 | `refunded_amount` | string | 本次退款後訂單累計已退款金額 |
-| `original_amount` | string | 原訂單金額 |
+| `original_amount` | string | 原始/基礎訂單金額，不含另向付款人收取的手續費 |
 | `reason` | string \| null | 退款原因 |
-| `metadata` | object \| null | 建立 Checkout Session 時傳入的 metadata |
+| `metadata` | object \| null | Checkout Session 的商戶 metadata；內部支付渠道欄位會被過濾 |
 
-## order.closed
+## 爭議事件（開通後可用）
 
-訂單未成功付款並關閉時發送。
+當你的帳戶支援並開通爭議處理時，還可能收到以下通知。是否可用取決於支付渠道和營運配置，請向 Kyren 支援確認。參見[爭議管理](/zh-Hant/dashboard/disputes)。
 
-```json
-{
-  "id": "evt_closed123",
-  "type": "order.closed",
-  "created_at": 1736932700000,
-  "data": {
-    "order_id": "order_def456",
-    "product_id": "prod_abc123",
-    "customer_email": "customer@example.com",
-    "amount": "9.99",
-    "currency": "USD",
-    "closed_at": 1736932700000,
-    "close_reason": "payment_timeout",
-    "compat": { "epay_trade_status": "TRADE_CLOSED" },
-    "metadata": { "user_id": "u_123" }
-  }
-}
-```
+| 事件 | 觸發條件 |
+| --- | --- |
+| `dispute.created` | 爭議案件首次匹配到你的訂單並成為商戶可見案件 |
+| `dispute.updated` | 商戶可見案件詳情或資金投影發生變化 |
+
+兩種事件使用相同的頂層結構，`data` 包含以下案件快照；可空欄位可能暫不可用：
 
 | 欄位 | 類型 | 描述 |
 | --- | --- | --- |
-| `order_id` | string | 訂單 ID |
-| `product_id` | string | 購買的產品 |
-| `customer_email` | string | 客戶電子郵件地址 |
-| `amount` | string | 訂單總金額 |
-| `currency` | string | 三字母貨幣代碼 |
-| `closed_at` | integer | 訂單關閉時間（Unix 毫秒時間戳） |
-| `close_reason` | string | 關閉原因，例如 `payment_canceled`、`payment_failed`、`payment_timeout`、`authorization_released` 或 `gateway_closed` |
-| `compat` | object | 面向舊處理器的相容欄位 |
-| `metadata` | object \| null | 建立 Checkout Session 時傳入的 metadata |
+| `id` | string | 爭議案件 ID，與頂層事件 ID 不同 |
+| `provider` | string | 支付渠道 |
+| `provider_dispute_id` | string \| null | 渠道爭議 ID |
+| `order_id` | string \| null | 關聯訂單 ID |
+| `type`, `status` | string | 案件類型和標準化狀態 |
+| `provider_status` | string \| null | 渠道狀態 |
+| `amount`, `currency` | string | 案件金額和幣種 |
+| `reason_code`, `reason` | string \| null | 爭議原因 |
+| `defendable` | boolean \| null | 是否可提交抗辯（如已知） |
+| `response_due_at`, `occurred_at` | integer \| null | Unix 毫秒時間戳 |
+| `updated_at` | integer | 案件更新時間（毫秒） |
+| `financial_status`, `financial_allocation_status` | string | 案件資金處理狀態和分配狀態 |
+| `settlement_currency` | string \| null | 以下資金金額的幣種 |
+| `allocated_merchant_principal`, `allocated_rolling_reserve` | string | 本案件分配的商戶本金和滾動保證金 |
+| `frozen_principal`, `charged_back_principal` | string | 本案件凍結或拒付的本金 |
+| `offset_rolling_reserve`, `chargeback_fee` | string | 本案件抵扣的保證金和商戶拒付手續費 |
+| `projection_state` | string \| null | 關聯訂單的資金投影狀態 |
+| `related_case_count` | integer | 共用該訂單資金投影的案件數量 |
+| `shared_order_projection` | boolean | 是否有多個案件共用資金投影 |
+
+這些通知用於同步案件資訊。僅 `status` 變化不代表餘額已變動，請結合資金欄位和控制台記錄對帳。即使 `shared_order_projection` 為 true，資金金額仍屬於單個案件。
 
 ## 處理事件
 
 以下是在 Webhook 端點中處理事件的方式：
 
 ```javascript
-app.post('/webhooks/kyren', (req, res) => {
+app.post('/webhooks/kyren', async (req, res) => {
   // ... 先驗證簽名 ...
 
   const event = JSON.parse(req.body.toString());
 
-  switch (event.type) {
-    case 'order.paid':
-      handleOrderPaid(event.data);
-      break;
-    case 'order.refunded':
-      handleOrderRefunded(event.data);
-      break;
-    case 'order.closed':
-      handleOrderClosed(event.data);
-      break;
-    default:
-      console.log(`未處理的事件類型: ${event.type}`);
+  try {
+    switch (event.type) {
+      case 'order.paid':
+        await handleOrderPaidIdempotently(event.id, event.data);
+        break;
+      case 'order.refunded':
+        await handleOrderRefundedIdempotently(event.id, event.data);
+        break;
+      case 'dispute.created':
+      case 'dispute.updated':
+        await handleDisputeIdempotently(event.id, event.data);
+        break;
+      default:
+        console.log(`未處理的事件類型: ${event.type}`);
+    }
+    res.status(200).send('OK');
+  } catch (error) {
+    res.status(500).send('Retry later');
   }
-
-  res.status(200).send('OK');
 });
 ```
+
+處理函式必須在持久化完成後才確認事件。較長的處理請採用[持久化佇列方案](/zh-Hant/webhooks/retries)，只有儲存成功後才能返回 `2xx`。

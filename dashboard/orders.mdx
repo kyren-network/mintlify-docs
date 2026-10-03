@@ -6,7 +6,7 @@ audience: merchant
 product_area: order
 intent: how-to
 visibility: public
-last_verified_at: 2026-05-26
+last_verified_at: 2026-10-01
 source_owner: product
 ---
 
@@ -33,9 +33,21 @@ Use Orders to review payment status, find order identifiers, and reconcile Kyren
 
 For paid or settled orders, merchants with refund access can submit a refund request from the order detail page. Review the request status, refund record status, and `order.refunded` Webhook event when reconciling refunded orders.
 
+## Amounts and fee sharing
+
+The order amount is the original product amount; the payable amount includes the customer's fee contribution. Review the merchant and customer fee rates, fixed fees and USD fee amounts separately. Per-transaction fixed fees are configured in USD. A change in [Payment methods](/dashboard/payment-methods) does not rewrite existing order fee snapshots.
+
+The payable amount is not the merchant's net proceeds. Compare the fee breakdown, reserve, exchange rate and actual USD settlement amount with [Funds](/dashboard/funds). Closed and failed orders hide fee details; a blank fee or settlement value does not confirm that money was received.
+
+## Disputed orders
+
+An order can show `DISPUTED` or `CHARGEBACK` when it has dispute exposure or recorded chargeback impact. Open [Disputes](/dashboard/disputes) to check related cases, deadlines and actual frozen or deducted amounts. Case status and completed financial operations can differ; reconcile the recorded funds rather than inferring a release from the case status alone.
+
 ## Related pages
 
 - [List all orders API reference](/api-reference/orders/list-all-orders)
 - [Retrieve an order API reference](/api-reference/orders/retrieve-an-order)
 - [Order refunds](/dashboard/order-refunds)
+- [Payment methods](/dashboard/payment-methods)
+- [Disputes](/dashboard/disputes)
 - [Webhook events](/webhooks/events)

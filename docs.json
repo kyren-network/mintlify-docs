@@ -39,9 +39,12 @@
                   "dashboard/checkouts",
                   "dashboard/orders",
                   "dashboard/order-refunds",
+                  "dashboard/payment-methods",
+                  "dashboard/disputes",
                   "dashboard/funds",
                   "dashboard/kyc",
                   "dashboard/kyb",
+                  "dashboard/merchant-agreement",
                   "dashboard/developer-settings",
                   "dashboard/personal-settings"
                 ]
@@ -77,6 +80,13 @@
                   "epay-migration/mapi-php",
                   "epay-migration/api-php",
                   "epay-migration/migration-checklist"
+                ]
+              },
+              {
+                "group": "System Integrations",
+                "pages": [
+                  "integrations/sub2api",
+                  "integrations/new-api"
                 ]
               },
               {
@@ -126,9 +136,12 @@
                   "zh/dashboard/checkouts",
                   "zh/dashboard/orders",
                   "zh/dashboard/order-refunds",
+                  "zh/dashboard/payment-methods",
+                  "zh/dashboard/disputes",
                   "zh/dashboard/funds",
                   "zh/dashboard/kyc",
                   "zh/dashboard/kyb",
+                  "zh/dashboard/merchant-agreement",
                   "zh/dashboard/developer-settings",
                   "zh/dashboard/personal-settings"
                 ]
@@ -164,6 +177,13 @@
                   "zh/epay-migration/mapi-php",
                   "zh/epay-migration/api-php",
                   "zh/epay-migration/migration-checklist"
+                ]
+              },
+              {
+                "group": "系统接入",
+                "pages": [
+                  "zh/integrations/sub2api",
+                  "zh/integrations/new-api"
                 ]
               },
               {
@@ -213,9 +233,12 @@
                   "zh-Hant/dashboard/checkouts",
                   "zh-Hant/dashboard/orders",
                   "zh-Hant/dashboard/order-refunds",
+                  "zh-Hant/dashboard/payment-methods",
+                  "zh-Hant/dashboard/disputes",
                   "zh-Hant/dashboard/funds",
                   "zh-Hant/dashboard/kyc",
                   "zh-Hant/dashboard/kyb",
+                  "zh-Hant/dashboard/merchant-agreement",
                   "zh-Hant/dashboard/developer-settings",
                   "zh-Hant/dashboard/personal-settings"
                 ]
@@ -251,6 +274,13 @@
                   "zh-Hant/epay-migration/mapi-php",
                   "zh-Hant/epay-migration/api-php",
                   "zh-Hant/epay-migration/migration-checklist"
+                ]
+              },
+              {
+                "group": "系統接入",
+                "pages": [
+                  "zh-Hant/integrations/sub2api",
+                  "zh-Hant/integrations/new-api"
                 ]
               },
               {

@@ -1,0 +1,79 @@
+---
+title: "Configure sub2api"
+description: "Connect sub2api balance top-ups to Kyren Pay through its built-in EasyPay provider."
+language: en
+audience: developer
+product_area: epay
+intent: how-to
+visibility: public
+last_verified_at: 2026-10-01
+source_owner: engineering
+---
+
+Use sub2api's built-in **EasyPay** provider to collect balance top-ups with Kyren Pay. This guide applies to [Wei-Shaw/sub2api at commit `42bc7f6`](https://github.com/Wei-Shaw/sub2api/tree/42bc7f6cffe24bcb471608e48e66b4a0afa1f882), verified on October 1, 2026. Older releases and forks may have different settings; confirm that your version includes the native provider and the fields below.
+
+## Before you start
+
+- Prepare a Kyren merchant account with the required payment provider bound and credentials active. Only enable payment methods available to that account.
+- Obtain the merchant account ID for `pid` and the complete, current API key beginning with `kyren_live_` for the merchant secret. Use the raw key, including its prefix, rather than a masked value or Webhook secret. Store it in the administrator settings only.
+- Deploy sub2api behind a public HTTPS domain, for example `https://ai.example.com`, with its payment callback routed to the backend.
+
+See [Developer settings](/dashboard/developer-settings) and [Epay compatibility](/epay-migration/overview).
+
+## Configure the payment provider
+
+Open **Admin > System Settings > Payment Settings** and select EasyPay as the enabled provider. Then, in provider management, add and enable an **EasyPay** provider instance.
+
+You can obtain your Kyren merchant account ID (PID) and PKey from **Kyren Merchant Dashboard > Developer Tools > API Keys**.
+
+| sub2api setting | Value |
+| --- | --- |
+| Provider | `easypay` / EasyPay |
+| Instance name | `Kyren Pay` |
+| PID (`pid`) | Your Kyren merchant account ID |
+| PKey (`pkey`) | Your complete current `kyren_live_...` API key |
+| API base (`apiBase`) | `https://api.kyrenpay.com/epay` |
+| Payment mode (`payment_mode`) | `popup` for hosted browser checkout, or `qrcode` for server-side creation |
+| Notification URL base | `https://ai.example.com` |
+| Return URL base | `https://ai.example.com` |
+| Alipay / WeChat channel ID (`cidAlipay`, `cidWxpay`) | Leave blank |
+
+The callback editor appends fixed paths. The resulting URLs are `https://ai.example.com/api/v1/payment/webhook/easypay` and `https://ai.example.com/payment/result`; enter only the origin in those base inputs. `popup` builds `/epay/submit.php`; `qrcode` calls `/epay/mapi.php`. The API base is normalized and the endpoint appended by the provider. [Settings fields](https://github.com/Wei-Shaw/sub2api/blob/42bc7f6cffe24bcb471608e48e66b4a0afa1f882/frontend/src/components/payment/providerConfig.ts), [callback editor](https://github.com/Wei-Shaw/sub2api/blob/42bc7f6cffe24bcb471608e48e66b4a0afa1f882/frontend/src/components/payment/PaymentProviderDialog.vue), [EasyPay client](https://github.com/Wei-Shaw/sub2api/blob/42bc7f6cffe24bcb471608e48e66b4a0afa1f882/backend/internal/payment/provider/easypay.go).
+
+## Choose payment methods
+
+Select the built-in `alipay` and/or `wxpay` options as enabled for your merchant. This verified version also has a **Custom payment methods** editor. To offer other documented Kyren methods, add matching local and upstream type values, then select the resulting supported methods:
+
+| Local type | Upstream type | Display name |
+| --- | --- | --- |
+| `creditcard` | `creditcard` | Card |
+| `crypto` | `crypto` | Crypto |
+| `paynow` | `paynow` | PayNow |
+
+Do not copy a different gateway's type aliases or channel IDs. Availability also depends on your Kyren provider binding. If your installed version lacks the custom-method editor, verify or upgrade that version before exposing these methods. [Custom-method editor and serialization](https://github.com/Wei-Shaw/sub2api/blob/42bc7f6cffe24bcb471608e48e66b4a0afa1f882/frontend/src/components/payment/PaymentProviderDialog.vue).
+
+## Set the amount and credited balance
+
+This EasyPay client does not send `money_type`, so Kyren interprets `money` as **CNY**. Changing a currency label or product-name suffix does not change the request currency.
+
+For balance top-ups, sub2api credits `recharge amount × balance recharge multiplier`, rounded to two decimals. Its separate recharge surcharge increases the Epay request amount, with the surcharge rounded up to cents. For an initial check, set `payment_balance_recharge_multiplier = 1` and `payment_recharge_fee_rate = 0`: a recharge amount of `10.00` sends an Epay base amount of **CNY 10.00** and credits **10.00 balance units**. Choose your intended conversion policy before enabling public recharge; a USD balance display does not perform exchange conversion automatically. [Order calculation](https://github.com/Wei-Shaw/sub2api/blob/42bc7f6cffe24bcb471608e48e66b4a0afa1f882/backend/internal/service/payment_order.go), [balance multiplier](https://github.com/Wei-Shaw/sub2api/blob/42bc7f6cffe24bcb471608e48e66b4a0afa1f882/backend/internal/service/payment_amounts.go), [surcharge rounding](https://github.com/Wei-Shaw/sub2api/blob/42bc7f6cffe24bcb471608e48e66b4a0afa1f882/backend/internal/payment/fee.go).
+
+The Epay base amount is not always the final checkout total. Kyren may add a customer-paid fee according to your payment channel's fee-sharing settings. The example total is exactly **CNY 10.00** only when no Kyren customer-paid fee applies. Epay notification and order-query `money` report the base amount; sub2api credits its stored balance amount, rather than any additional fee. Compare the base amount, displayed checkout total and expected credited balance separately.
+
+## Verify payment and crediting
+
+1. Save the settings, sign in as a test user and create a small top-up. Record the merchant order number (`out_trade_no`), Epay base amount, displayed CNY checkout total and starting balance.
+2. Complete payment and confirm that the corresponding Kyren order is paid. Check the sub2api payment order and confirm the intended balance increase.
+3. Confirm that the backend received the signed GET notification at `/api/v1/payment/webhook/easypay`, verified the Epay MD5 signature and `TRADE_SUCCESS`, and returned the plain text `success`.
+4. Confirm a repeated notification for the same order does not add balance again. A return-page visit or HTTP `success` response alone is insufficient evidence of crediting; check the order and balance records together.
+
+The built-in handler accepts GET notifications and performs verification through the provider. Its acknowledgement can also cover an unknown order, so inspect backend logs if Kyren is paid but balance has not increased. [Callback routes](https://github.com/Wei-Shaw/sub2api/blob/42bc7f6cffe24bcb471608e48e66b4a0afa1f882/backend/internal/server/routes/payment.go), [callback handler](https://github.com/Wei-Shaw/sub2api/blob/42bc7f6cffe24bcb471608e48e66b4a0afa1f882/backend/internal/handler/payment_webhook_handler.go). See [Epay MD5 signatures](/epay-migration/signature) and [Paid but not credited](/troubleshooting/paid-but-not-credited).
+
+## Common configuration problems
+
+- **Wrong endpoint:** preserve `/epay/` in the API base. Do not enter the merchant dashboard URL or a complete `submit.php` URL.
+- **Server-side creation denied:** if Kyren's API IP allowlist is enabled, allow the sub2api server's outbound IP for `mapi.php`. Browser `submit.php` checkout does not require adding each customer's IP.
+- **Notification missing:** make the HTTPS callback publicly reachable, preserve GET query parameters and route it to the backend without login redirects or browser challenges.
+- **Signature failure after key rotation:** regenerating the Kyren API key invalidates the old secret. Update the provider's PKey immediately and verify a new payment and any pending callbacks. Never publish the key in a support ticket.
+
+These instructions were checked against source code; they do not represent a live payment test on your deployment.

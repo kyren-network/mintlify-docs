@@ -1,0 +1,51 @@
+---
+title: Payment methods
+description: Enable bound payment methods and configure customer fee sharing
+language: en
+audience: merchant
+product_area: payment
+intent: how-to
+visibility: public
+last_verified_at: 2026-10-01
+source_owner: product
+---
+
+Open **Payment methods** in the merchant dashboard to review the methods already bound to your account, their status, and how order fees are shared. Contact Kyren support to request a method that is missing from the list.
+
+## Enable or disable a method
+
+1. Find the payment method and check its current status.
+2. Use the switch in the action column to enable or disable it.
+3. Wait for the success message, then check the method in a new Checkout.
+
+An enabled binding is still subject to platform availability, channel configuration, currency and account restrictions. Enabling can fail if the channel is unavailable or an applicable [merchant agreement](/dashboard/merchant-agreement) signing requirement is overdue. Disabling a method does not cancel paid orders or reverse their funds.
+
+## Configure fee sharing
+
+Choose **Set fee sharing** for a method. The dialog shows the total percentage fee and fixed fee, then lets you enter:
+
+| Setting | Meaning |
+| --- | --- |
+| Customer fee rate | Customer share of the percentage fee used to calculate the Checkout surcharge. The dashboard accepts a percentage; `customerFeeRate` stores a decimal rate, such as `0.01` for 1%. |
+| Customer fixed fee | Customer contribution per transaction, configured in USD as `customerPerTransactionFee`. |
+| Merchant contribution | Calculated as the total fee minus the customer contribution, separately for the rate and fixed fee. |
+| Checkout display text | Optional description shown at Checkout, up to 80 characters. |
+
+Both customer contributions must be nonnegative and no greater than their respective total fee. Set both to zero to have the merchant bear the full fee. Choose **Save** and check a new Checkout before directing customers to it.
+
+The original order amount is the product price. The payable amount adds the customer fee contribution; the merchant's net proceeds reflect the merchant contribution and any applicable reserve. Fixed fees are configured in **USD**, even when the order uses another currency. Use the payable amount, fee breakdown, conversion and settlement amounts in [Orders](/dashboard/orders) for reconciliation. A settings change does not rewrite fee snapshots on existing orders.
+
+Checkout adjusts the customer surcharge to account for processing fees on that surcharge: `(original amount × customer rate + customer fixed fee converted to order currency) ÷ (1 − total order fee rate)`, rounded to two decimal places. For a USD 100.00 order, a total rate of 3%, and a customer share of 1% plus USD 0.20, the surcharge is USD 1.24 and the payable amount is USD 101.24. Always use the Checkout quote and recorded order amounts for the actual charge.
+
+## Multiple channel bindings
+
+A payment method name is not a unique channel identity. Several providers or integration routes can be bound to the same method. Channel identity includes the provider, provider method code, integration mode and business mode.
+
+The current dashboard identifies actions by payment method and does not offer a complete route selector. If duplicate methods appear or saving reports that channel identity is required, contact Kyren support to identify the intended binding. Include the method, intended provider and error message. Do not assume one switch updates every route.
+
+## Related pages
+
+- [Orders](/dashboard/orders)
+- [Funds](/dashboard/funds)
+- [Merchant agreement](/dashboard/merchant-agreement)
+- [Checkout sessions](/dashboard/checkouts)
