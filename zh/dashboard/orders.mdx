@@ -6,7 +6,7 @@ audience: merchant
 product_area: order
 intent: how-to
 visibility: public
-last_verified_at: 2026-05-26
+last_verified_at: 2026-10-01
 source_owner: product
 ---
 
@@ -33,9 +33,21 @@ source_owner: product
 
 对于已支付或已结款订单，已启用退款权限的商户可以从订单详情页提交退款申请。对账退款订单时，请同时查看退款申请状态、退款记录状态和 `order.refunded` Webhook 事件。
 
+## 金额与手续费分担
+
+订单金额是原始商品金额，应付金额包含客户承担的手续费。分别查看商户和客户承担的费率、每笔固定手续费及 USD 费用金额。每笔固定手续费以 USD 配置。[支付方式](/zh/dashboard/payment-methods)中的配置修改不会重写已有订单的费用快照。
+
+应付金额不等于商户净收入。请结合费用分担、保证金、汇率及实际 USD 结算金额，与[资金](/zh/dashboard/funds)对账。已关闭和支付失败订单隐藏费用详情；费用或结算金额为空不能证明已收到款项。
+
+## 争议订单
+
+订单存在争议敞口或已记录拒付影响时，可能显示 `DISPUTED` 或 `CHARGEBACK`。在[争议案件](/zh/dashboard/disputes)中查看关联案件、截止时间及实际冻结或扣除金额。案件状态与已完成的资金操作可能不同，请核对资金记录，不要仅凭案件状态判断资金已释放。
+
 ## 相关页面
 
 - [订单列表 API 参考](/api-reference/orders/list-all-orders)
 - [获取订单 API 参考](/api-reference/orders/retrieve-an-order)
 - [订单退款](/zh/dashboard/order-refunds)
+- [支付方式](/zh/dashboard/payment-methods)
+- [争议案件](/zh/dashboard/disputes)
 - [Webhook 事件](/zh/webhooks/events)

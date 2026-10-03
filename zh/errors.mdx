@@ -15,17 +15,19 @@ description: 了解 API 错误响应
 | `401` | 未认证 — 缺少或无效的 API 密钥 |
 | `403` | 禁止访问 — 权限不足 |
 | `404` | 未找到 — 资源不存在 |
+| `409` | 冲突 — 资源状态或幂等冲突 |
 | `429` | 请求过多 — 超出频率限制 |
 | `500` | 服务器内部错误 — 我们这边出了问题 |
+| `503` | 服务不可用 — 上游服务错误 |
 
 ## 错误响应格式
 
-发生错误时，响应体包含以下 JSON 结构：
+由 API 应用层处理的错误使用以下 JSON 结构。认证中间件和代理错误的响应体可能为空或采用其他格式，请先检查 HTTP 状态再解析 JSON。
 
 ```json
 {
-  "code": 400,
-  "message": "Bad Request",
+  "code": 40001,
+  "message": "Validation failed",
   "error": {
     "field": "productId",
     "reason": "Product ID is required"
@@ -35,14 +37,35 @@ description: 了解 API 错误响应
 
 | 字段 | 类型 | 描述 |
 | --- | --- | --- |
-| `code` | integer | HTTP 状态码 |
+| `code` | integer | 应用错误码，与 HTTP 状态码不同 |
 | `message` | string | 人类可读的错误信息 |
 | `error.field` | string | 导致错误的参数（如适用） |
 | `error.reason` | string | 详细的错误说明 |
 
 <Note>
-  `error` 对象仅在验证错误（400）时出现。其他错误类型只包含 `code` 和 `message`。
+  `error` 是可选字段，有字段详情时才包含。`field` 和 `reason` 也可能分别省略。不要依赖错误信息的固定文本。
 </Note>
+
+## 应用错误码
+
+| 错误码 | 含义 |
+| --- | --- |
+| `40001` | 请求无效或验证失败 |
+| `40101` | 应用层未认证错误 |
+| `40102` | Token 已过期 |
+| `40103` | API 密钥无效 |
+| `40301` | 禁止访问 |
+| `40401` | 资源不存在 |
+| `40901` | 冲突 |
+| `40902` | 幂等冲突 |
+| `42901` | 超出频率限制 |
+| `50001` | 服务器内部错误 |
+| `50002` | 外部服务错误（HTTP `503`） |
+| `60006` | 产品不存在 |
+| `60007` | Checkout 已过期 |
+| `60008` | 订单不存在 |
+
+这些错误码表示错误条件。业务错误可能使用 HTTP `400`，不要根据 `code` 的前几位推断 HTTP 状态。
 
 ## 常见错误
 
@@ -52,7 +75,7 @@ description: 了解 API 错误响应
 
 ```json
 {
-  "code": 400,
+  "code": 40001,
   "message": "Bad Request",
   "error": {
     "field": "price",
@@ -63,14 +86,7 @@ description: 了解 API 错误响应
 
 ### 401 未认证
 
-API 密钥缺失或无效时返回。
-
-```json
-{
-  "code": 401,
-  "message": "Unauthorized"
-}
-```
+API 密钥缺失或被拒绝时返回。认证入口不保证返回 JSON 响应体。应用层未认证错误若返回 JSON，其 `code` 为 `40101`。
 
 ### 404 未找到
 
@@ -78,19 +94,19 @@ API 密钥缺失或无效时返回。
 
 ```json
 {
-  "code": 404,
-  "message": "Not Found"
+  "code": 40401,
+  "message": "Resource not found"
 }
 ```
 
 ### 429 请求过多
 
-超过 API 频率限制（每分钟 100 次请求）时返回。
+超过配置的频率限制时返回。默认值为普通 API 请求**每个 IP 每分钟 100 次**，`POST /v1/checkouts` 创建收银台为**每个已认证商户每分钟 60 次**。限制可配置，不代表生产环境保证提供的配额。
 
 ```json
 {
-  "code": 429,
-  "message": "Too Many Requests"
+  "code": 42901,
+  "message": "Rate limit exceeded. Try again later."
 }
 ```
 
@@ -100,7 +116,7 @@ API 密钥缺失或无效时返回。
 
 ## 成功响应格式
 
-成功的响应始终包含 `code: 0` 和 `message: "success"`：
+公开商户 JSON API 的成功响应包含 `code: 0` 和 `message: "success"`。Epay 兼容响应和文件下载使用各接口规定的格式。
 
 ```json
 {

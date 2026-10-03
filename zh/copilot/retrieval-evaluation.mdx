@@ -6,7 +6,7 @@ audience: copilot
 product_area: copilot
 intent: retrieval_evaluation
 visibility: public
-last_verified_at: 2026-05-27
+last_verified_at: 2026-10-01
 source_owner: support
 ---
 
@@ -26,6 +26,8 @@ source_owner: support
 
 | 测试问题 | 必须命中的来源 | 可用辅助来源 | 必须避免 |
 | --- | --- | --- | --- |
+| How do I configure KyrenPay payments in sub2api? | [sub2api configuration](/integrations/sub2api) | [Epay migration](/epay-migration/overview) | Omitting /epay/ from the gateway URL or treating CNY as USD. |
+| How do I configure KyrenPay payments in new api? | [new-api configuration](/integrations/new-api) | [Epay migration](/epay-migration/overview) | Treating browser return as payment success or ignoring balance unit pricing. |
 | My API call returns 401. What should I check? | [API request returns 401](/troubleshooting/api-401) | [Authentication](/authentication) | Asking for the full API key. |
 | Checkout session creation fails with a currency error. | [Checkout session creation fails](/troubleshooting/checkout-session-fails) | [Supported currencies](/api-reference/config/get-supported-currencies) | Treating amount as a JSON number. |
 | The customer paid but my app did not add credits. | [Customer paid but was not credited](/troubleshooting/paid-but-not-credited) | [Webhook events](/webhooks/events) | Automatic merchant fulfillment recovery claim. |
@@ -41,6 +43,8 @@ source_owner: support
 
 | 测试问题 | 必须命中的来源 | 可用辅助来源 | 必须避免 |
 | --- | --- | --- | --- |
+| sub2api 如何配置 KyrenPay 易支付充值？ | [sub2api 配置](/zh/integrations/sub2api) | [易支付迁移](/zh/epay-migration/overview) | 漏填 /epay/ 或把默认人民币收单当作美元。 |
+| new-api 如何配置 KyrenPay 易支付充值？ | [new-api 配置](/zh/integrations/new-api) | [易支付迁移](/zh/epay-migration/overview) | 使用浏览器返回作为入账依据，或忽略额度单位和价格设置。 |
 | API 请求返回 401，应该检查什么？ | [API 请求返回 401](/zh/troubleshooting/api-401) | [认证](/zh/authentication) | 要求商户发送完整 API Key。 |
 | 创建 Checkout Session 时币种报错。 | [Checkout Session 创建失败](/zh/troubleshooting/checkout-session-fails) | [支持币种](/api-reference/config/get-supported-currencies) | 把金额当作 JSON 数字。 |
 | 客户已经付款，但系统没有加积分。 | [客户已付款但未到账](/zh/troubleshooting/paid-but-not-credited) | [Webhook 事件](/zh/webhooks/events) | 自动修复商户履约的表述。 |
@@ -56,6 +60,8 @@ source_owner: support
 
 | 測試問題 | 必須命中的來源 | 可用輔助來源 | 必須避免 |
 | --- | --- | --- | --- |
+| sub2api 如何設定 KyrenPay 易支付儲值？ | [sub2api 設定](/zh-Hant/integrations/sub2api) | [易支付遷移](/zh-Hant/epay-migration/overview) | 漏填 /epay/ 或把預設人民幣收單當作美元。 |
+| new-api 如何設定 KyrenPay 易支付儲值？ | [new-api 設定](/zh-Hant/integrations/new-api) | [易支付遷移](/zh-Hant/epay-migration/overview) | 使用瀏覽器返回作為入帳依據，或忽略額度單位和價格設定。 |
 | API 請求返回 401，應該檢查什麼？ | [API 請求返回 401](/zh-Hant/troubleshooting/api-401) | [認證](/zh-Hant/authentication) | 要求商戶發送完整 API Key。 |
 | 建立 Checkout Session 時幣種報錯。 | [Checkout Session 建立失敗](/zh-Hant/troubleshooting/checkout-session-fails) | [支援幣種](/api-reference/config/get-supported-currencies) | 把金額當作 JSON 數字。 |
 | 客戶已經付款，但系統沒有加積分。 | [客戶已付款但未入帳](/zh-Hant/troubleshooting/paid-but-not-credited) | [Webhook 事件](/zh-Hant/webhooks/events) | 自動修復商戶履約的表述。 |

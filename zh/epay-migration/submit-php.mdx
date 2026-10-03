@@ -39,7 +39,7 @@ source_owner: engineering
 | `param` | 商户透传元数据，会在通知中返回。 |
 | `userId` | 可选的商户用户标识；渠道支持时会传给支付网关。 |
 | `device` | 可选设备提示：`pc` 或 `mobile`。同一订单号复用到不同支付宝/微信设备支付形态时可能被拒绝。 |
-| `channel_param` | 可选的渠道扩展 JSON 字符串。 |
+| `channel_param` | 非信用卡支付类型可选的渠道扩展 JSON 字符串。当 `type=creditcard` 时，其原始值仍参与 Epay 签名，但 Kyren 在验签后会完全忽略该值。禁止通过 `channel_param` 传入卡号、有效期、CVV、账单资料或联系信息；买家将在 Kyren 或上游托管页面输入卡片资料。顶层 `email`、`phone` 和 `userId` 参数不受影响。 |
 
 ## Paydify：`type=crypto`
 

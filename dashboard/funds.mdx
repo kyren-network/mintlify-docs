@@ -6,7 +6,7 @@ audience: merchant
 product_area: funds
 intent: how-to
 visibility: public
-last_verified_at: 2026-05-28
+last_verified_at: 2026-10-01
 source_owner: product
 ---
 
@@ -31,6 +31,12 @@ If an order is paid in `CNY` or `HKD`, review the order detail and transaction r
 
 Percentage fee rates apply to the order amount. Per-transaction fixed fees and chargeback fixed fees are configured in `USD`; they do not follow the order currency.
 
+Configure customer and merchant fee contributions in [Payment methods](/dashboard/payment-methods). The amount the customer pays can exceed the original order amount; merchant proceeds also reflect merchant fees and applicable reserves. Use the order's fee snapshot and settlement records for reconciliation.
+
+## Dispute funds
+
+Where dispute financial processing is enabled, cases can freeze affected funds, release eligible frozen funds or deduct principal and chargeback fees. [Disputes](/dashboard/disputes) shows the recorded frozen principal, reserve allocation, deducted principal, reserve offset and chargeback fee. Compare these with transaction records and available funds. A won or closed case alone does not confirm that a release completed or that charged-back funds were restored.
+
 ## Before managing settlement accounts
 
 1. Make sure required KYC or KYB verification is complete.
@@ -38,8 +44,13 @@ Percentage fee rates apply to the order amount. Per-transaction fixed fees and c
 3. Review recent orders and transactions for reconciliation.
 4. Keep settlement account information accurate before settlement processing.
 
+If a [merchant agreement](/dashboard/merchant-agreement) grace period expires, the agreement gate still permits balances, settlements and settlement accounts. Their normal balance, account and verification requirements continue to apply.
+
 ## Related pages
 
 - [Orders](/dashboard/orders)
+- [Payment methods](/dashboard/payment-methods)
+- [Disputes](/dashboard/disputes)
+- [Merchant agreement](/dashboard/merchant-agreement)
 - [KYC](/dashboard/kyc)
 - [KYB](/dashboard/kyb)

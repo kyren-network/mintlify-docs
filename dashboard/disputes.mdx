@@ -1,0 +1,51 @@
+---
+title: Disputes
+description: Review dispute cases, deadlines, timelines and their recorded financial impact
+language: en
+audience: merchant
+product_area: dispute
+intent: how-to
+visibility: public
+last_verified_at: 2026-10-01
+source_owner: product
+---
+
+Use **Disputes** in the merchant dashboard to view cases matched to your own orders. Case availability and financial processing depend on the platform and provider being enabled for your account and environment. An empty list does not establish that no dispute exists at a provider.
+
+## Review a case
+
+1. Open **Disputes**, optionally filter by status, and use pagination to find the case.
+2. Check the provider case number, order ID, case type, amount, status and occurrence time.
+3. Choose **View details** to open the detail drawer.
+4. Review the reason, response deadline, financial impact and case timeline.
+5. Contact Kyren support promptly when a response is needed, using the case number and order ID.
+
+The list and detail drawer are read-only. Evidence submission, appeals, editing a case and executing financial actions are handled with operations support. A **Needs response** status or deadline does not mean a response has been submitted automatically. Only merchant-visible timeline events are shown.
+
+## Case status and funds
+
+| Item | What to check |
+| --- | --- |
+| Case status | Whether a response is needed, review is underway, or the case is won, lost, accepted, canceled or closed. |
+| Provider dispute amount | Amount and currency reported for the case; it can differ from the settlement currency. |
+| Frozen principal | Principal actually recorded as frozen. |
+| Allocated rolling reserve | Reserve associated with the case. |
+| Charged-back principal and offset reserve | Amounts already recorded as deducted or used to offset the chargeback. |
+| Chargeback fee | Recorded chargeback fee in the displayed settlement currency. |
+
+An active dispute can freeze affected funds. An eligible release can return frozen funds; a chargeback deducts affected principal and may use the associated reserve and incur a chargeback fee. These operations depend on enabled financial processing and the recorded outcome. A terminal case status alone does not confirm that a funds operation completed, or that previously charged-back funds were restored.
+
+When an order has multiple related cases, the drawer indicates the shared order financial context. Do not add shared figures across cases as if each were a separate balance. Reconcile actual amounts against [Funds](/dashboard/funds), transaction records and [Orders](/dashboard/orders).
+
+## Notifications and support
+
+Where dispute notifications are enabled, `dispute.created` and `dispute.updated` can notify your endpoint of case changes. See [Webhook events](/webhooks/events). Use the case identifier to correlate notifications and recheck the latest case and financial records; a case notification does not by itself establish a successful balance operation.
+
+For missing cases, approaching deadlines, or funds that differ from the case status, provide support with your merchant ID, provider case number, order ID, amount, currency, deadline and relevant timestamps. Do not include API keys or Webhook secrets.
+
+## Related pages
+
+- [Orders](/dashboard/orders)
+- [Funds](/dashboard/funds)
+- [Order refunds](/dashboard/order-refunds)
+- [Webhook events](/webhooks/events)

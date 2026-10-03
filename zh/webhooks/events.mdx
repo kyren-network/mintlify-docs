@@ -11,7 +11,8 @@ description: 所有 Webhook 事件类型及其载荷
 | --- | --- | --- |
 | `order.paid` | 付款已确认 | 客户完成收银台付款 |
 | `order.refunded` | 订单退款已生效 | 退款成功 |
-| `order.closed` | 订单未成功付款并已关闭 | 付款取消、失败、超时、授权释放，或网关关闭订单 |
+
+当前订单集成不会发送 `order.closed` Webhook。请调用 `GET /v1/orders/{orderId}` 核对 `FAILED`、`CLOSED` 或 `REVOKED` 等未付款终态，参见[订单管理](/zh/dashboard/orders)。
 
 ## 事件对象结构
 
@@ -60,13 +61,13 @@ description: 所有 Webhook 事件类型及其载荷
 | 字段 | 类型 | 描述 |
 | --- | --- | --- |
 | `order_id` | string | 订单 ID |
-| `product_id` | string | 购买的产品 |
-| `customer_email` | string | 客户邮箱地址 |
-| `amount` | string | 总支付金额 |
+| `product_id` | string | 购买的产品；无关联产品时可能为空字符串 |
+| `customer_email` | string \| null | 客户邮箱地址（如有） |
+| `amount` | string | 原始/基础订单金额，不含另向付款人收取的手续费 |
 | `currency` | string | 三字母货币代码 |
 | `net_amount` | string | 扣除手续费后的金额 |
-| `paid_at` | integer | 付款确认时间（Unix 毫秒时间戳） |
-| `metadata` | object \| null | 创建 Checkout Session 时传入的 metadata |
+| `paid_at` | integer \| null | 付款确认时间（Unix 毫秒时间戳，如有） |
+| `metadata` | object \| null | Checkout Session 的商户 metadata；内部支付渠道字段会被过滤 |
 
 <Tip>
   这是最重要的事件。用它来完成订单处理 — 例如，为用户的账户充值额度。
@@ -105,69 +106,75 @@ description: 所有 Webhook 事件类型及其载荷
 | `amount` | string | 本次事件对应的退款金额 |
 | `currency` | string | 三字母货币代码 |
 | `refunded_amount` | string | 本次退款后订单累计已退款金额 |
-| `original_amount` | string | 原订单金额 |
+| `original_amount` | string | 原始/基础订单金额，不含另向付款人收取的手续费 |
 | `reason` | string \| null | 退款原因 |
-| `metadata` | object \| null | 创建 Checkout Session 时传入的 metadata |
+| `metadata` | object \| null | Checkout Session 的商户 metadata；内部支付渠道字段会被过滤 |
 
-## order.closed
+## 争议事件（开通后可用）
 
-订单未成功付款并关闭时发送。
+当你的账户支持并开通争议处理时，还可能收到以下通知。是否可用取决于支付渠道和运营配置，请向 Kyren 支持确认。参见[争议管理](/zh/dashboard/disputes)。
 
-```json
-{
-  "id": "evt_closed123",
-  "type": "order.closed",
-  "created_at": 1736932700000,
-  "data": {
-    "order_id": "order_def456",
-    "product_id": "prod_abc123",
-    "customer_email": "customer@example.com",
-    "amount": "9.99",
-    "currency": "USD",
-    "closed_at": 1736932700000,
-    "close_reason": "payment_timeout",
-    "compat": { "epay_trade_status": "TRADE_CLOSED" },
-    "metadata": { "user_id": "u_123" }
-  }
-}
-```
+| 事件 | 触发条件 |
+| --- | --- |
+| `dispute.created` | 争议案件首次匹配到你的订单并成为商户可见案件 |
+| `dispute.updated` | 商户可见案件详情或资金投影发生变化 |
+
+两种事件使用相同的顶层结构，`data` 包含以下案件快照；可空字段可能暂不可用：
 
 | 字段 | 类型 | 描述 |
 | --- | --- | --- |
-| `order_id` | string | 订单 ID |
-| `product_id` | string | 购买的产品 |
-| `customer_email` | string | 客户邮箱地址 |
-| `amount` | string | 订单总金额 |
-| `currency` | string | 三字母货币代码 |
-| `closed_at` | integer | 订单关闭时间（Unix 毫秒时间戳） |
-| `close_reason` | string | 关闭原因，例如 `payment_canceled`、`payment_failed`、`payment_timeout`、`authorization_released` 或 `gateway_closed` |
-| `compat` | object | 面向旧处理器的兼容字段 |
-| `metadata` | object \| null | 创建 Checkout Session 时传入的 metadata |
+| `id` | string | 争议案件 ID，与顶层事件 ID 不同 |
+| `provider` | string | 支付渠道 |
+| `provider_dispute_id` | string \| null | 渠道争议 ID |
+| `order_id` | string \| null | 关联订单 ID |
+| `type`, `status` | string | 案件类型和标准化状态 |
+| `provider_status` | string \| null | 渠道状态 |
+| `amount`, `currency` | string | 案件金额和币种 |
+| `reason_code`, `reason` | string \| null | 争议原因 |
+| `defendable` | boolean \| null | 是否可提交抗辩（如已知） |
+| `response_due_at`, `occurred_at` | integer \| null | Unix 毫秒时间戳 |
+| `updated_at` | integer | 案件更新时间（毫秒） |
+| `financial_status`, `financial_allocation_status` | string | 案件资金处理状态和分配状态 |
+| `settlement_currency` | string \| null | 以下资金金额的币种 |
+| `allocated_merchant_principal`, `allocated_rolling_reserve` | string | 本案件分配的商户本金和滚动保证金 |
+| `frozen_principal`, `charged_back_principal` | string | 本案件冻结或拒付的本金 |
+| `offset_rolling_reserve`, `chargeback_fee` | string | 本案件抵扣的保证金和商户拒付手续费 |
+| `projection_state` | string \| null | 关联订单的资金投影状态 |
+| `related_case_count` | integer | 共用该订单资金投影的案件数量 |
+| `shared_order_projection` | boolean | 是否有多个案件共用资金投影 |
+
+这些通知用于同步案件信息。仅 `status` 变化不代表余额已变动，请结合资金字段和控制台记录对账。即使 `shared_order_projection` 为 true，资金金额仍属于单个案件。
 
 ## 处理事件
 
 以下是在 Webhook 端点中处理事件的方式：
 
 ```javascript
-app.post('/webhooks/kyren', (req, res) => {
+app.post('/webhooks/kyren', async (req, res) => {
   // ... 先验证签名 ...
 
   const event = JSON.parse(req.body.toString());
 
-  switch (event.type) {
-    case 'order.paid':
-      handleOrderPaid(event.data);
-      break;
-    case 'order.refunded':
-      handleOrderRefunded(event.data);
-      break;
-    case 'order.closed':
-      handleOrderClosed(event.data);
-      break;
-    default:
-      console.log(`未处理的事件类型: ${event.type}`);
+  try {
+    switch (event.type) {
+      case 'order.paid':
+        await handleOrderPaidIdempotently(event.id, event.data);
+        break;
+      case 'order.refunded':
+        await handleOrderRefundedIdempotently(event.id, event.data);
+        break;
+      case 'dispute.created':
+      case 'dispute.updated':
+        await handleDisputeIdempotently(event.id, event.data);
+        break;
+      default:
+        console.log(`未处理的事件类型: ${event.type}`);
+    }
+    res.status(200).send('OK');
+  } catch (error) {
+    res.status(500).send('Retry later');
   }
-
-  res.status(200).send('OK');
 });
 ```
+
+处理函数必须在持久化完成后才确认事件。较长的处理请采用[持久化队列方案](/zh/webhooks/retries)，只有保存成功后才能返回 `2xx`。

@@ -15,17 +15,19 @@ Kyren Pay uses conventional HTTP status codes to indicate the success or failure
 | `401` | Unauthorized — Missing or invalid API key |
 | `403` | Forbidden — Insufficient permissions |
 | `404` | Not Found — Resource does not exist |
+| `409` | Conflict — Resource state or idempotency conflict |
 | `429` | Too Many Requests — Rate limit exceeded |
 | `500` | Internal Server Error — Something went wrong on our end |
+| `503` | Service Unavailable — Upstream service error |
 
 ## Error Response Format
 
-When an error occurs, the response body contains a JSON object with the following structure:
+Application errors handled by the API use this JSON structure. Authentication middleware and proxy errors may have an empty or different body; check the HTTP status before parsing JSON.
 
 ```json
 {
-  "code": 400,
-  "message": "Bad Request",
+  "code": 40001,
+  "message": "Validation failed",
   "error": {
     "field": "productId",
     "reason": "Product ID is required"
@@ -35,14 +37,35 @@ When an error occurs, the response body contains a JSON object with the followin
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `code` | integer | HTTP status code |
+| `code` | integer | Application error code; different from the HTTP status |
 | `message` | string | A human-readable error message |
 | `error.field` | string | The parameter that caused the error (if applicable) |
 | `error.reason` | string | Detailed explanation of what went wrong |
 
 <Note>
-  The `error` object is only present for validation errors (400). Other error types only include `code` and `message`.
+  `error` is optional. It is included when a field detail is available; `field` and `reason` may also be omitted independently. Do not depend on exact message text.
 </Note>
+
+## Application Error Codes
+
+| Code | Meaning |
+| --- | --- |
+| `40001` | Invalid request or validation failure |
+| `40101` | Application-level unauthorized error |
+| `40102` | Token expired |
+| `40103` | Invalid API key |
+| `40301` | Forbidden |
+| `40401` | Resource not found |
+| `40901` | Conflict |
+| `40902` | Idempotency conflict |
+| `42901` | Rate limit exceeded |
+| `50001` | Internal server error |
+| `50002` | External service error (HTTP `503`) |
+| `60006` | Product not found |
+| `60007` | Checkout expired |
+| `60008` | Order not found |
+
+These codes identify the error condition. Business errors can use HTTP `400`; do not infer the HTTP status from the first digits of `code`.
 
 ## Common Errors
 
@@ -52,7 +75,7 @@ Returned when the request body or parameters are invalid.
 
 ```json
 {
-  "code": 400,
+  "code": 40001,
   "message": "Bad Request",
   "error": {
     "field": "price",
@@ -63,14 +86,7 @@ Returned when the request body or parameters are invalid.
 
 ### 401 Unauthorized
 
-Returned when the API key is missing or invalid.
-
-```json
-{
-  "code": 401,
-  "message": "Unauthorized"
-}
-```
+Returned when the API key is missing or rejected. The authentication entrypoint does not guarantee a JSON body. If an application-level unauthorized error returns JSON, its `code` is `40101`.
 
 ### 404 Not Found
 
@@ -78,19 +94,19 @@ Returned when the requested resource does not exist.
 
 ```json
 {
-  "code": 404,
-  "message": "Not Found"
+  "code": 40401,
+  "message": "Resource not found"
 }
 ```
 
 ### 429 Too Many Requests
 
-Returned when you exceed the API rate limit (100 requests per minute).
+Returned when a configured rate limit is exceeded. Defaults are **100 requests per minute per IP** for general API requests and **60 checkout creations per minute per authenticated merchant** for `POST /v1/checkouts`. These limits are configurable and are not a guaranteed production quota.
 
 ```json
 {
-  "code": 429,
-  "message": "Too Many Requests"
+  "code": 42901,
+  "message": "Rate limit exceeded. Try again later."
 }
 ```
 
@@ -100,7 +116,7 @@ Returned when you exceed the API rate limit (100 requests per minute).
 
 ## Success Response Format
 
-Successful responses always include `code: 0` and `message: "success"`:
+Public merchant JSON API success responses include `code: 0` and `message: "success"`. Epay compatibility responses and file downloads follow their endpoint-specific formats.
 
 ```json
 {

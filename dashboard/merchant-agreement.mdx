@@ -1,0 +1,44 @@
+---
+title: Merchant agreement
+description: Accept the merchant services agreement during verification or a signing reminder
+language: en
+audience: merchant
+product_area: compliance
+intent: how-to
+visibility: public
+last_verified_at: 2026-10-01
+source_owner: product
+---
+
+The Merchant Services Agreement is accepted during KYC or KYB submission. Existing merchants may also receive a signing reminder in the dashboard. Reading the public agreement or loading the latest text does not record acceptance.
+
+## Sign during verification
+
+1. Complete the required information on [KYC](/dashboard/kyc) or [KYB](/dashboard/kyb) and submit it.
+2. Review the agreement dialog, including the signing party, legal name, authorized signer and registered email. A personal KYC submission can use the business party already associated with the account; check the party actually displayed.
+3. Read the agreement version and effective date. Confirm that the displayed signer is operating personally and has authority to accept for the merchant.
+4. Select the acceptance checkbox at the bottom, then choose **Agree and submit verification**.
+5. Check the verification submission result and review status.
+
+If a valid acceptance for the current version and same party is available, the dialog displays that record and can reuse it. If the legal party or document changes, read and confirm the updated agreement. Use **Return to edit information** if the displayed details are incorrect.
+
+Acceptance is associated with the displayed version, document and signing party. Kyren retains the acceptance evidence and generates a signed PDF in the backend. Contact support for assistance with a signing record; this workflow does not provide a dashboard PDF download button.
+
+Signing does not approve KYC or KYB. Verification remains subject to a separate review.
+
+## Signing reminders and grace periods
+
+When a reminder appears, choose **Sign now**, review the current agreement, select the acceptance checkbox and submit. Check that the reminder clears after acceptance. If the content has changed, the dialog reloads it and asks you to read and confirm again.
+
+Any grace deadline is shown in Hong Kong time. Where enforcement applies, an unsigned merchant past that deadline cannot create new Checkout or EPay payments, generate or regenerate an API key, or enable a bound payment method. Existing orders and refund handling, dispute viewing, balances, settlement requests and settlement accounts remain accessible, subject to their own account and verification requirements.
+
+An unsigned agreement may also block approval of a pending verification when that requirement applies. Signing preserves the existing verification materials and submission status; it allows review to continue.
+
+If the agreement or signing party cannot load, use the reload action. If acceptance fails, the party is incorrect, or the reminder remains after a successful submission, contact Kyren support with your merchant ID, displayed version, time and error message.
+
+## Related pages
+
+- [KYC](/dashboard/kyc)
+- [KYB](/dashboard/kyb)
+- [Payment methods](/dashboard/payment-methods)
+- [Funds](/dashboard/funds)

@@ -40,7 +40,7 @@ Optional parameters:
 | `display_merchant_name` | Per-payment merchant display name shown on Kyren intermediate payment pages. |
 | `param` | Passthrough merchant metadata returned in notifications. |
 | `userId` | Optional merchant user identifier passed to the payment gateway when supported. |
-| `channel_param` | Optional JSON string for channel-specific fields. |
+| `channel_param` | Optional channel-extension JSON string for non-credit-card payment types. When `type=creditcard`, its original value is included in the Epay signature but Kyren completely ignores it after signature verification. Do not send card number, expiry date, CVV, billing details, or contact information in `channel_param`; the buyer enters card details on a Kyren or upstream hosted page. Top-level `email`, `phone`, and `userId` parameters are unaffected. |
 
 ## Example request
 

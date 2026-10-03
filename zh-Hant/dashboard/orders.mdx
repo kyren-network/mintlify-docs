@@ -6,7 +6,7 @@ audience: merchant
 product_area: order
 intent: how-to
 visibility: public
-last_verified_at: 2026-05-26
+last_verified_at: 2026-10-01
 source_owner: product
 ---
 
@@ -33,9 +33,21 @@ source_owner: product
 
 對於已支付或已結款訂單，已啟用退款權限的商戶可以從訂單詳情頁提交退款申請。對帳退款訂單時，請同時查看退款申請狀態、退款記錄狀態和 `order.refunded` Webhook 事件。
 
+## 金額與手續費分擔
+
+訂單金額是原始商品金額，應付金額包含客戶承擔的手續費。分別查看商戶和客戶承擔的費率、每筆固定手續費及 USD 費用金額。每筆固定手續費以 USD 設定。[支付方式](/zh-Hant/dashboard/payment-methods)中的設定修改不會重寫已有訂單的費用快照。
+
+應付金額不等於商戶淨收入。請結合費用分擔、保證金、匯率及實際 USD 結算金額，與[資金](/zh-Hant/dashboard/funds)對帳。已關閉和支付失敗訂單隱藏費用詳情；費用或結算金額為空不能證明已收到款項。
+
+## 爭議訂單
+
+訂單存在爭議敞口或已記錄拒付影響時，可能顯示 `DISPUTED` 或 `CHARGEBACK`。在[爭議案件](/zh-Hant/dashboard/disputes)中查看關聯案件、截止時間及實際凍結或扣除金額。案件狀態與已完成的資金操作可能不同，請核對資金記錄，不要僅憑案件狀態判斷資金已釋放。
+
 ## 相關頁面
 
 - [訂單列表 API 參考](/api-reference/orders/list-all-orders)
 - [取得訂單 API 參考](/api-reference/orders/retrieve-an-order)
 - [訂單退款](/zh-Hant/dashboard/order-refunds)
+- [支付方式](/zh-Hant/dashboard/payment-methods)
+- [爭議案件](/zh-Hant/dashboard/disputes)
 - [Webhook 事件](/zh-Hant/webhooks/events)

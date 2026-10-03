@@ -1,0 +1,79 @@
+---
+title: "配置 sub2api"
+description: "使用 sub2api 内置易支付服务商接入启润支付，完成余额充值。"
+language: zh
+audience: developer
+product_area: epay
+intent: how-to
+visibility: public
+last_verified_at: 2026-10-01
+source_owner: engineering
+---
+
+通过 sub2api 内置的 **EasyPay（易支付）** 服务商接入启润支付，收取余额充值款。本指南适用于 [Wei-Shaw/sub2api 提交 `42bc7f6`](https://github.com/Wei-Shaw/sub2api/tree/42bc7f6cffe24bcb471608e48e66b4a0afa1f882)，核验日期为 2026 年 10 月 1 日。旧版本和分支的配置可能不同，请先确认已安装版本包含内置服务商及下列字段。
+
+## 接入准备
+
+- 启润商户已绑定所需支付服务商，相关凭据有效。仅启用该商户实际开通的支付方式。
+- 获取商户账号 ID，作为 `pid`；获取当前完整的 `kyren_live_...` API Key，作为商户密钥。使用包含前缀的原始值，不使用脱敏值或 Webhook Secret。仅在管理员配置中保存密钥。
+- 为 sub2api 配置公网 HTTPS 域名，例如 `https://ai.example.com`，并将支付通知路径转发到后端。
+
+参见[开发者设置](/zh/dashboard/developer-settings)和 [Epay 兼容接入](/zh/epay-migration/overview)。
+
+## 配置支付服务商
+
+进入 **管理员 > 系统设置 > 支付设置**，启用的服务商选择易支付。接着在服务商管理中，添加并启用 **EasyPay** 服务商实例。
+
+启润商户账号ID(PID)，PKey，都可以在启润商户后台 > 开发者工具 > API Keys 页面中获取。
+
+| sub2api 配置 | 填写值 |
+| --- | --- |
+| 服务商 | `easypay` / EasyPay |
+| 实例名称 | `启润支付` |
+| PID（`pid`） | 启润商户账号 ID |
+| PKey（`pkey`） | 当前完整的 `kyren_live_...` API Key |
+| API 地址（`apiBase`） | `https://api.kyrenpay.com/epay` |
+| 支付模式（`payment_mode`） | `popup` 为浏览器托管收银台，`qrcode` 为服务端创建支付 |
+| 异步通知基础地址 | `https://ai.example.com` |
+| 返回页面基础地址 | `https://ai.example.com` |
+| 支付宝 / 微信渠道 ID（`cidAlipay`、`cidWxpay`） | 留空 |
+
+通知地址编辑器会追加固定路径。完整通知地址为 `https://ai.example.com/api/v1/payment/webhook/easypay`，返回地址为 `https://ai.example.com/payment/result`；基础地址输入框只填写域名，不重复填写路径。`popup` 拼接 `/epay/submit.php`，`qrcode` 请求 `/epay/mapi.php`，服务商会规范化 API 基础地址后追加端点。[配置字段](https://github.com/Wei-Shaw/sub2api/blob/42bc7f6cffe24bcb471608e48e66b4a0afa1f882/frontend/src/components/payment/providerConfig.ts)、[通知地址编辑器](https://github.com/Wei-Shaw/sub2api/blob/42bc7f6cffe24bcb471608e48e66b4a0afa1f882/frontend/src/components/payment/PaymentProviderDialog.vue)、[易支付客户端](https://github.com/Wei-Shaw/sub2api/blob/42bc7f6cffe24bcb471608e48e66b4a0afa1f882/backend/internal/payment/provider/easypay.go)。
+
+## 选择支付方式
+
+按商户开通情况选择内置的 `alipay` 和 / 或 `wxpay`。核验版本还提供**自定义支付方式**编辑器。需要其他已记录的启润支付方式时，添加以下本地类型与上游类型映射，并勾选新增的支持方式：
+
+| 本地类型 | 上游类型 | 显示名称 |
+| --- | --- | --- |
+| `creditcard` | `creditcard` | 银行卡 |
+| `crypto` | `crypto` | 加密货币 |
+| `paynow` | `paynow` | PayNow |
+
+不要照搬其他网关的类型别名或渠道 ID。可用性仍取决于启润商户的服务商绑定。若已安装版本没有自定义方式编辑器，先核验或升级该版本，再向用户展示这些方式。[自定义编辑器与序列化](https://github.com/Wei-Shaw/sub2api/blob/42bc7f6cffe24bcb471608e48e66b4a0afa1f882/frontend/src/components/payment/PaymentProviderDialog.vue)。
+
+## 设置付款金额与入账余额
+
+此易支付客户端不发送 `money_type`，启润因此将 `money` 解释为 **CNY**。修改币种显示或商品名称后缀不会改变请求币种。
+
+余额充值入账为 `充值金额 × 余额充值倍率`，四舍五入到两位小数。软件另设的充值附加费会增加 Epay 请求金额，附加费向上取整到分。首次验证可设 `payment_balance_recharge_multiplier = 1`、`payment_recharge_fee_rate = 0`：充值金额 `10.00` 时，发送 **CNY 10.00** 的 Epay 基础金额，增加 **10.00 余额单位**。公开充值前应确定自己的换算政策；美元余额显示不会自动换汇。[订单计算](https://github.com/Wei-Shaw/sub2api/blob/42bc7f6cffe24bcb471608e48e66b4a0afa1f882/backend/internal/service/payment_order.go)、[余额倍率](https://github.com/Wei-Shaw/sub2api/blob/42bc7f6cffe24bcb471608e48e66b4a0afa1f882/backend/internal/service/payment_amounts.go)、[附加费取整](https://github.com/Wei-Shaw/sub2api/blob/42bc7f6cffe24bcb471608e48e66b4a0afa1f882/backend/internal/payment/fee.go)。
+
+Epay 基础金额不一定等于最终收银总额。启润可能按支付渠道的费用分担设置增加客户承担的费用；只有不增加此类费用时，示例的最终总额才是 **CNY 10.00**。Epay 通知和订单查询的 `money` 返回基础金额，sub2api 根据已保存的余额金额入账，不会把额外费用计入余额。应分别核对基础金额、收银台总额和预期入账余额。
+
+## 验证付款和入账
+
+1. 保存配置，以测试用户创建一笔小额充值，记录商户订单号 `out_trade_no`、Epay 基础金额、收银台显示的 CNY 总额和充值前余额。
+2. 完成付款，在启润确认对应订单已付款，同时检查 sub2api 支付订单和预期余额增量。
+3. 确认后端在 `/api/v1/payment/webhook/easypay` 收到签名 GET 通知，校验 Epay MD5 签名及 `TRADE_SUCCESS`，并返回纯文本 `success`。
+4. 确认同一订单的重复通知不会再次增加余额。浏览器返回页面或 HTTP `success` 本身不能证明已入账，需要同时核对订单与余额记录。
+
+内置处理器支持 GET 通知，通过服务商验证签名。未知订单也可能收到成功应答，因此启润已付款但余额未增加时，应检查后端日志。[通知路由](https://github.com/Wei-Shaw/sub2api/blob/42bc7f6cffe24bcb471608e48e66b4a0afa1f882/backend/internal/server/routes/payment.go)、[通知处理器](https://github.com/Wei-Shaw/sub2api/blob/42bc7f6cffe24bcb471608e48e66b4a0afa1f882/backend/internal/handler/payment_webhook_handler.go)。参见 [Epay MD5 签名](/zh/epay-migration/signature)和[已付款但未入账](/zh/troubleshooting/paid-but-not-credited)。
+
+## 常见配置问题
+
+- **地址错误：** API 基础地址保留 `/epay/`，不填写商户控制台地址或完整的 `submit.php` 地址。
+- **服务端创建被拒绝：** 启润启用 API IP 白名单时，将 sub2api 服务器的出口 IP 加入白名单，以便调用 `mapi.php`。浏览器 `submit.php` 收银无需添加每位客户的 IP。
+- **收不到通知：** 确保 HTTPS 通知地址可从公网访问，保留 GET 查询参数，直接转发后端，不跳转登录页或触发浏览器验证。
+- **更换密钥后验签失败：** 重新生成启润 API Key 会使旧密钥失效。立即更新 PKey，并验证新付款和待处理通知。不要在支持工单中公开密钥。
+
+本指南已核对源代码，尚不代表在你的部署上完成了真实付款测试。

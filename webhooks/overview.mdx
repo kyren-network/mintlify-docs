@@ -3,7 +3,7 @@ title: Webhook Overview
 description: Receive real-time payment notifications via webhooks
 ---
 
-Webhooks allow Kyren Pay to send real-time notifications to your server when events happen in your account — such as a successful payment or a completed payout.
+Webhooks allow Kyren Pay to notify your server when a payment or refund succeeds. See [Events](/webhooks/events) for supported events and optional dispute notifications.
 
 ## How Webhooks Work
 
@@ -17,14 +17,16 @@ sequenceDiagram
     KyrenPay->>KyrenPay: Process payment
     KyrenPay->>YourServer: POST webhook (signed)
     YourServer->>YourServer: Verify signature
-    YourServer->>YourServer: Process event
+    YourServer->>YourServer: Persist event to durable inbox
     YourServer-->>KyrenPay: 200 OK
+    YourServer->>YourServer: Process event with worker retries
 ```
 
 1. An event occurs (e.g., a customer completes a payment)
 2. Kyren Pay sends an HTTP POST request to your configured webhook URL
 3. The request includes a signature for verification
-4. Your server processes the event and returns a `200` response
+4. Your server verifies the signature, persists the event, and returns `200` within 10 seconds
+5. Your worker processes the persisted event with idempotency and its own retries
 
 ## Configuring Webhooks
 
@@ -38,7 +40,7 @@ Set up your webhook endpoint in the [Merchant Dashboard](https://merchant.kyrenp
   Your webhook URL must:
   - Use HTTPS (required for production)
   - Be publicly accessible
-  - Return a `2xx` response within 30 seconds
+  - Complete a `2xx` response within 10 seconds, after durable persistence succeeds
 </Warning>
 
 ## Webhook Payload
@@ -49,7 +51,7 @@ Every webhook request includes these headers:
 | --- | --- |
 | `Content-Type` | `application/json` |
 | `X-Kyren-Signature` | HMAC-SHA256 signature for verification |
-| `X-Kyren-Timestamp` | Unix timestamp when the webhook was sent |
+| `X-Kyren-Timestamp` | Unix timestamp in milliseconds when the webhook was sent |
 
 The request body is a JSON object:
 
@@ -66,7 +68,7 @@ The request body is a JSON object:
     "currency": "USD",
     "net_amount": "9.29",
     "paid_at": 1736932500000,
-    "metadata": {}
+    "metadata": null
   }
 }
 ```
@@ -78,13 +80,13 @@ The request body is a JSON object:
     Always verify the `X-Kyren-Signature` header to ensure the webhook is authentic. See [Webhook Signatures](/webhooks/signatures).
   </Card>
   <Card title="Return 200 Quickly" icon="clock">
-    Return a `200` response as soon as you receive the webhook. Process the event asynchronously if it takes more than a few seconds.
+    Verify the signature and durably store the event before returning `200`. Return non-`2xx` if persistence fails, so Kyren can retry.
   </Card>
   <Card title="Handle Duplicates" icon="copy">
     Use the event `id` to deduplicate. Your endpoint may receive the same event more than once due to retries.
   </Card>
   <Card title="Use a Queue" icon="list">
-    For production, consider pushing webhook events to a message queue (e.g., RabbitMQ, SQS) for reliable processing.
+    For asynchronous processing, persist to a durable inbox or queue and acknowledge only after storage succeeds. Workers need their own retries after Kyren receives `2xx`.
   </Card>
 </CardGroup>
 

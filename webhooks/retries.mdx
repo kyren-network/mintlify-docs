@@ -7,26 +7,25 @@ If your webhook endpoint doesn't respond with a `2xx` status code, Kyren Pay wil
 
 ## Retry Schedule
 
-Kyren Pay retries failed webhooks up to **7 times**:
+For order and dispute events described in this guide, Kyren Pay makes up to **7 delivery attempts in total: the initial attempt plus 6 retries**.
 
 | Attempt | Delay After Failure |
 | --- | --- |
-| 1st retry | 30 seconds |
-| 2nd retry | 30 seconds |
-| 3rd retry | 1 minute |
-| 4th retry | 1 minute |
-| 5th retry | 30 minutes |
-| 6th retry | 30 minutes |
-| 7th retry | 30 minutes |
+| 1st retry | 1 minute |
+| 2nd retry | 5 minutes |
+| 3rd retry | 15 minutes |
+| 4th retry | 1 hour |
+| 5th retry | 6 hours |
+| 6th retry | 24 hours |
 
-After 7 failed attempts, the webhook is marked as **failed** and no further retries are attempted.
+Each delay is measured from the preceding failed attempt; actual dispatch may occur later. After 7 failed delivery attempts, the webhook is marked as **failed** and automatic retries stop.
 
 ## What Counts as a Failure
 
 A webhook delivery is considered failed if:
 
 - Your endpoint returns a non-`2xx` HTTP status code (e.g., `400`, `500`)
-- Your endpoint doesn't respond within **30 seconds**
+- Your endpoint doesn't complete its response within **10 seconds**
 - The connection to your server fails (DNS error, connection refused, timeout)
 
 <Info>
@@ -39,53 +38,48 @@ Since webhooks may be retried, your endpoint should be **idempotent** — proces
 
 ### Use Event IDs for Deduplication
 
-Every webhook event has a unique `id` field. Store processed event IDs and skip duplicates:
+Every webhook event has a unique `id` field. Store processed event IDs durably, with a unique constraint, and commit the business change and processed marker in the same transaction:
 
 ```javascript
-const processedEvents = new Set(); // Use a database in production
-
-app.post('/webhooks/kyren', (req, res) => {
+app.post('/webhooks/kyren', async (req, res) => {
   // ... verify signature ...
 
   const event = JSON.parse(req.body.toString());
 
-  // Check if we've already processed this event
-  if (processedEvents.has(event.id)) {
-    console.log(`Duplicate event ${event.id}, skipping`);
-    return res.status(200).send('OK');
+  try {
+    await database.transaction(async tx => {
+      // Atomic insert with a unique event ID; duplicates return false.
+      if (!await tx.processedEvents.insertIfAbsent(event.id)) return;
+      await processEvent(tx, event);
+    });
+    res.status(200).send('OK');
+  } catch (error) {
+    res.status(500).send('Retry later');
   }
-
-  // Process the event
-  processEvent(event);
-
-  // Mark as processed
-  processedEvents.add(event.id);
-
-  res.status(200).send('OK');
 });
 ```
 
 <Tip>
-  In production, store processed event IDs in a database (e.g., Redis or your primary database) rather than in-memory.
+  The database methods above illustrate the transaction contract; adapt them to your storage system. Also protect the business operation with a stable identifier, such as `order_id` for payment fulfillment or `refund_id` for a refund. For dispute updates, do not deduplicate only by case ID because one case can have multiple updates.
 </Tip>
 
 ### Return 200 Quickly
 
-Return a `200` response as soon as you receive and validate the webhook. If processing takes a long time, do it asynchronously:
+For long processing, validate the signature and durably persist the event in an inbox or queue before returning `200`. A worker can then process it with its own retries. If persistence fails, return a non-`2xx` response so Kyren can retry:
 
 ```javascript
-app.post('/webhooks/kyren', (req, res) => {
+app.post('/webhooks/kyren', async (req, res) => {
   // ... verify signature ...
 
   const event = JSON.parse(req.body.toString());
 
-  // Respond immediately
-  res.status(200).send('OK');
-
-  // Process asynchronously
-  processEventAsync(event).catch(err => {
-    console.error('Failed to process event:', err);
-  });
+  try {
+    // Resolves only after durable storage; event.id has a unique constraint.
+    await webhookInbox.insertIfAbsent(event.id, event);
+    res.status(200).send('OK');
+  } catch (error) {
+    res.status(503).send('Retry later');
+  }
 });
 ```
 
@@ -106,5 +100,5 @@ If you need Kyren to check delivery attempts, contact support with those details
 | --- | --- |
 | Not receiving webhooks | Check your webhook URL is correct and publicly accessible |
 | Signature verification fails | Ensure you're using the raw request body (not parsed JSON) |
-| Frequent timeouts | Respond with `200` immediately and process events asynchronously |
+| Frequent timeouts | Persist to a durable inbox or queue, return `200` within 10 seconds, then process with worker retries |
 | Duplicate events | Implement idempotency using the event `id` field |

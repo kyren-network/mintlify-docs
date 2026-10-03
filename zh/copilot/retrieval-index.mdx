@@ -6,7 +6,7 @@ audience: copilot
 product_area: copilot
 intent: retrieval_index
 visibility: public
-last_verified_at: 2026-05-27
+last_verified_at: 2026-10-01
 source_owner: support
 ---
 
@@ -27,6 +27,8 @@ source_owner: support
 | --- | --- | --- |
 | 集成路径 | [开始使用](/zh/start-here)、[快速开始](/zh/quickstart)、[收第一笔款](/zh/guides/collect-first-payment) | 首次使用和接入路径问题的最佳来源。 |
 | 控制台工作流 | [产品](/zh/dashboard/products)、[Checkout](/zh/dashboard/checkouts)、[订单](/zh/dashboard/orders)、[开发者设置](/zh/dashboard/developer-settings) | 商户使用控制台时的最佳来源。 |
+| 系统接入 | [sub2api](/zh/integrations/sub2api), [new-api](/zh/integrations/new-api) | 现有 AI 网关的支付配置、回调和金额单位说明。 |
+| 账户操作 | [支付方式](/zh/dashboard/payment-methods), [商户服务协议](/zh/dashboard/merchant-agreement), [争议案件](/zh/dashboard/disputes) | 支付方式设置、协议签署和争议处理。 |
 | API 基础 | [认证](/zh/authentication)、[错误](/zh/errors)、[测试](/zh/testing)、[代码示例](/zh/guides/code-examples) | API 设置和通用集成细节的最佳来源。 |
 | Webhook | [Webhook 概览](/zh/webhooks/overview)、[事件](/zh/webhooks/events)、[签名](/zh/webhooks/signatures)、[重试](/zh/webhooks/retries) | 事件处理和 Webhook 验证的最佳来源。 |
 | 故障排除 | 所有 [故障排除](/zh/troubleshooting/api-401) 页面 | 诊断、可能原因、安全修复和支持交接的最佳来源。 |
@@ -40,7 +42,7 @@ source_owner: support
 
 | API 区域 | 页面 |
 | --- | --- |
-| Config | [获取支持币种](/api-reference/config/get-supported-currencies) |
+| Config | [获取支持币种](/api-reference/config/get-supported-currencies), [结算配置](/api-reference/config/get-settlement-configuration), [法律配置](/api-reference/config/get-legal-configuration), [当前商户服务协议](/api-reference/config/get-current-merchant-services-agreement), [历史商户服务协议](/api-reference/config/get-historical-merchant-services-agreement) |
 | Products | [列出产品](/api-reference/products/list-all-products)、[创建产品](/api-reference/products/create-a-product)、[获取产品](/api-reference/products/retrieve-a-product)、[归档产品](/api-reference/products/archive-a-product)、[更新产品](/api-reference/products/update-a-product) |
 | Checkouts | [创建 Checkout Session](/api-reference/checkouts/create-a-checkout-session)、[获取 Checkout Session](/api-reference/checkouts/retrieve-a-checkout-session) |
 | Orders | [列出订单](/api-reference/orders/list-all-orders)、[获取订单](/api-reference/orders/retrieve-an-order)、[导出订单 CSV](/api-reference/orders/export-orders-as-csv) |
