@@ -16,6 +16,8 @@ source_owner: support
 
 ## 常見原因
 
+Checkout API 回傳 `401` 時，先檢查 `x-api-key`、憑證所屬環境和伺服器出口 IP 白名單，不要先修改產品或 Session 參數。伺服器憑證要求見[快速開始](/zh-Hant/quickstart)。
+
 - 缺少 `x-api-key` 請求標頭，或請求標頭為空。
 - API Key 無效、已過期，或已輪換。
 - 請求使用了錯誤環境的 Key。

@@ -15,9 +15,13 @@ description: 5 分钟内完成第一笔收款
 - 一个可以安全保存 API 密钥的服务端环境
 - 上线前用于接收付款通知的 Webhook 端点
 
+一次性收款要求产品为 `ACTIVE`、商户托管收银台已启用，且至少一个启用的渠道支持产品币种和金额；适用时还需解除商户协议限制。创建产品成功不代表已有可用支付方式。当前单笔上限为 USD 630.00、CNY 4,000.00、HKD 5,000.00、IDR 10,000,000.00，渠道或商户限额可能更低。已配置 API IP 白名单时，允许业务服务器的出口 IP。
+
+首笔付款前，在**开发者工具 > Webhook 设置**配置公网 HTTPS Webhook URL 并取得独立的 Webhook Secret；它不是 API Key。未配置时不会创建普通 `order.paid` 通知事件，事后配置不会自动补发。
+
 ## 第一步：获取 API 密钥
 
-注册后，前往 **控制台 > 开发者**，复制你的 API 密钥。
+注册后，前往 **控制台 > 开发者工具 > API Keys**。完整密钥仅在生成时显示，使用妥善保存的原始值，不使用脱敏显示值；重新生成会立即使旧密钥失效。
 
 - **生产密钥**：`kyren_live_xxxxxxxxxxxx` — 用于正式收款
 
@@ -41,7 +45,7 @@ curl -X POST https://api.kyrenpay.com/v1/products \
   }'
 ```
 
-保存响应中的 `id`，后续创建 Checkout Session 时需要用到。
+保存 JSON 响应中的 `data.id`。例如 `{ "code": 0, "message": "success", "data": { "id": "prod_abc123" } }` 展示响应包装结构，其他产品字段已省略。
 
 ## 第三步：创建 Checkout Session
 
@@ -55,13 +59,16 @@ curl -X POST https://api.kyrenpay.com/v1/checkouts \
     "productId": "prod_abc123",
     "successUrl": "https://yoursite.com/success",
     "cancelUrl": "https://yoursite.com/cancel",
-    "displayMerchantName": "Campaign Store"
+    "displayMerchantName": "Campaign Store",
+    "metadata": { "businessOrderId": "purchase_123", "userId": "user_123" }
   }'
 ```
 
 当本次 Checkout 需要展示不同于商户账户名称的活动、店铺或应用名称时，可以传入 `displayMerchantName`。
 
-响应中包含 `url` 字段 — 将客户重定向到该 URL 即可完成付款。
+响应为 `{ "code": 0, "message": "success", "data": { ... } }`。读取 `data.id`、`data.url`、`data.amount`、`data.currency` 和 `data.expiresAt`（Unix 毫秒），与服务端生成的业务订单关联并持久化后，才向浏览器返回 URL。产品 ID、用户身份和 metadata 必须来自可信服务端记录。Session 金额和币种来自产品，不支持覆盖价格、数量或币种。
+
+每笔业务购买创建一个待付款 Session，重复点击复用它；有效期为 24 小时。创建 API 没有幂等键，应持久化创建占位，超时或本地保存失败时先对账，不自动再次创建。详见[完整示例](/zh/guides/collect-first-payment)。
 
 ## 第四步：重定向到收银台
 
@@ -69,41 +76,67 @@ curl -X POST https://api.kyrenpay.com/v1/checkouts \
 
 ```javascript
 // 示例：在你的 Web 应用中重定向
-window.location.href = checkoutResponse.data.url;
+// checkoutUrl 由已认证的业务后端提供，来自 Kyren 响应的 data.url。
+window.location.href = checkoutUrl;
 ```
 
 ## 第五步：处理 Webhook
 
-付款完成后，启润支付会向你的服务器发送 Webhook：
+付款完成后，启润支付会向已配置的 Webhook URL 发送签名 JSON POST。原始请求体路由必须先于任何全局 JSON 解析器注册。下列路由需要[签名验证函数](/zh/webhooks/signatures)和[完整示例](/zh/guides/collect-first-payment)中说明的持久化通知适配器：
 
 ```javascript
-// Express.js 示例
-app.post('/webhooks/kyren', express.raw({ type: 'application/json' }), (req, res) => {
-  const signature = req.headers['x-kyren-signature'];
-  const timestamp = req.headers['x-kyren-timestamp'];
-  const payload = req.body.toString();
+const crypto = require('crypto');
 
-  // 验证签名（详见 Webhook 签名验证章节）
-  if (!verifySignature(payload, signature, timestamp)) {
-    return res.status(400).send('Invalid signature');
+function verifyWebhookSignature(payload, signature, timestamp, secret) {
+  if (typeof secret !== 'string' || !secret) return false;
+  if (typeof signature !== 'string' || !/^sha256=[0-9a-f]{64}$/.test(signature)) return false;
+  if (typeof timestamp !== 'string' || !/^\d+$/.test(timestamp)) return false;
+  const sentAt = Number(timestamp);
+  if (!Number.isSafeInteger(sentAt) || Math.abs(Date.now() - sentAt) > 300000) return false;
+  const data = `${timestamp}.${payload}`;
+  const expected = 'sha256=' + crypto
+    .createHmac('sha256', secret)
+    .update(data)
+    .digest('hex');
+
+  return crypto.timingSafeEqual(
+    Buffer.from(expected),
+    Buffer.from(signature)
+  );
+}
+
+app.post('/webhooks/kyren',
+  express.raw({ type: 'application/json' }),
+  async (req, res) => {
+    const signature = req.headers['x-kyren-signature'];
+    const timestamp = req.headers['x-kyren-timestamp'];
+    if (!Buffer.isBuffer(req.body)) return res.status(400).send('Raw JSON body required');
+    const payload = req.body.toString('utf8');
+
+    if (!verifyWebhookSignature(payload, signature, timestamp, process.env.KYREN_WEBHOOK_SECRET)) {
+      return res.status(400).send('Invalid signature');
+    }
+
+    let event;
+    try { event = JSON.parse(payload); } catch { return res.status(400).send('Invalid JSON'); }
+    if (!event || typeof event.id !== 'string' || !event.id || typeof event.type !== 'string' || !event.data) {
+      return res.status(400).send('Invalid event');
+    }
+    try {
+      await webhookInbox.insertIfAbsent(event.id, event);
+    } catch {
+      return res.status(503).send('Retry later');
+    }
+    res.status(200).send('OK');
   }
-
-  const event = JSON.parse(payload);
-
-  if (event.type === 'order.paid') {
-    const orderId = event.data.order_id;
-    const amount = event.data.amount;
-    // 在你的系统中完成订单
-    console.log(`收到付款: ${amount} ${event.data.currency}`);
-  }
-
-  res.status(200).send('OK');
-});
+);
 ```
 
 <Info>
-  在 **控制台 > 开发者 > Webhook 设置** 中配置你的 Webhook URL。
+  在 **控制台 > 开发者工具 > Webhook 设置** 中配置 Webhook URL。验签、持久化成功后，在 10 秒内返回 `2xx`。持久化工作进程负责履约失败重试，按事件 ID 去重，并以 Kyren 订单 ID 唯一约束和数据库事务保证每笔业务订单只入账一次。
 </Info>
+
+`successUrl` 和 `cancelUrl` 是浏览器导航，不是付款凭证。服务端查询 `GET /v1/checkouts/{id}`：`OPEN` 为待付款，`COMPLETE` 包含成功关联的 `orderId`，`EXPIRED` 为会话过期。遗漏通知时，通过 `GET /v1/orders/{orderId}` 核对付款及产品、基础金额、币种和 metadata 关联，再调用与 Webhook 相同的幂等入账事务。创建 Session 时不返回 `orderId`，不要自行拼接收银台 URL。`successUrl` 必填，`cancelUrl` 可选。
 
 ## 下一步
 

@@ -14,6 +14,8 @@ source_owner: support
 
 Your server calls a Kyren Pay API endpoint and receives `401 Unauthorized`.
 
+If your Checkout API call returns `401`, check authentication before changing product or Session parameters. Check the `x-api-key` header, the credential's environment and your server's IP allowlist entry. See [Checkout Quickstart](/quickstart) for the required server-side credentials.
+
 ## Likely causes
 
 - The `x-api-key` header is missing or empty.

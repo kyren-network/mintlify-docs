@@ -39,52 +39,53 @@ The signature and timestamp are sent in HTTP headers:
 
 ## Code Examples
 
+Register the raw Webhook route before any global JSON parser, or parse JSON only on regular routes. Verify headers and the original body before parsing the event. The examples below require your durable inbox adapter: uniquely save an event ID and pending payload before returning `2xx`; a worker must retry and fulfill idempotently. Invalid headers return a rejection, not an unhandled exception. Each retry uses a fresh sending timestamp; use the header, not `created_at`, for signature verification.
+
 ### Node.js
 
 ```javascript
 const crypto = require('crypto');
 
 function verifyWebhookSignature(payload, signature, timestamp, secret) {
-  // Check timestamp tolerance (5 minutes)
-  const currentTime = Date.now();
-  if (Math.abs(currentTime - parseInt(timestamp)) > 300000) {
-    return false;
-  }
-
-  // Compute expected signature
+  if (typeof secret !== 'string' || !secret) return false;
+  if (typeof signature !== 'string' || !/^sha256=[0-9a-f]{64}$/.test(signature)) return false;
+  if (typeof timestamp !== 'string' || !/^\d+$/.test(timestamp)) return false;
+  const sentAt = Number(timestamp);
+  if (!Number.isSafeInteger(sentAt) || Math.abs(Date.now() - sentAt) > 300000) return false;
   const data = `${timestamp}.${payload}`;
   const expected = 'sha256=' + crypto
     .createHmac('sha256', secret)
     .update(data)
     .digest('hex');
 
-  // Constant-time comparison
-  try {
-    return crypto.timingSafeEqual(
-      Buffer.from(expected),
-      Buffer.from(signature)
-    );
-  } catch {
-    return false;
-  }
+  return crypto.timingSafeEqual(
+    Buffer.from(expected),
+    Buffer.from(signature)
+  );
 }
 
-// Usage in Express
 app.post('/webhooks/kyren',
   express.raw({ type: 'application/json' }),
-  (req, res) => {
-    const isValid = verifyWebhookSignature(
-      req.body.toString(),
-      req.headers['x-kyren-signature'],
-      req.headers['x-kyren-timestamp'],
-      process.env.KYREN_WEBHOOK_SECRET
-    );
+  async (req, res) => {
+    const signature = req.headers['x-kyren-signature'];
+    const timestamp = req.headers['x-kyren-timestamp'];
+    if (!Buffer.isBuffer(req.body)) return res.status(400).send('Raw JSON body required');
+    const payload = req.body.toString('utf8');
 
-    if (!isValid) {
+    if (!verifyWebhookSignature(payload, signature, timestamp, process.env.KYREN_WEBHOOK_SECRET)) {
       return res.status(400).send('Invalid signature');
     }
 
-    // Process the event...
+    let event;
+    try { event = JSON.parse(payload); } catch { return res.status(400).send('Invalid JSON'); }
+    if (!event || typeof event.id !== 'string' || !event.id || typeof event.type !== 'string' || !event.data) {
+      return res.status(400).send('Invalid event');
+    }
+    try {
+      await webhookInbox.insertIfAbsent(event.id, event);
+    } catch {
+      return res.status(503).send('Retry later');
+    }
     res.status(200).send('OK');
   }
 );
@@ -96,9 +97,18 @@ app.post('/webhooks/kyren',
 import hmac
 import hashlib
 import time
+import re
 
 def verify_webhook_signature(payload: str, signature: str, timestamp: str, secret: str) -> bool:
     # Check timestamp tolerance (5 minutes)
+    if not isinstance(secret, str) or not secret:
+        return False
+    if not isinstance(signature, str) or not re.fullmatch(r"sha256=[0-9a-f]{64}", signature):
+        return False
+    if not isinstance(timestamp, str) or not re.fullmatch(r"[0-9]{1,16}", timestamp):
+        return False
+    if int(timestamp) > 9007199254740991:
+        return False
     current_time = int(time.time() * 1000)
     if abs(current_time - int(timestamp)) > 300000:
         return False
@@ -130,7 +140,12 @@ def webhook():
         return "Invalid signature", 400
 
     event = request.get_json()
-    # Process the event...
+    if not isinstance(event, dict) or not isinstance(event.get("id"), str) or not event["id"]:
+        return "Invalid event", 400
+    try:
+        webhook_inbox.insert_if_absent(event["id"], event)
+    except Exception:
+        return "Retry later", 503
 
     return "OK", 200
 ```
@@ -146,16 +161,22 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"encoding/json"
 	"math"
 	"net/http"
 	"strconv"
+	"regexp"
 	"time"
 )
 
 func verifyWebhookSignature(payload, signature, timestamp, secret string) bool {
+    if secret == "" || !regexp.MustCompile("^sha256=[0-9a-f]{64}$").MatchString(signature) ||
+        !regexp.MustCompile("^[0-9]+$").MatchString(timestamp) {
+        return false
+    }
 	// Check timestamp tolerance (5 minutes)
 	ts, err := strconv.ParseInt(timestamp, 10, 64)
-	if err != nil {
+	if err != nil || ts > 9007199254740991 {
 		return false
 	}
 	currentTime := time.Now().UnixMilli()
@@ -174,7 +195,11 @@ func verifyWebhookSignature(payload, signature, timestamp, secret string) bool {
 }
 
 func webhookHandler(w http.ResponseWriter, r *http.Request) {
-	body, _ := io.ReadAll(r.Body)
+    body, err := io.ReadAll(r.Body)
+    if err != nil {
+        http.Error(w, "Invalid body", http.StatusBadRequest)
+        return
+    }
 	payload := string(body)
 	signature := r.Header.Get("X-Kyren-Signature")
 	timestamp := r.Header.Get("X-Kyren-Timestamp")
@@ -184,7 +209,15 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Process the event...
+    var event struct { ID string `json:"id"` }
+    if json.Unmarshal(body, &event) != nil || event.ID == "" {
+        http.Error(w, "Invalid event", http.StatusBadRequest)
+        return
+    }
+    if err := persistWebhookIfAbsent(event.ID, body); err != nil {
+        http.Error(w, "Retry later", http.StatusServiceUnavailable)
+        return
+    }
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))
 }

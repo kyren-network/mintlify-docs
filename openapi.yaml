@@ -362,6 +362,12 @@ paths:
       description: |
         Creates a new checkout session for a product. Returns a URL where you can redirect
         your customer to complete the payment. Checkout sessions expire after 24 hours.
+        Amount and currency come from the active product; per-session price, currency and quantity
+        overrides are not supported. Hosted checkout must be enabled for the merchant.
+        Persist the session against your business order and reuse it on repeated purchase attempts.
+        Creation has no idempotency-key support: reconcile an uncertain creation result before retrying.
+        Configure the merchant Webhook URL and Secret before payment. Use the returned data.url directly;
+        browser success/cancel redirects are not payment confirmation.
       requestBody:
         required: true
         content:
@@ -392,7 +398,8 @@ paths:
                   amount: "9.99"
                   currency: "USD"
                   status: "OPEN"
-                  url: "https://payment.kyren.io/checkout/cs_xyz789"
+                  checkoutMode: "ONE_TIME"
+                  url: "https://payment.kyren.io/checkout/one-time/cs_xyz789"
                   expiresAt: 1736934000000
                   createdAt: 1736932200000
         "400":
@@ -407,7 +414,12 @@ paths:
       operationId: getCheckout
       tags: [Checkouts]
       summary: Retrieve a checkout session
-      description: Retrieves the details of an existing checkout session.
+      description: |
+        Retrieves a session belonging to the authenticated merchant. OPEN is awaiting payment,
+        COMPLETE indicates completion and exposes the associated successful orderId, and EXPIRED
+        indicates session expiry. orderId is omitted until a successful order is associated.
+        For payment reconciliation, retrieve that order and use the same idempotent fulfillment
+        transaction as Webhooks. Session expiry is not evidence that an existing payment attempt failed.
       parameters:
         - $ref: "#/components/parameters/ResourceId"
       responses:
@@ -1210,6 +1222,13 @@ components:
         customerName:
           type: string
           description: Pre-fill the customer's name on the checkout page
+        merchantCustomerId:
+          type: string
+          description: |
+            Optional stable merchant-side customer ID, also accepted as merchant_customer_id.
+            This is separate from metadata used to associate your business order for fulfillment.
+            For DOKU OVO, an explicitly identified end customer must already be registered with Kyren;
+            omit this field to use the hosted anonymous browser binding flow.
         displayMerchantName:
           type: string
           maxLength: 80
@@ -1218,7 +1237,11 @@ components:
           type: object
           additionalProperties:
             type: string
-          description: Arbitrary key-value pairs attached to the checkout and resulting order
+          description: |
+            Merchant-defined string values attached to the checkout, resulting order and payment
+            Webhook. Supply trusted server-side businessOrderId and userId values for reconciliation.
+            Product metadata is not automatically merged. Internal provider metadata keys are filtered
+            from Webhooks. Do not store secrets or card data here.
 
     CreateRefundRequest:
       type: object
@@ -1559,6 +1582,10 @@ components:
           type: string
         status:
           $ref: "#/components/schemas/CheckoutStatus"
+        checkoutMode:
+          type: string
+          enum: [ONE_TIME, SUBSCRIPTION]
+          description: Product billing mode; this guide's one-time integration uses ONE_TIME.
         orderId:
           type: string
           description: Kyren order ID for the final successful payment. Present only after the checkout has been linked to that order.

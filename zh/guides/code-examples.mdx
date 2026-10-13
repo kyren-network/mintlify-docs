@@ -101,6 +101,8 @@ func createProduct() {
 
 ## 创建 Checkout Session
 
+以下为服务端请求示例。使用已认证用户和服务端生成的业务订单 ID 设置 metadata；产品 metadata 不会自动复制到 Session。创建时不支持覆盖产品金额、币种或数量。读取 `response.data.data`（Axios）或响应 JSON 的 `data`，将 Session ID、URL、金额、币种和有效期持久化后才返回 URL 给浏览器。并发购买、创建结果不确定、通知入账和查单补偿的处理见[完整接入示例](/zh/guides/collect-first-payment)。不要在浏览器中运行含 API Key 的示例。
+
 <CodeGroup>
 ```bash cURL
 curl -X POST https://api.kyrenpay.com/v1/checkouts \

@@ -101,6 +101,8 @@ func createProduct() {
 
 ## Create a Checkout Session
 
+These are server-side request examples. Populate metadata with your authenticated user and server-generated business order ID; product metadata is not copied automatically. Session creation cannot override product amount, currency or quantity. Read Axios `response.data.data` or the JSON response's `data`, and durably associate its Session ID, URL, amount, currency and expiry with your business order before returning the URL to the browser. See the [full example](/guides/collect-first-payment) for concurrent purchases, uncertain creation outcomes, durable fulfillment and reconciliation. Never run API-key examples in a browser.
+
 <CodeGroup>
 ```bash cURL
 curl -X POST https://api.kyrenpay.com/v1/checkouts \

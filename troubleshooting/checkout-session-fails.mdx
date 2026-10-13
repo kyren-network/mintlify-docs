@@ -18,9 +18,9 @@ Creating a Checkout Session returns an error or no hosted checkout URL is create
 
 - The `product_id` does not exist or belongs to another merchant.
 - The product is archived and can no longer be used for new sessions.
-- The currency is not supported for the requested checkout.
-- Amount or price fields are sent as numbers instead of decimal strings.
-- `success_url` or `cancel_url` is missing or invalid.
+- Hosted Checkout is disabled for the merchant, or applicable merchant agreement restrictions remain unresolved.
+- The product amount exceeds per-order limits; payment also needs an enabled channel supporting its currency.
+- Required `successUrl` (also accepted as `success_url`) is missing or invalid. `cancelUrl` / `cancel_url` is optional; omitting it does not fail creation.
 - Authentication failed before the checkout request was processed.
 
 ## Check this in Kyren
@@ -32,14 +32,15 @@ Creating a Checkout Session returns an error or no hosted checkout URL is create
 
 ## Check this in your server
 
-- Send amount and price values as decimal strings, such as `"9.99"`.
-- Use a supported three-letter currency code such as `USD`.
-- Confirm `success_url` and `cancel_url` are absolute HTTPS URLs.
+- Create Checkout with `productId` and `successUrl`, without amount, quantity or currency overrides; the Session uses its product's price and currency.
+- When creating or updating a product, send `price` as a decimal string such as `"9.99"` and use an allowed three-letter currency code.
+- `successUrl` is required and accepts `http://` or `https://`; use absolute HTTPS URLs in production. If supplied, use a valid site URL for `cancelUrl` too.
+- If an API IP whitelist is configured, check your server's outbound IP. Read `data.id` and `data.url`, not top-level fields.
 - Log the request body and Kyren response status, excluding secrets.
 
 ## Fix
 
-Update the request to use an active product, a supported currency, decimal string amounts, valid redirect URLs, and a valid `x-api-key`.
+Use your merchant's active product, the required success URL and a valid `x-api-key`. Confirm hosted Checkout access, enabled channels, amount limits and applicable agreement status. Correct price and currency issues in the product configuration.
 
 ## Contact support if unresolved
 

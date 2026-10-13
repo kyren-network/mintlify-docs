@@ -15,9 +15,13 @@ If you want to learn the dashboard first, start with [Dashboard overview](/dashb
 - A server-side environment where your API key can be stored securely
 - A Webhook endpoint for payment notifications before you go live
 
+For one-time payments, the product must be `ACTIVE`, hosted Checkout must be enabled for your merchant, and an enabled channel must support the product's currency and amount. Resolve merchant agreement restrictions when applicable. Product creation alone does not guarantee an available payment method. Current per-order caps are USD 630.00, CNY 4,000.00, HKD 5,000.00 and IDR 10,000,000.00; channel and merchant limits may be lower. If an API IP whitelist is configured, allow your server's outbound IP.
+
+Before the first payment, configure a public HTTPS Webhook URL and obtain its separate Webhook Secret in **Developer Tools > Webhook Settings**. This is not your API Key. Unconfigured Webhooks do not queue ordinary `order.paid` events; later configuration does not automatically replay past payments.
+
 ## Step 1: Get your API Key
 
-After signing up, navigate to **Dashboard > Developer** and copy your API key.
+After signing up, navigate to **Dashboard > Developer Tools > API Keys**. A full key is shown only when generated. Use your securely stored original value, not its masked display. Regeneration immediately invalidates the old key.
 
 - **Live key**: `kyren_live_xxxxxxxxxxxx` — use this for production
 
@@ -41,7 +45,7 @@ curl -X POST https://api.kyrenpay.com/v1/products \
   }'
 ```
 
-Save the `id` from the response — you'll need it to create checkout sessions.
+Save `data.id` from the JSON response. For example, `{ "code": 0, "message": "success", "data": { "id": "prod_abc123" } }` illustrates the envelope with other product fields omitted.
 
 ## Step 3: Create a Checkout Session
 
@@ -55,13 +59,16 @@ curl -X POST https://api.kyrenpay.com/v1/checkouts \
     "productId": "prod_abc123",
     "successUrl": "https://yoursite.com/success",
     "cancelUrl": "https://yoursite.com/cancel",
-    "displayMerchantName": "Campaign Store"
+    "displayMerchantName": "Campaign Store",
+    "metadata": { "businessOrderId": "purchase_123", "userId": "user_123" }
   }'
 ```
 
 Use `displayMerchantName` when this checkout should show a campaign, store, or app name that differs from your account name.
 
-The response includes a `url` field — redirect your customer to this URL to complete payment.
+The response is `{ "code": 0, "message": "success", "data": { ... } }`. Read `data.id`, `data.url`, `data.amount`, `data.currency` and `data.expiresAt` (Unix milliseconds), and persist them against your server-generated business order before returning its URL to the browser. Product ID, user identity and metadata must come from trusted server records. Session amount and currency come from the product; price, quantity and currency overrides are not supported.
+
+Create one pending Session per business purchase and reuse it on repeated clicks. Sessions expire after 24 hours. The API has no Checkout creation idempotency key, so persist a creation reservation and reconcile timeouts or failed local saves before creating another Session. See the [full example](/guides/collect-first-payment).
 
 ## Step 4: Redirect to Checkout
 
@@ -69,41 +76,67 @@ Redirect the customer to the checkout URL returned in Step 3. They will see a ho
 
 ```javascript
 // Example: redirect in your web app
-window.location.href = checkoutResponse.data.url;
+// checkoutUrl is supplied by your authenticated backend, from Kyren's data.url.
+window.location.href = checkoutUrl;
 ```
 
 ## Step 5: Handle the Webhook
 
-After payment is completed, Kyren Pay sends a webhook to your server:
+After payment, Kyren Pay sends a signed JSON POST to your configured Webhook URL. Register the raw-body route before any global JSON parser. The following route requires the [signature function](/webhooks/signatures) and the durable inbox adapter described in the [full example](/guides/collect-first-payment):
 
 ```javascript
-// Express.js example
-app.post('/webhooks/kyren', express.raw({ type: 'application/json' }), (req, res) => {
-  const signature = req.headers['x-kyren-signature'];
-  const timestamp = req.headers['x-kyren-timestamp'];
-  const payload = req.body.toString();
+const crypto = require('crypto');
 
-  // Verify the signature (see Webhook Signatures for details)
-  if (!verifySignature(payload, signature, timestamp)) {
-    return res.status(400).send('Invalid signature');
+function verifyWebhookSignature(payload, signature, timestamp, secret) {
+  if (typeof secret !== 'string' || !secret) return false;
+  if (typeof signature !== 'string' || !/^sha256=[0-9a-f]{64}$/.test(signature)) return false;
+  if (typeof timestamp !== 'string' || !/^\d+$/.test(timestamp)) return false;
+  const sentAt = Number(timestamp);
+  if (!Number.isSafeInteger(sentAt) || Math.abs(Date.now() - sentAt) > 300000) return false;
+  const data = `${timestamp}.${payload}`;
+  const expected = 'sha256=' + crypto
+    .createHmac('sha256', secret)
+    .update(data)
+    .digest('hex');
+
+  return crypto.timingSafeEqual(
+    Buffer.from(expected),
+    Buffer.from(signature)
+  );
+}
+
+app.post('/webhooks/kyren',
+  express.raw({ type: 'application/json' }),
+  async (req, res) => {
+    const signature = req.headers['x-kyren-signature'];
+    const timestamp = req.headers['x-kyren-timestamp'];
+    if (!Buffer.isBuffer(req.body)) return res.status(400).send('Raw JSON body required');
+    const payload = req.body.toString('utf8');
+
+    if (!verifyWebhookSignature(payload, signature, timestamp, process.env.KYREN_WEBHOOK_SECRET)) {
+      return res.status(400).send('Invalid signature');
+    }
+
+    let event;
+    try { event = JSON.parse(payload); } catch { return res.status(400).send('Invalid JSON'); }
+    if (!event || typeof event.id !== 'string' || !event.id || typeof event.type !== 'string' || !event.data) {
+      return res.status(400).send('Invalid event');
+    }
+    try {
+      await webhookInbox.insertIfAbsent(event.id, event);
+    } catch {
+      return res.status(503).send('Retry later');
+    }
+    res.status(200).send('OK');
   }
-
-  const event = JSON.parse(payload);
-
-  if (event.type === 'order.paid') {
-    const orderId = event.data.order_id;
-    const amount = event.data.amount;
-    // Fulfill the order in your system
-    console.log(`Payment received: ${amount} ${event.data.currency}`);
-  }
-
-  res.status(200).send('OK');
-});
+);
 ```
 
 <Info>
-  Configure your webhook URL in **Dashboard > Developer > Webhook Settings**.
+  Configure your URL in **Dashboard > Developer Tools > Webhook Settings**. Verify, persist, then return `2xx` within 10 seconds. A durable worker must retry failures, deduplicate event IDs and credit each business order only once using a unique Kyren order ID and a database transaction.
 </Info>
+
+`successUrl` and `cancelUrl` are browser navigation, not payment evidence. Your backend can query `GET /v1/checkouts/{id}`: `OPEN` is pending, `COMPLETE` includes the successfully associated `orderId`, and `EXPIRED` closes the Session. For missed notifications, query `GET /v1/orders/{orderId}`, verify payment and its product/base amount/currency/metadata association, and use the same idempotent fulfillment transaction as Webhooks. Session creation does not return an `orderId`. Use the exact returned `data.url`. `successUrl` is required; `cancelUrl` is optional.
 
 ## What's Next?
 

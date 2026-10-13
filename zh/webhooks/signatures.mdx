@@ -39,52 +39,53 @@ signature = "sha256=" + HMAC-SHA256(timestamp + "." + payload, webhook_secret)
 
 ## 代码示例
 
+原始 Webhook 路由必须先于全局 JSON 解析器注册，或只在普通业务路由解析 JSON。解析事件前先校验请求头并使用原始请求体验签。下列示例需实现自己的持久化通知适配器：按唯一事件 ID 保存待处理通知后才返回 `2xx`，工作进程负责重试和幂等履约。异常请求头应拒绝，而不是抛出未处理异常。每次投递重试都会生成新的发送时间戳，验签使用请求头时间戳，不使用 `created_at`。
+
 ### Node.js
 
 ```javascript
 const crypto = require('crypto');
 
 function verifyWebhookSignature(payload, signature, timestamp, secret) {
-  // 检查时间戳容差（5 分钟）
-  const currentTime = Date.now();
-  if (Math.abs(currentTime - parseInt(timestamp)) > 300000) {
-    return false;
-  }
-
-  // 计算期望签名
+  if (typeof secret !== 'string' || !secret) return false;
+  if (typeof signature !== 'string' || !/^sha256=[0-9a-f]{64}$/.test(signature)) return false;
+  if (typeof timestamp !== 'string' || !/^\d+$/.test(timestamp)) return false;
+  const sentAt = Number(timestamp);
+  if (!Number.isSafeInteger(sentAt) || Math.abs(Date.now() - sentAt) > 300000) return false;
   const data = `${timestamp}.${payload}`;
   const expected = 'sha256=' + crypto
     .createHmac('sha256', secret)
     .update(data)
     .digest('hex');
 
-  // 常量时间比较
-  try {
-    return crypto.timingSafeEqual(
-      Buffer.from(expected),
-      Buffer.from(signature)
-    );
-  } catch {
-    return false;
-  }
+  return crypto.timingSafeEqual(
+    Buffer.from(expected),
+    Buffer.from(signature)
+  );
 }
 
-// 在 Express 中使用
 app.post('/webhooks/kyren',
   express.raw({ type: 'application/json' }),
-  (req, res) => {
-    const isValid = verifyWebhookSignature(
-      req.body.toString(),
-      req.headers['x-kyren-signature'],
-      req.headers['x-kyren-timestamp'],
-      process.env.KYREN_WEBHOOK_SECRET
-    );
+  async (req, res) => {
+    const signature = req.headers['x-kyren-signature'];
+    const timestamp = req.headers['x-kyren-timestamp'];
+    if (!Buffer.isBuffer(req.body)) return res.status(400).send('Raw JSON body required');
+    const payload = req.body.toString('utf8');
 
-    if (!isValid) {
+    if (!verifyWebhookSignature(payload, signature, timestamp, process.env.KYREN_WEBHOOK_SECRET)) {
       return res.status(400).send('Invalid signature');
     }
 
-    // 处理事件...
+    let event;
+    try { event = JSON.parse(payload); } catch { return res.status(400).send('Invalid JSON'); }
+    if (!event || typeof event.id !== 'string' || !event.id || typeof event.type !== 'string' || !event.data) {
+      return res.status(400).send('Invalid event');
+    }
+    try {
+      await webhookInbox.insertIfAbsent(event.id, event);
+    } catch {
+      return res.status(503).send('Retry later');
+    }
     res.status(200).send('OK');
   }
 );
@@ -96,9 +97,18 @@ app.post('/webhooks/kyren',
 import hmac
 import hashlib
 import time
+import re
 
 def verify_webhook_signature(payload: str, signature: str, timestamp: str, secret: str) -> bool:
     # 检查时间戳容差（5 分钟）
+    if not isinstance(secret, str) or not secret:
+        return False
+    if not isinstance(signature, str) or not re.fullmatch(r"sha256=[0-9a-f]{64}", signature):
+        return False
+    if not isinstance(timestamp, str) or not re.fullmatch(r"[0-9]{1,16}", timestamp):
+        return False
+    if int(timestamp) > 9007199254740991:
+        return False
     current_time = int(time.time() * 1000)
     if abs(current_time - int(timestamp)) > 300000:
         return False
@@ -130,7 +140,12 @@ def webhook():
         return "Invalid signature", 400
 
     event = request.get_json()
-    # 处理事件...
+    if not isinstance(event, dict) or not isinstance(event.get("id"), str) or not event["id"]:
+        return "Invalid event", 400
+    try:
+        webhook_inbox.insert_if_absent(event["id"], event)
+    except Exception:
+        return "Retry later", 503
 
     return "OK", 200
 ```
@@ -146,16 +161,22 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"encoding/json"
 	"math"
 	"net/http"
 	"strconv"
+	"regexp"
 	"time"
 )
 
 func verifyWebhookSignature(payload, signature, timestamp, secret string) bool {
+    if secret == "" || !regexp.MustCompile("^sha256=[0-9a-f]{64}$").MatchString(signature) ||
+        !regexp.MustCompile("^[0-9]+$").MatchString(timestamp) {
+        return false
+    }
 	// 检查时间戳容差（5 分钟）
 	ts, err := strconv.ParseInt(timestamp, 10, 64)
-	if err != nil {
+	if err != nil || ts > 9007199254740991 {
 		return false
 	}
 	currentTime := time.Now().UnixMilli()
@@ -174,7 +195,11 @@ func verifyWebhookSignature(payload, signature, timestamp, secret string) bool {
 }
 
 func webhookHandler(w http.ResponseWriter, r *http.Request) {
-	body, _ := io.ReadAll(r.Body)
+    body, err := io.ReadAll(r.Body)
+    if err != nil {
+        http.Error(w, "Invalid body", http.StatusBadRequest)
+        return
+    }
 	payload := string(body)
 	signature := r.Header.Get("X-Kyren-Signature")
 	timestamp := r.Header.Get("X-Kyren-Timestamp")
@@ -184,7 +209,15 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 处理事件...
+    var event struct { ID string `json:"id"` }
+    if json.Unmarshal(body, &event) != nil || event.ID == "" {
+        http.Error(w, "Invalid event", http.StatusBadRequest)
+        return
+    }
+    if err := persistWebhookIfAbsent(event.ID, body); err != nil {
+        http.Error(w, "Retry later", http.StatusServiceUnavailable)
+        return
+    }
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))
 }

@@ -27,6 +27,10 @@ Kyren Pay Checkout 讓客戶在託管付款頁完成付款。
 
 ## 常見錯誤
 
+建立接口回傳包裝在 `data` 中的 Session，金額和幣種取自產品。儲存業務訂單與 Session ID、URL、金額、幣種和有效期的關聯，重複點擊複用有效 Session；不確定的建立結果先對帳，不自動重建。會話有效期為 24 小時，狀態為 `OPEN`、`COMPLETE`、`EXPIRED`。
+
+遺漏通知時，在伺服器查詢 `GET /v1/checkouts/{id}`，透過成功關聯的 `orderId` 查詢訂單，核對產品、基礎金額、幣種及 metadata 後，執行與 Webhook 相同的冪等入帳交易。成功或取消頁面不是付款證明；Session 過期不代表已存在的支付嘗試一定失敗。完整實作見[收取第一筆付款](/zh-Hant/guides/collect-first-payment)。
+
 - 在瀏覽器 JavaScript 中使用 API 密鑰建立 Checkout Session。
 - 在訂單已支付或收到支付成功 Webhook 前履約。
 - 需要對帳時，沒有在 metadata 中保存內部使用者 ID 或訂單 ID。

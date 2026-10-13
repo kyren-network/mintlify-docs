@@ -27,6 +27,10 @@ Create a product and prepare your success and cancel URLs. If your integration u
 
 ## Common mistakes
 
+Creation returns a Session inside `data`, with amount and currency taken from the product. Persist its ID, URL, amount, currency and expiry against your business order. Reuse a valid Session on repeated clicks and reconcile uncertain creation outcomes before retrying. Sessions last 24 hours and use `OPEN`, `COMPLETE`, `EXPIRED`.
+
+For missed notifications, query `GET /v1/checkouts/{id}` from your server and retrieve its successful associated `orderId`. Verify the order's product, base amount, currency and metadata, then use the same idempotent fulfillment transaction as Webhooks. Browser success/cancel pages are not payment evidence, and Session expiry does not prove an existing payment attempt failed. See the [full example](/guides/collect-first-payment).
+
 - Creating checkout sessions from browser JavaScript with an API key.
 - Fulfilling the order before a paid status or payment-success Webhook.
 - Not storing your internal user or order ID in metadata when you need reconciliation.

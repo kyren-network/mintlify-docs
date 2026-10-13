@@ -22,23 +22,26 @@ source_owner: engineering
 
 ## 設定易支付
 
-進入**系統設定 > 計費 > 支付**（`/system-settings/billing/payment`），按已安裝版本的介面要求啟用支付。在 **Epay** 頁籤填寫憑據，在**通用**頁籤設定金額、支付方式和通知基礎位址，然後儲存。
+1. 進入**系統設定 > 計費與支付 > 支付閘道**（`/system-settings/billing/payment`）。
+2. 首次設定時，由超級管理員閱讀並完成頁面上的**合規確認**。未完成確認時，支付設定和線上儲值功能處於鎖定狀態；頁面已顯示**合規已確認**時，無需重複確認。
+3. 在 **Epay** 頁籤填寫 **Epay 端點**、**易支付商戶 ID**、**Epay 密鑰**和**回調位址**（`CustomCallbackAddress`）。回調位址只填寫公網網域，不附加通知路徑。
+4. 在**常規**頁籤設定**價格（本地貨幣/美元）**、**最低儲值（美元）**、**付款方式**、預設儲值金額及折扣，再點擊**儲存所有設定**。
 
 | new-api 設定 | 填寫值 |
 | --- | --- |
-| 支付位址（`PayAddress`） | `https://api.kyrenpay.com/epay/` |
-| 商戶 ID（`EpayId`） | 啟潤商戶帳號 ID，即 `pid` |
-| 商戶密鑰（`EpayKey`） | 目前完整的 `kyren_live_...` API Key |
-| 自訂回呼位址（`CustomCallbackAddress`） | `https://ai.example.com` |
+| Epay 端點（`PayAddress`） | `https://api.kyrenpay.com/epay/` |
+| 易支付商戶 ID（`EpayId`） | 啟潤商戶帳號 ID，即 `pid` |
+| Epay 密鑰（`EpayKey`） | 目前完整的 `kyren_live_...` API Key |
+| 回調位址（`CustomCallbackAddress`） | `https://ai.example.com` |
 | 伺服器位址（`ServerAddress`） | new-api 公網網域 |
-| 儲值價格（`Price`） | 每 USD 餘額對應的 Epay 基礎金額（CNY），由你設定 |
-| 最低儲值（`MinTopUp`） | 你設定的最低儲值金額 |
+| 價格（本地貨幣/美元）（`Price`） | 每 USD 餘額對應的 Epay 基礎金額（CNY），由你設定 |
+| 最低儲值（美元）（`MinTopUp`） | 你設定的最低儲值金額（USD） |
 
-自訂回呼位址為空時使用 `ServerAddress`，後端會追加 `/api/user/epay/notify`；只填寫基礎網域，不填寫完整通知路徑。SDK 保留支付位址的 `/epay` 並追加 `submit.php`，最終使用 `https://api.kyrenpay.com/epay/submit.php`。[設定介面](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/web/src/features/system-settings/integrations/payment-settings-section.tsx)、[通知基礎位址](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/service/epay.go)、[SDK 位址拼接](https://github.com/Calcium-Ion/go-epay/blob/d8c8810761402e9de0320c4b7eed3cfd7fa94461/epay/order.go)。
+回調位址為空時使用 `ServerAddress`，後端會追加 `/api/user/epay/notify`；只填寫基礎網域，不填寫完整通知路徑。SDK 保留 Epay 端點的 `/epay` 並追加 `submit.php`，最終使用 `https://api.kyrenpay.com/epay/submit.php`。[設定介面](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/web/src/features/system-settings/integrations/payment-settings-section.tsx)、[通知基礎位址](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/service/epay.go)、[SDK 位址拼接](https://github.com/Calcium-Ion/go-epay/blob/d8c8810761402e9de0320c4b7eed3cfd7fa94461/epay/order.go)。
 
 ## 設定支付方式
 
-通用設定的 `PayMethods` 提供視覺化與 JSON 編輯器，`type` 會傳送給 Epay。先填寫商戶已開通的方式，例如：
+**常規**頁籤的**付款方式**（`PayMethods`）提供視覺化與 JSON 編輯器，`type` 會傳送給 Epay。先填寫商戶已開通的方式，例如：
 
 ```json
 [

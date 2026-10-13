@@ -18,9 +18,9 @@ source_owner: support
 
 - `product_id` 不存在，或属于其他商户。
 - 产品已归档，不能用于新的 Session。
-- 请求的币种不受支持。
-- 金额或价格字段以数字传入，而不是十进制字符串。
-- 缺少 `success_url` 或 `cancel_url`，或 URL 无效。
+- 商户托管收银台未启用，或适用的商户协议限制尚未解除。
+- 产品金额超过单笔限额；产品币种还需有可用支付渠道支持。
+- 缺少 `successUrl`（也接受 `success_url`），或其格式无效。`cancelUrl` / `cancel_url` 可选，缺少它不会导致创建失败。
 - 鉴权失败，请求未进入 Checkout 处理。
 
 ## 在 Kyren 中检查
@@ -32,14 +32,15 @@ source_owner: support
 
 ## 在你的服务端检查
 
-- 金额和价格值必须使用十进制字符串，例如 `"9.99"`。
-- 使用受支持的三位币种代码，例如 `USD`。
-- 确认 `success_url` 和 `cancel_url` 是完整 HTTPS URL。
+- 创建 Checkout 传入 `productId` 和 `successUrl`，不传金额、数量或币种覆盖值；Session 使用产品的价格和币种。
+- 创建或修改产品时，`price` 使用十进制字符串（例如 `"9.99"`），币种使用平台允许的三位代码。
+- `successUrl` 必填，后端要求 `http://` 或 `https://` 格式；生产环境使用完整 HTTPS URL。提供 `cancelUrl` 时也使用有效的站点 URL。
+- 配置 API IP 白名单时，检查服务器出口 IP。读取响应的 `data.id` 和 `data.url`，不要从顶层查找它们。
 - 记录请求体和 Kyren 响应状态，但不要记录密钥。
 
 ## 修复
 
-更新请求，使用启用中的产品、受支持币种、十进制字符串金额、有效跳转 URL 和有效的 `x-api-key`。
+更新请求，使用本商户启用中的产品、必填的成功跳转 URL 和有效的 `x-api-key`；确认收银台及渠道开通、金额限额和适用的协议状态。金额和币种问题应在产品配置中修正。
 
 ## 仍未解决时联系支持
 

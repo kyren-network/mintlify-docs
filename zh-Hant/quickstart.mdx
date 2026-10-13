@@ -15,9 +15,13 @@ description: 5 分鐘內完成第一筆收款
 - 一個可以安全保存 API 密鑰的服務端環境
 - 上線前用於接收付款通知的 Webhook 端點
 
+一次性收款要求產品為 `ACTIVE`、商戶託管收銀台已啟用，且至少一個啟用的渠道支援產品幣種和金額；適用時還需解除商戶協議限制。建立產品成功不代表已有可用支付方式。目前單筆上限為 USD 630.00、CNY 4,000.00、HKD 5,000.00、IDR 10,000,000.00，渠道或商戶限額可能更低。已設定 API IP 白名單時，允許業務伺服器的出口 IP。
+
+首筆付款前，在**開發者工具 > Webhook 設定**設定公網 HTTPS Webhook URL 並取得獨立的 Webhook Secret；它不是 API Key。未設定時不會建立普通 `order.paid` 通知事件，事後設定不會自動補發。
+
 ## 第一步：取得 API 密鑰
 
-註冊後，前往 **控制台 > 開發者**，複製你的 API 密鑰。
+註冊後，前往 **控制台 > 開發者工具 > API Keys**。完整密鑰僅在產生時顯示，使用妥善儲存的原始值，不使用遮蔽顯示值；重新產生會立即使舊密鑰失效。
 
 - **生產密鑰**：`kyren_live_xxxxxxxxxxxx` — 用於正式收款
 
@@ -41,7 +45,7 @@ curl -X POST https://api.kyrenpay.com/v1/products \
   }'
 ```
 
-儲存回應中的 `id`，後續建立 Checkout Session 時需要用到。
+儲存 JSON 回應中的 `data.id`。例如 `{ "code": 0, "message": "success", "data": { "id": "prod_abc123" } }` 展示回應包裝結構，其他產品欄位已省略。
 
 ## 第三步：建立 Checkout Session
 
@@ -55,13 +59,16 @@ curl -X POST https://api.kyrenpay.com/v1/checkouts \
     "productId": "prod_abc123",
     "successUrl": "https://yoursite.com/success",
     "cancelUrl": "https://yoursite.com/cancel",
-    "displayMerchantName": "Campaign Store"
+    "displayMerchantName": "Campaign Store",
+    "metadata": { "businessOrderId": "purchase_123", "userId": "user_123" }
   }'
 ```
 
 當本次 Checkout 需要展示不同於商戶帳戶名稱的活動、店鋪或應用名稱時，可以傳入 `displayMerchantName`。
 
-回應中包含 `url` 欄位 — 將客戶重新導向到該 URL 即可完成付款。
+回應為 `{ "code": 0, "message": "success", "data": { ... } }`。讀取 `data.id`、`data.url`、`data.amount`、`data.currency` 和 `data.expiresAt`（Unix 毫秒），與伺服器產生的業務訂單關聯並持久化後，才向瀏覽器回傳 URL。產品 ID、使用者身分和 metadata 必須來自可信伺服器記錄。Session 金額和幣種來自產品，不支援覆蓋價格、數量或幣種。
+
+每筆業務購買建立一個待付款 Session，重複點擊複用它；有效期為 24 小時。建立 API 沒有冪等鍵，應持久化建立占位，逾時或本地儲存失敗時先對帳，不自動再次建立。詳見[完整範例](/zh-Hant/guides/collect-first-payment)。
 
 ## 第四步：重新導向到收銀台
 
@@ -69,41 +76,67 @@ curl -X POST https://api.kyrenpay.com/v1/checkouts \
 
 ```javascript
 // 範例：在你的 Web 應用中重新導向
-window.location.href = checkoutResponse.data.url;
+// checkoutUrl 由已驗證的業務後端提供，來自 Kyren 回應的 data.url。
+window.location.href = checkoutUrl;
 ```
 
 ## 第五步：處理 Webhook
 
-付款完成後，啟潤支付會向你的伺服器發送 Webhook：
+付款完成後，啟潤支付會向已設定的 Webhook URL 發送簽名 JSON POST。原始請求本體路由必須先於任何全域 JSON 解析器註冊。下列路由需要[簽名驗證函式](/zh-Hant/webhooks/signatures)和[完整範例](/zh-Hant/guides/collect-first-payment)中說明的持久化通知適配器：
 
 ```javascript
-// Express.js 範例
-app.post('/webhooks/kyren', express.raw({ type: 'application/json' }), (req, res) => {
-  const signature = req.headers['x-kyren-signature'];
-  const timestamp = req.headers['x-kyren-timestamp'];
-  const payload = req.body.toString();
+const crypto = require('crypto');
 
-  // 驗證簽名（詳見 Webhook 簽名驗證章節）
-  if (!verifySignature(payload, signature, timestamp)) {
-    return res.status(400).send('Invalid signature');
+function verifyWebhookSignature(payload, signature, timestamp, secret) {
+  if (typeof secret !== 'string' || !secret) return false;
+  if (typeof signature !== 'string' || !/^sha256=[0-9a-f]{64}$/.test(signature)) return false;
+  if (typeof timestamp !== 'string' || !/^\d+$/.test(timestamp)) return false;
+  const sentAt = Number(timestamp);
+  if (!Number.isSafeInteger(sentAt) || Math.abs(Date.now() - sentAt) > 300000) return false;
+  const data = `${timestamp}.${payload}`;
+  const expected = 'sha256=' + crypto
+    .createHmac('sha256', secret)
+    .update(data)
+    .digest('hex');
+
+  return crypto.timingSafeEqual(
+    Buffer.from(expected),
+    Buffer.from(signature)
+  );
+}
+
+app.post('/webhooks/kyren',
+  express.raw({ type: 'application/json' }),
+  async (req, res) => {
+    const signature = req.headers['x-kyren-signature'];
+    const timestamp = req.headers['x-kyren-timestamp'];
+    if (!Buffer.isBuffer(req.body)) return res.status(400).send('Raw JSON body required');
+    const payload = req.body.toString('utf8');
+
+    if (!verifyWebhookSignature(payload, signature, timestamp, process.env.KYREN_WEBHOOK_SECRET)) {
+      return res.status(400).send('Invalid signature');
+    }
+
+    let event;
+    try { event = JSON.parse(payload); } catch { return res.status(400).send('Invalid JSON'); }
+    if (!event || typeof event.id !== 'string' || !event.id || typeof event.type !== 'string' || !event.data) {
+      return res.status(400).send('Invalid event');
+    }
+    try {
+      await webhookInbox.insertIfAbsent(event.id, event);
+    } catch {
+      return res.status(503).send('Retry later');
+    }
+    res.status(200).send('OK');
   }
-
-  const event = JSON.parse(payload);
-
-  if (event.type === 'order.paid') {
-    const orderId = event.data.order_id;
-    const amount = event.data.amount;
-    // 在你的系統中完成訂單
-    console.log(`收到付款: ${amount} ${event.data.currency}`);
-  }
-
-  res.status(200).send('OK');
-});
+);
 ```
 
 <Info>
-  在 **控制台 > 開發者 > Webhook 設定** 中配置你的 Webhook URL。
+  在 **控制台 > 開發者工具 > Webhook 設定** 中設定 Webhook URL。驗簽、持久化成功後，在 10 秒內回傳 `2xx`。持久化工作程序負責履約失敗重試，依事件 ID 去重，並以 Kyren 訂單 ID 唯一約束和資料庫交易保證每筆業務訂單只入帳一次。
 </Info>
+
+`successUrl` 和 `cancelUrl` 是瀏覽器導航，不是付款憑證。伺服器查詢 `GET /v1/checkouts/{id}`：`OPEN` 為待付款，`COMPLETE` 包含成功關聯的 `orderId`，`EXPIRED` 為會話過期。遺漏通知時，透過 `GET /v1/orders/{orderId}` 核對付款及產品、基礎金額、幣種和 metadata 關聯，再呼叫與 Webhook 相同的冪等入帳交易。建立 Session 時不回傳 `orderId`，不要自行拼接收銀台 URL。`successUrl` 必填，`cancelUrl` 可選。
 
 ## 下一步
 

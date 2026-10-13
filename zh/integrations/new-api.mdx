@@ -22,23 +22,30 @@ source_owner: engineering
 
 ## 配置易支付
 
-进入**系统设置 > 计费 > 支付**（`/system-settings/billing/payment`），按已安装版本的界面要求启用支付。在 **Epay** 页签填写凭据，在**通用**页签配置金额、支付方式和通知基础地址，然后保存。
+1. 进入**系统设置 > 计费与支付 > 支付网关**（`/system-settings/billing/payment`）。
+2. 首次配置时，由超级管理员阅读并完成页面上的**合规确认**。未完成确认时，支付配置和在线充值功能处于锁定状态；页面已显示**合规已确认**时，无需重复确认。
+3. 在 **Epay** 页签填写 **Epay 端点**、**易支付商户 ID**、**Epay 密钥**和**回调地址**（`CustomCallbackAddress`）。回调地址只填写公网域名，不追加通知路径。
+4. 在**常规**页签配置**价格（本地货币/美元）**、**最低充值（美元）**、**付款方式**、预设充值金额及折扣，再点击**保存所有设置**。
+
+![new-api 的 Epay 配置界面：Epay 端点、回调地址、易支付商户 ID 和 Epay 密钥](/images/integrations/new-api-epay-settings.png)
+
+上图为界面示例，实际接口地址和凭据请按下表填写。
 
 | new-api 配置 | 填写值 |
 | --- | --- |
-| 支付地址（`PayAddress`） | `https://api.kyrenpay.com/epay/` |
-| 商户 ID（`EpayId`） | 启润商户账号 ID，即 `pid` |
-| 商户密钥（`EpayKey`） | 当前完整的 `kyren_live_...` API Key |
-| 自定义回调地址（`CustomCallbackAddress`） | `https://ai.example.com` |
+| Epay 端点（`PayAddress`） | `https://api.kyrenpay.com/epay/` |
+| 易支付商户 ID（`EpayId`） | 启润商户账号 ID，即 `pid` |
+| Epay 密钥（`EpayKey`） | 当前完整的 `kyren_live_...` API Key |
+| 回调地址（`CustomCallbackAddress`） | `https://ai.example.com` |
 | 服务器地址（`ServerAddress`） | new-api 公网域名 |
-| 充值价格（`Price`） | 每 USD 余额对应的 Epay 基础金额（CNY），由你设定 |
-| 最低充值（`MinTopUp`） | 你设定的最低充值金额 |
+| 价格（本地货币/美元）（`Price`） | 每 USD 余额对应的 Epay 基础金额（CNY），由你设定 |
+| 最低充值（美元）（`MinTopUp`） | 你设定的最低充值金额（USD） |
 
-自定义回调地址为空时使用 `ServerAddress`，后端会追加 `/api/user/epay/notify`；只填写基础域名，不填写完整通知路径。SDK 保留支付地址的 `/epay` 并追加 `submit.php`，最终使用 `https://api.kyrenpay.com/epay/submit.php`。[配置界面](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/web/src/features/system-settings/integrations/payment-settings-section.tsx)、[通知基础地址](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/service/epay.go)、[SDK 地址拼接](https://github.com/Calcium-Ion/go-epay/blob/d8c8810761402e9de0320c4b7eed3cfd7fa94461/epay/order.go)。
+回调地址为空时使用 `ServerAddress`，后端会追加 `/api/user/epay/notify`；只填写基础域名，不填写完整通知路径。SDK 保留 Epay 端点的 `/epay` 并追加 `submit.php`，最终使用 `https://api.kyrenpay.com/epay/submit.php`。[配置界面](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/web/src/features/system-settings/integrations/payment-settings-section.tsx)、[通知基础地址](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/service/epay.go)、[SDK 地址拼接](https://github.com/Calcium-Ion/go-epay/blob/d8c8810761402e9de0320c4b7eed3cfd7fa94461/epay/order.go)。
 
 ## 配置支付方式
 
-通用设置的 `PayMethods` 提供可视化与 JSON 编辑器，`type` 会发送给 Epay。先填写商户已开通的方式，例如：
+**常规**页签的**付款方式**（`PayMethods`）提供可视化与 JSON 编辑器，`type` 会发送给 Epay。先填写商户已开通的方式，例如：
 
 ```json
 [

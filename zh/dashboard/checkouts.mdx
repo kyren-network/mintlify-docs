@@ -25,6 +25,10 @@ Kyren Pay Checkout 让客户在托管付款页完成付款。
 5. Kyren 向你的服务端发送 Webhook 事件。
 6. 你的系统确认支付成功后履约。
 
+创建接口返回包装在 `data` 中的 Session，金额和币种取自产品。保存业务订单与 `data.id`、URL、金额、币种和有效期的关联，重复点击复用有效 Session；不确定的创建结果先对账，不自动重建。会话有效期为 24 小时，状态为 `OPEN`、`COMPLETE`、`EXPIRED`。
+
+遗漏通知时，在服务端查询 `GET /v1/checkouts/{id}`，通过成功关联的 `orderId` 查询订单，核对产品、基础金额、币种及 metadata 后，执行与 Webhook 相同的幂等入账事务。成功或取消页面不是付款证明；Session 过期不代表已存在的支付尝试一定失败。完整实现见[收取第一笔付款](/zh/guides/collect-first-payment)。
+
 ## 常见错误
 
 - 在浏览器 JavaScript 中使用 API 密钥创建 Checkout Session。

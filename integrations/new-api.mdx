@@ -22,7 +22,10 @@ See [Developer settings](/dashboard/developer-settings) and [Epay compatibility]
 
 ## Configure Epay
 
-Open **System Settings > Billing > Payment** (`/system-settings/billing/payment`). Complete any payment-enablement requirements shown by your installed version. Under **Epay**, enter the credentials; under **General**, configure the amount, payment methods and callback address. Save the settings.
+1. Open **System Settings > Billing & Payments > Payment Gateway** (`/system-settings/billing/payment`).
+2. For the initial setup, the root administrator must read and complete the page's **Compliance Confirmation**. Payment settings and online top-ups remain locked until confirmation is complete. Skip this step if the page already shows **Compliance Confirmed**.
+3. Under **Epay**, enter the payment endpoint, merchant ID, merchant secret key and callback base address (`CustomCallbackAddress`). Enter only the public site origin for the callback address, without the notification path.
+4. Under **General**, configure the price, minimum top-up, payment methods, preset recharge amounts and discounts, then click **Save All Settings**.
 
 | new-api setting | Value |
 | --- | --- |

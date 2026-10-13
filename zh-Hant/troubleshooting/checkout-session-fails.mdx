@@ -18,9 +18,9 @@ source_owner: support
 
 - `product_id` 不存在，或屬於其他商戶。
 - 產品已封存，不能用於新的 Session。
-- 請求的幣種不受支援。
-- 金額或價格欄位以數字傳入，而不是十進位字串。
-- 缺少 `success_url` 或 `cancel_url`，或 URL 無效。
+- 商戶託管收銀台未啟用，或適用的商戶協議限制尚未解除。
+- 產品金額超過單筆限額；產品幣種還需有可用支付渠道支援。
+- 缺少 `successUrl`（也接受 `success_url`），或其格式無效。`cancelUrl` / `cancel_url` 可選，缺少它不會導致建立失敗。
 - 驗證失敗，請求未進入 Checkout 處理。
 
 ## 在 Kyren 中檢查
@@ -32,14 +32,15 @@ source_owner: support
 
 ## 在你的伺服器檢查
 
-- 金額和價格值必須使用十進位字串，例如 `"9.99"`。
-- 使用受支援的三位幣種代碼，例如 `USD`。
-- 確認 `success_url` 和 `cancel_url` 是完整 HTTPS URL。
+- 建立 Checkout 傳入 `productId` 和 `successUrl`，不傳金額、數量或幣種覆蓋值；Session 使用產品的價格和幣種。
+- 建立或修改產品時，`price` 使用十進位字串（例如 `"9.99"`），幣種使用平台允許的三位代碼。
+- `successUrl` 必填，後端要求 `http://` 或 `https://` 格式；正式環境使用完整 HTTPS URL。提供 `cancelUrl` 時也使用有效的站點 URL。
+- 設定 API IP 白名單時，檢查伺服器出口 IP。讀取回應的 `data.id` 和 `data.url`，不要從頂層查找它們。
 - 記錄請求體和 Kyren 回應狀態，但不要記錄密鑰。
 
 ## 修復
 
-更新請求，使用啟用中的產品、受支援幣種、十進位字串金額、有效跳轉 URL 和有效的 `x-api-key`。
+更新請求，使用本商戶啟用中的產品、必填的成功跳轉 URL 和有效的 `x-api-key`；確認收銀台及渠道開通、金額限額和適用的協議狀態。金額和幣種問題應在產品設定中修正。
 
 ## 仍未解決時聯絡支援
 
