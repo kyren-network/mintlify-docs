@@ -26,6 +26,7 @@
                 "pages": [
                   "introduction",
                   "start-here",
+                  "agent-setup",
                   "quickstart",
                   "guides/collect-first-payment",
                   "go-live-checklist"
@@ -123,6 +124,7 @@
                 "pages": [
                   "zh/introduction",
                   "zh/start-here",
+                  "zh/agent-setup",
                   "zh/quickstart",
                   "zh/guides/collect-first-payment",
                   "zh/go-live-checklist"
@@ -220,6 +222,7 @@
                 "pages": [
                   "zh-Hant/introduction",
                   "zh-Hant/start-here",
+                  "zh-Hant/agent-setup",
                   "zh-Hant/quickstart",
                   "zh-Hant/guides/collect-first-payment",
                   "zh-Hant/go-live-checklist"

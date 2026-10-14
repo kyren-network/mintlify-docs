@@ -1,0 +1,45 @@
+---
+title: 使用 AI Agent 串接
+description: 從官方 Agent 指引開始串接 KyrenPay 一次性收款。
+language: zh-Hant
+audience: developer
+product_area: integration
+intent: how-to
+visibility: public
+last_verified_at: 2026-10-13
+source_owner: engineering
+---
+
+在你的應用專案中，將以下指令交給 Codex、Claude Code 等程式開發 Agent：
+
+```text
+請閱讀 https://merchant.kyrenpay.com/agent-setup/prompt.md，檢查目前專案並協助我串接 KyrenPay 一次性收款。
+```
+
+[官方 Prompt](https://merchant.kyrenpay.com/agent-setup/prompt.md)、[任務索引](https://merchant.kyrenpay.com/agent-setup/tasks.md)和[驗證清單](https://merchant.kyrenpay.com/agent-setup/verification.md)皆為公開 Markdown，閱讀無需登入。也可以在商戶控制台的 **開發者工具 > API Keys** 複製串接指令。
+
+## 選擇串接方式
+
+| 你的專案 | 串接方式 |
+| --- | --- |
+| 自行開發的應用 | 服務端[一次性 Checkout](/zh-Hant/guides/collect-first-payment)、簽名 Webhook 和持久化履約 |
+| new-api | 按已安裝版本設定內建[易支付](/zh-Hant/integrations/new-api) |
+| sub2api | 按已安裝版本設定內建 [EasyPay](/zh-Hant/integrations/sub2api) |
+| 其他已串接易支付的應用 | [易支付遷移](/zh-Hant/epay-migration/overview)和 MD5 通知協定 |
+| 無需撰寫程式的收款連結 | 控制台[產品](/zh-Hant/dashboard/products)和 [Checkout 連結](/zh-Hant/dashboard/checkouts) |
+
+實際可用付款方式、金額和幣別取決於商戶已開通的渠道。新訂閱銷售目前暫停，本指引涵蓋一次性收款。
+
+## 準備帳戶與憑證
+
+註冊或登入[商戶帳戶](https://merchant.kyrenpay.com)，確認開戶、渠道等前提條件，並在[開發者設定](/zh-Hant/dashboard/developer-settings)取得憑證。註冊、認證、協議接受和付款由你完成；Agent 可以準備程式並引導後續步驟。
+
+在應用的服務端環境變數或密鑰管理器中私下設定密鑰，不要貼到 Agent 對話或提交到版本庫。原生 Webhook Secret 與 API Key 不同。原生串接應在首筆付款前設定 Webhook，事後設定不會自動產生過去的 `order.paid` 通知。
+
+目前沒有自助 Sandbox 密鑰。只有 Kyren 提供對應位址和憑證後，才使用 [Staging 環境](/zh-Hant/testing)。不要在未經確認的生產渠道使用測試卡。
+
+## 檢查串接結果
+
+讓 Agent 列明修改檔案、執行本地測試並報告待處理事項。重點檢查簽名拒絕、重複通知防重、金額與幣別關聯及故障恢復。應用不能根據瀏覽器返回判斷付款成功。
+
+本地模擬測試不代表真實付款已通過。取得授權測試環境後，由你完成付款，再分別核對 Kyren 已付款訂單和應用履約紀錄。生產驗收前閱讀[上線清單](/zh-Hant/go-live-checklist)；尚未執行的環節應由 Agent 明確標記為未驗證。

@@ -1,0 +1,45 @@
+---
+title: Integrate with an AI Agent
+description: Start a KyrenPay one-time payment integration from the official Agent guide.
+language: en
+audience: developer
+product_area: integration
+intent: how-to
+visibility: public
+last_verified_at: 2026-10-13
+source_owner: engineering
+---
+
+Give the following instruction to your coding agent, such as Codex or Claude Code, in your application project:
+
+```text
+Read https://merchant.kyrenpay.com/agent-setup/prompt.md, inspect this project, and help me integrate KyrenPay one-time payments.
+```
+
+The [official Prompt](https://merchant.kyrenpay.com/agent-setup/prompt.md), [task index](https://merchant.kyrenpay.com/agent-setup/tasks.md) and [verification checklist](https://merchant.kyrenpay.com/agent-setup/verification.md) are public Markdown files. You do not need a merchant login to read them. You can also copy the instruction from **Merchant Dashboard > Developer Tools > API Keys**.
+
+## Choose a path
+
+| Your project | Integration |
+| --- | --- |
+| A custom application | Server-side [one-time Checkout](/guides/collect-first-payment), signed Webhooks and durable fulfillment |
+| new-api | Its built-in [Epay configuration](/integrations/new-api), checked against the installed version |
+| sub2api | Its built-in [EasyPay provider](/integrations/sub2api), checked against the installed version |
+| Another existing Epay client | [Epay migration](/epay-migration/overview) and its MD5 notification contract |
+| Payment links without application code | Dashboard [products](/dashboard/products) and [Checkout links](/dashboard/checkouts) |
+
+Your enabled payment channels determine which methods, amounts and currencies are available. New subscription sales are currently paused; this guide covers one-time payments.
+
+## Prepare access
+
+Create or sign in to your [merchant account](https://merchant.kyrenpay.com), check onboarding and payment-channel prerequisites, and obtain credentials in [Developer settings](/dashboard/developer-settings). You handle registration, verification, agreement acceptance and payments; the Agent can prepare code and guide you through remaining steps.
+
+Set secrets privately in your application's server environment or secret manager. Do not paste them into Agent conversations or commit them. The native Webhook secret is different from the API key. Configure Webhook before the first native payment, because adding it afterward does not automatically create past `order.paid` events.
+
+There is currently no self-service sandbox key. Use [staging](/testing) only when Kyren supplies its Base URL and matching credentials. Do not use test cards on an unconfirmed live channel.
+
+## Review the result
+
+Ask the Agent to identify changed files, run local tests and report pending actions. Check signature rejection, duplicate-notification protection, amount/currency association and recovery. Your application must not fulfill purchases from a browser redirect.
+
+Local mock tests do not prove a real payment. When you have an authorized test environment, complete its payment step yourself, then verify both the Kyren paid order and your application's fulfillment record. Review the [go-live checklist](/go-live-checklist) before production acceptance. Until those steps have been run, the Agent should label them unverified.

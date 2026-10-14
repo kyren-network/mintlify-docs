@@ -1,0 +1,45 @@
+---
+title: 使用 AI Agent 接入
+description: 从官方 Agent 指引开始接入 KyrenPay 一次性收款。
+language: zh
+audience: developer
+product_area: integration
+intent: how-to
+visibility: public
+last_verified_at: 2026-10-13
+source_owner: engineering
+---
+
+在你的应用项目中，将以下指令交给 Codex、Claude Code 等编程 Agent：
+
+```text
+请阅读 https://merchant.kyrenpay.com/agent-setup/prompt.md，检查当前项目并协助我接入 KyrenPay 一次性收款。
+```
+
+[官方 Prompt](https://merchant.kyrenpay.com/agent-setup/prompt.md)、[任务索引](https://merchant.kyrenpay.com/agent-setup/tasks.md)和[验证清单](https://merchant.kyrenpay.com/agent-setup/verification.md)均为公开 Markdown，阅读无需登录。也可以在商户控制台的 **开发者工具 > API Keys** 复制接入指令。
+
+## 选择接入方式
+
+| 你的项目 | 接入方式 |
+| --- | --- |
+| 自研应用 | 服务端[一次性 Checkout](/zh/guides/collect-first-payment)、签名 Webhook 和持久化履约 |
+| new-api | 按已安装版本配置内置[易支付](/zh/integrations/new-api) |
+| sub2api | 按已安装版本配置内置 [EasyPay](/zh/integrations/sub2api) |
+| 其他已接入易支付的应用 | [易支付迁移](/zh/epay-migration/overview)和 MD5 通知协议 |
+| 无需编写代码的收款链接 | 控制台[产品](/zh/dashboard/products)和 [Checkout 链接](/zh/dashboard/checkouts) |
+
+实际可用支付方式、金额和币种取决于商户已开通的渠道。新订阅销售目前暂停，本指引覆盖一次性收款。
+
+## 准备账户与凭证
+
+注册或登录[商户账户](https://merchant.kyrenpay.com)，确认开户、渠道等前提条件，并在[开发者设置](/zh/dashboard/developer-settings)取得凭证。注册、认证、协议接受和付款由你完成；Agent 可以准备代码并引导后续步骤。
+
+在应用的服务端环境变量或密钥管理器中私下配置密钥，不要粘贴到 Agent 对话或提交到版本库。原生 Webhook Secret 与 API Key 不同。原生接入应在首笔付款前配置 Webhook，事后配置不会自动生成过去的 `order.paid` 通知。
+
+目前没有自助 Sandbox 密钥。只有 Kyren 提供对应地址和凭证后，才使用 [Staging 环境](/zh/testing)。不要在未经确认的生产渠道使用测试卡。
+
+## 检查接入结果
+
+让 Agent 列明修改文件、执行本地测试并报告待处理事项。重点检查签名拒绝、重复通知防重、金额与币种关联及故障恢复。应用不能根据浏览器回跳判断付款成功。
+
+本地模拟测试不代表真实支付已通过。取得授权测试环境后，由你完成付款，再分别核对 Kyren 已支付订单和应用履约记录。生产验收前阅读[上线清单](/zh/go-live-checklist)；尚未执行的环节应由 Agent 明确标记为未验证。
