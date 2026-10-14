@@ -6,7 +6,7 @@ audience: developer
 product_area: epay
 intent: how-to
 visibility: public
-last_verified_at: 2026-10-01
+last_verified_at: 2026-10-14
 source_owner: engineering
 ---
 
@@ -76,6 +76,12 @@ TOKENS 显示模式会通过 `QuotaPerUnit` 换算请求；使用前应核对已
 [通知实现](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/controller/topup.go)、[事务入账](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/model/topup.go)。参见 [Epay MD5 签名](/zh/epay-migration/signature)和[已付款但未入账](/zh/troubleshooting/paid-but-not-credited)。
 
 ## 常见配置问题
+
+### 核验版本的验收限制
+
+本地测试直接运行固定提交的控制器、Epay SDK 和 SQLite 事务，普通入账和重复通知防重通过。但 `EpayNotify` 不比较签名通知的 `money` 与保存的 `TopUp.Money`：预期 CNY 70.00 的充值收到正确签名的 CNY 0.01 通知，仍增加完整的已保存额度。未重新签名的金额篡改会被验签拒绝；这里的问题是已正确签名的金额错配。正式上线前，需要由核验后的应用版本或明确审查的应用改动拒绝该错配，不能将当前提交的此项验收标为通过。
+
+TOKENS 显示模式下，`QuotaPerUnit = 500,000`、`Price = 7.00` 时请求 5,250,000 额度，发送 CNY 73.50，但保存的整数 `Amount = 10`，最终增加 5,000,000 额度。首轮使用文档中的 USD/整数余额配置，开放小数 TOKENS 换算前单独核对。这些属于隔离源码测试，不代表在你的部署上完成了付款。
 
 - **支付地址错误：** `PayAddress` 保留 `/epay/`，SDK 会自行追加 `submit.php`。
 - **实付金额错误：** 同时检查 `Price`、用户组充值倍率、预设折扣、额度显示模式和启润客户承担的费用。显示币种不会选择启润收款币种。

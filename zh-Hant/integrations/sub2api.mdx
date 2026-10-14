@@ -6,7 +6,7 @@ audience: developer
 product_area: epay
 intent: how-to
 visibility: public
-last_verified_at: 2026-10-01
+last_verified_at: 2026-10-14
 source_owner: engineering
 ---
 
@@ -76,6 +76,12 @@ Epay 基礎金額不一定等於最終收銀總額。啟潤可能按支付渠道
 內建處理器支援 GET 通知，透過服務商驗證簽名。未知訂單也可能收到成功回應，因此啟潤已付款但餘額未增加時，應檢查後端日誌。[通知路由](https://github.com/Wei-Shaw/sub2api/blob/42bc7f6cffe24bcb471608e48e66b4a0afa1f882/backend/internal/server/routes/payment.go)、[通知處理器](https://github.com/Wei-Shaw/sub2api/blob/42bc7f6cffe24bcb471608e48e66b4a0afa1f882/backend/internal/handler/payment_webhook_handler.go)。參見 [Epay MD5 簽名](/zh-Hant/epay-migration/signature)和[已付款但未入帳](/zh-Hant/troubleshooting/paid-but-not-credited)。
 
 ## 常見設定問題
+
+### 核驗版本的驗收限制
+
+本地測試使用固定提交的真實服務商、Webhook 處理器、支付服務與 PostgreSQL 倉儲，發現通知金額允許誤差：預期 `10.00` 的訂單收到正確簽名的 `money = 9.99` 時被接受，增加儲存的 `10.00` 餘額；較大金額錯配被拒絕且未入帳。實作採用 0.01 容差，不是嚴格的十進位金額相等。
+
+並行通知可能返回需要重試的衝突，而非全部返回 `success`。應驗證失敗投遞經重試後成功，最終訂單和餘額只有一次履約。這些結果不代表你的部署已完成實際付款或執行嚴格金額相等政策。
 
 - **位址錯誤：** API 基礎位址保留 `/epay/`，不填寫商戶控制台位址或完整的 `submit.php` 位址。
 - **伺服器端建立被拒絕：** 啟潤啟用 API IP 白名單時，將 sub2api 伺服器的出口 IP 加入白名單，以便呼叫 `mapi.php`。瀏覽器 `submit.php` 收銀無需新增每位客戶的 IP。

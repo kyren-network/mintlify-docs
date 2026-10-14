@@ -6,7 +6,7 @@ audience: developer
 product_area: epay
 intent: how-to
 visibility: public
-last_verified_at: 2026-10-01
+last_verified_at: 2026-10-14
 source_owner: engineering
 ---
 
@@ -76,6 +76,12 @@ The Epay base amount is not always the final checkout total. Kyren may add a cus
 The built-in handler accepts GET notifications and performs verification through the provider. Its acknowledgement can also cover an unknown order, so inspect backend logs if Kyren is paid but balance has not increased. [Callback routes](https://github.com/Wei-Shaw/sub2api/blob/42bc7f6cffe24bcb471608e48e66b4a0afa1f882/backend/internal/server/routes/payment.go), [callback handler](https://github.com/Wei-Shaw/sub2api/blob/42bc7f6cffe24bcb471608e48e66b4a0afa1f882/backend/internal/handler/payment_webhook_handler.go). See [Epay MD5 signatures](/epay-migration/signature) and [Paid but not credited](/troubleshooting/paid-but-not-credited).
 
 ## Common configuration problems
+
+### Acceptance limits in the documented version
+
+Local tests using the pinned commit's real provider, Webhook handler, payment service and PostgreSQL repository found an amount tolerance: a correctly signed `money = 9.99` was accepted for an expected `10.00` order and credited the stored `10.00` balance amount; a large amount mismatch was rejected without crediting. The implemented tolerance is 0.01, not exact decimal equality.
+
+Concurrent deliveries can return a retryable conflict rather than all returning `success`. Check that failed attempts are retried and the final order and balance show one fulfillment. These results do not establish a live payment test or an exact-match amount policy on your deployment.
 
 - **Wrong endpoint:** preserve `/epay/` in the API base. Do not enter the merchant dashboard URL or a complete `submit.php` URL.
 - **Server-side creation denied:** if Kyren's API IP allowlist is enabled, allow the sub2api server's outbound IP for `mapi.php`. Browser `submit.php` checkout does not require adding each customer's IP.

@@ -6,7 +6,7 @@ audience: developer
 product_area: epay
 intent: how-to
 visibility: public
-last_verified_at: 2026-10-01
+last_verified_at: 2026-10-14
 source_owner: engineering
 ---
 
@@ -76,6 +76,12 @@ Epay 基础金额不一定等于最终收银总额。启润可能按支付渠道
 内置处理器支持 GET 通知，通过服务商验证签名。未知订单也可能收到成功应答，因此启润已付款但余额未增加时，应检查后端日志。[通知路由](https://github.com/Wei-Shaw/sub2api/blob/42bc7f6cffe24bcb471608e48e66b4a0afa1f882/backend/internal/server/routes/payment.go)、[通知处理器](https://github.com/Wei-Shaw/sub2api/blob/42bc7f6cffe24bcb471608e48e66b4a0afa1f882/backend/internal/handler/payment_webhook_handler.go)。参见 [Epay MD5 签名](/zh/epay-migration/signature)和[已付款但未入账](/zh/troubleshooting/paid-but-not-credited)。
 
 ## 常见配置问题
+
+### 核验版本的验收限制
+
+本地测试使用固定提交的真实服务商、Webhook 处理器、支付服务与 PostgreSQL 仓储，发现通知金额允许误差：预期 `10.00` 的订单收到正确签名的 `money = 9.99` 时被接受，增加保存的 `10.00` 余额；较大金额错配被拒绝且未入账。实现采用 0.01 容差，不是严格的十进制金额相等。
+
+并发通知可能返回需要重试的冲突，而非全部返回 `success`。应验证失败投递经过重试后成功，最终订单和余额只有一次履约。这些结果不代表你的部署已完成实际付款或执行严格金额相等政策。
 
 - **地址错误：** API 基础地址保留 `/epay/`，不填写商户控制台地址或完整的 `submit.php` 地址。
 - **服务端创建被拒绝：** 启润启用 API IP 白名单时，将 sub2api 服务器的出口 IP 加入白名单，以便调用 `mapi.php`。浏览器 `submit.php` 收银无需添加每位客户的 IP。

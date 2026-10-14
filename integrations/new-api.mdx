@@ -6,7 +6,7 @@ audience: developer
 product_area: epay
 intent: how-to
 visibility: public
-last_verified_at: 2026-10-01
+last_verified_at: 2026-10-14
 source_owner: engineering
 ---
 
@@ -76,6 +76,12 @@ In TOKENS display mode, the request is converted through `QuotaPerUnit`; check t
 [Callback implementation](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/controller/topup.go), [transactional crediting](https://github.com/QuantumNous/new-api/blob/56758edf95ec162033a6b73b553ac789404f87c9/model/topup.go). See [Epay MD5 signatures](/epay-migration/signature) and [Paid but not credited](/troubleshooting/paid-but-not-credited).
 
 ## Common configuration problems
+
+### Acceptance limits in the documented version
+
+Local tests against the pinned commit's actual controller, Epay SDK and SQLite transaction logic confirmed ordinary crediting and duplicate protection. They also found that `EpayNotify` does not compare signed callback `money` with the stored `TopUp.Money`: a stored CNY 70.00 purchase accepted a correctly signed CNY 0.01 callback and credited its full stored entitlement. Changing an unsigned amount still fails signature verification; this finding concerns a signed amount mismatch. Before production readiness, require that mismatch to be rejected by a verified application version or an explicitly reviewed application change. Do not mark this acceptance check passed for the documented commit.
+
+In TOKENS display, requesting 5,250,000 quota units with `QuotaPerUnit = 500,000` and `Price = 7.00` sent CNY 73.50 but persisted integer `Amount = 10` and credited 5,000,000 quota units. Start with the documented USD/integer-balance configuration and verify fractional TOKENS conversion before enabling it. These are isolated source-level tests, not a payment on your deployment.
 
 - **Wrong payment URL:** preserve `/epay/` in `PayAddress`; the SDK adds `submit.php` itself.
 - **Wrong charge:** check `Price`, group recharge ratio, preset discounts, quota display mode and Kyren customer-paid fees together. Display currency does not select Kyren's charge currency.
