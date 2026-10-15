@@ -1,16 +1,17 @@
 ---
-title: Webhook 概述
-description: 透過 Webhook 接收即時支付通知
+title: "支付 Webhook 串接指南"
+sidebarTitle: Webhook 概述
+description: "配置 KyrenPay 支付 Webhook 通知，了解事件投遞流程、簽名驗證、失敗重試與訂單履約，可靠地同步支付結果。"
 ---
 
-Webhook 允許啟潤支付在付款或退款成功時向你的伺服器發送通知。支援的事件及可選爭議通知見[事件類型](/zh-Hant/webhooks/events)。
+Webhook 允許KyrenPay在付款或退款成功時向你的伺服器發送通知。支援的事件及可選爭議通知見[事件類型](/zh-Hant/webhooks/events)。
 
 ## 工作原理
 
 ```mermaid
 sequenceDiagram
     participant Customer as 客戶
-    participant KyrenPay as 啟潤支付
+    participant KyrenPay as KyrenPay
     participant YourServer as 你的伺服器
 
     Customer->>KyrenPay: 完成付款
@@ -23,7 +24,7 @@ sequenceDiagram
 ```
 
 1. 事件發生（如客戶完成付款）
-2. 啟潤支付向你配置的 Webhook URL 發送 HTTP POST 請求
+2. KyrenPay向你配置的 Webhook URL 發送 HTTP POST 請求
 3. 請求中包含用於驗證的簽名
 4. 你的伺服器驗證簽名、持久化事件，並在 10 秒內返回 `200`
 5. 工作程序冪等處理已持久化的事件，並負責自己的重試
@@ -80,13 +81,13 @@ sequenceDiagram
     始終驗證 `X-Kyren-Signature` 請求標頭以確保 Webhook 的真實性。參見 [Webhook 簽名驗證](/zh-Hant/webhooks/signatures)。
   </Card>
   <Card title="快速返回 200" icon="clock">
-    驗證簽名並持久化事件後再返回 `200`。持久化失敗時返回非 `2xx`，讓 Kyren 重試。
+    驗證簽名並持久化事件後再返回 `200`。持久化失敗時返回非 `2xx`，讓 KyrenPay 重試。
   </Card>
   <Card title="處理重複事件" icon="copy">
     使用事件 `id` 進行去重。由於重試機制，你的端點可能會收到同一事件多次。
   </Card>
   <Card title="使用訊息佇列" icon="list">
-    非同步處理時，將事件儲存到持久化接收表或佇列，儲存成功後才確認。Kyren 收到 `2xx` 後，工作程序需要負責自己的重試。
+    非同步處理時，將事件儲存到持久化接收表或佇列，儲存成功後才確認。KyrenPay 收到 `2xx` 後，工作程序需要負責自己的重試。
   </Card>
 </CardGroup>
 

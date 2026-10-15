@@ -1,6 +1,7 @@
 ---
-title: 上线清单
-description: 在接受生产流量前检查 Kyren Pay 设置
+title: "支付接入上线检查清单"
+sidebarTitle: 上线清单
+description: "上线前检查 KyrenPay API 密钥、Webhook 验签、订单履约、资金对账及支持流程，确认生产收款准备情况。"
 language: zh
 audience: merchant
 product_area: checkout
@@ -10,7 +11,7 @@ last_verified_at: 2026-05-26
 source_owner: product
 ---
 
-在把真实客户发送到 Kyren Pay Checkout 前，使用本清单检查你的设置。
+在把真实客户发送到 KyrenPay Checkout 前，使用本清单检查你的设置。
 
 ## 账户和产品设置
 
@@ -23,12 +24,12 @@ source_owner: product
 
 - API 密钥只保存在服务端。
 - API 密钥没有出现在浏览器 JavaScript、移动端应用、日志、截图或公开仓库中。
-- 部署环境使用正确的 Kyren API Base URL。
+- 部署环境使用正确的 KyrenPay API Base URL。
 
 ## Webhook
 
 - 已在控制台配置 Webhook URL。
-- 你的服务端会验证 Kyren Webhook 签名。
+- 你的服务端会验证 KyrenPay Webhook 签名。
 - 你的服务端在处理合法事件后返回 2xx 响应。
 - 你的履约逻辑是幂等的，可以处理重复投递。
 
@@ -36,12 +37,12 @@ source_owner: product
 
 - 你的系统只在订单已支付或收到支付成功 Webhook 后履约。
 - 需要对账时，你会在 metadata 中保存内部订单 ID 或用户 ID。
-- 团队知道如何在 Kyren 控制台查找订单。
+- 团队知道如何在 KyrenPay 控制台查找订单。
 
 ## 支持准备
 
 - 支持团队知道在哪里找到订单号。
-- 联系 Kyren 支持时，团队可以提供 Checkout Session ID、订单号、时间戳、Webhook URL，以及你的服务端观察到的响应或错误。
+- 联系 KyrenPay 支持时，团队可以提供 Checkout Session ID、订单号、时间戳、Webhook URL，以及你的服务端观察到的响应或错误。
 
 ## 相关页面
 

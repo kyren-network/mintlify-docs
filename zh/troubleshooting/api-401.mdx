@@ -1,6 +1,6 @@
 ---
 title: "API 请求返回 401"
-description: "排查 Kyren Pay API 鉴权失败问题。"
+description: "排查 KyrenPay API 鉴权失败问题。"
 language: zh
 audience: merchant
 product_area: troubleshooting
@@ -12,7 +12,7 @@ source_owner: support
 
 ## 现象
 
-你的服务端调用 Kyren Pay API 时收到 `401 Unauthorized`。
+你的服务端调用 KyrenPay API 时收到 `401 Unauthorized`。
 
 ## 常见原因
 
@@ -24,7 +24,7 @@ Checkout API 返回 `401` 时，先检查 `x-api-key`、凭证所属环境和服
 - 已启用 IP 白名单，但请求来自未加入白名单的服务器 IP。
 - Key 已泄露，不应继续信任。
 
-## 在 Kyren 中检查
+## 在 KyrenPay 中检查
 
 - 打开 **控制台 > 开发者设置**，确认当前有效的 API Key。
 - 如果启用了 IP 白名单，确认你的服务端出口 IP 已加入白名单。
@@ -34,7 +34,7 @@ Checkout API 返回 `401` 时，先检查 `x-api-key`、凭证所属环境和服
 
 - 确认请求以 HTTP Header 形式发送 `x-api-key`。
 - 检查部署后运行中的进程是否正确加载了密钥。
-- 确认请求发送到预期的 Kyren Pay API Base URL。
+- 确认请求发送到预期的 KyrenPay API Base URL。
 - 排查最近部署中是否修改了 Key、密钥名称或配置。
 
 ## 修复
@@ -46,7 +46,7 @@ Checkout API 返回 `401` 时，先检查 `x-api-key`、凭证所属环境和服
 
 ## 仍未解决时联系支持
 
-联系 Kyren 支持时，请提供请求时间、接口路径、响应状态和商户账号。不要发送完整 API Key。
+联系 KyrenPay 支持时，请提供请求时间、接口路径、响应状态和商户账号。不要发送完整 API Key。
 
 ## 相关页面
 

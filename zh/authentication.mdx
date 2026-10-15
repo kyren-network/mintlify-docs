@@ -1,6 +1,7 @@
 ---
-title: 认证
-description: 使用 API 密钥认证你的 API 请求
+title: "支付 API 密钥认证"
+sidebarTitle: 认证
+description: "了解 KyrenPay 支付 API 的 x-api-key 认证方式，在商户控制台获取 API 密钥，安全地从服务端发起请求并处理认证错误。"
 ---
 
 公开商户集成接口（如 `/v1/products`、`/v1/checkouts` 和 `/v1/orders`）通过 `x-api-key` 请求头中的 API 密钥认证。
@@ -18,7 +19,7 @@ Epay 的独立签名规则见 [Epay 签名](/zh/epay-migration/signature)。
 
 ## API 密钥
 
-启润支付使用 API 密钥来认证请求。你可以在[商户控制台](https://merchant.kyrenpay.com)中管理你的 API 密钥。
+KyrenPay使用 API 密钥来认证请求。你可以在[商户控制台](https://merchant.kyrenpay.com)中管理你的 API 密钥。
 
 当前后端实现接受生产 API 密钥：
 
@@ -48,12 +49,12 @@ curl https://api.kyrenpay.com/v1/products \
 | 环境 | Base URL | API 密钥前缀 |
 | --- | --- | --- |
 | 生产环境 | `https://api.kyrenpay.com` | `kyren_live_` |
-| Staging | 由 Kyren 支持提供 | 仅使用 Kyren 为该 Staging 环境提供的凭证 |
+| Staging | 由 KyrenPay 支持提供 | 仅使用 KyrenPay 为该 Staging 环境提供的凭证 |
 
 <Info>
   当前公开生产 API 接受 `kyren_live_` 前缀的生产密钥。
   商户控制台目前不提供自助创建 `kyren_test_` 测试密钥。
-  只有在 Kyren 向你提供对应环境的 Base URL 和凭证时，才应使用 Staging 环境。
+  只有在 KyrenPay 向你提供对应环境的 Base URL 和凭证时，才应使用 Staging 环境。
 </Info>
 
 ## 重新生成 API 密钥

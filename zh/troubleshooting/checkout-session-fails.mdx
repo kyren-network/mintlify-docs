@@ -23,7 +23,7 @@ source_owner: support
 - 缺少 `successUrl`（也接受 `success_url`），或其格式无效。`cancelUrl` / `cancel_url` 可选，缺少它不会导致创建失败。
 - 鉴权失败，请求未进入 Checkout 处理。
 
-## 在 Kyren 中检查
+## 在 KyrenPay 中检查
 
 - 在 **控制台 > 产品** 确认产品处于启用状态。
 - 检查产品价格和币种。
@@ -36,7 +36,7 @@ source_owner: support
 - 创建或修改产品时，`price` 使用十进制字符串（例如 `"9.99"`），币种使用平台允许的三位代码。
 - `successUrl` 必填，后端要求 `http://` 或 `https://` 格式；生产环境使用完整 HTTPS URL。提供 `cancelUrl` 时也使用有效的站点 URL。
 - 配置 API IP 白名单时，检查服务器出口 IP。读取响应的 `data.id` 和 `data.url`，不要从顶层查找它们。
-- 记录请求体和 Kyren 响应状态，但不要记录密钥。
+- 记录请求体和 KyrenPay 响应状态，但不要记录密钥。
 
 ## 修复
 
@@ -44,7 +44,7 @@ source_owner: support
 
 ## 仍未解决时联系支持
 
-联系 Kyren 支持时，请提供请求时间、产品 ID、币种、响应状态和错误信息。不要发送 API Key。
+联系 KyrenPay 支持时，请提供请求时间、产品 ID、币种、响应状态和错误信息。不要发送 API Key。
 
 ## 相关页面
 

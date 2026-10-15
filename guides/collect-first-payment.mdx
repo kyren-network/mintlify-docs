@@ -1,6 +1,7 @@
 ---
-title: Collect Your First Payment
-description: End-to-end guide to accepting a payment with Kyren Pay
+title: "Collect your first payment with Checkout"
+sidebarTitle: Collect Your First Payment
+description: "Build a KyrenPay payment flow from product and Checkout creation to Webhook verification, durable event handling, and order fulfillment."
 ---
 
 This guide explains one-time hosted Checkout integration using a Node.js backend. The examples require your application's login and database adapters before they can run. The same flow applies to other languages.
@@ -25,7 +26,7 @@ Related pages:
 sequenceDiagram
     participant Customer
     participant YourServer as Your Server
-    participant KyrenPay as Kyren Pay API
+    participant KyrenPay as KyrenPay API
     participant Checkout as Checkout Page
 
     Customer->>YourServer: Click "Buy Credits"
@@ -51,9 +52,9 @@ Create your server file. Implement `app-adapters.js` using your application's au
 
 - `requireUser` rejects unauthenticated requests and supplies `req.user` from a verified login, never from client-supplied user IDs. Apply your application's CSRF protection to cookie-authenticated purchase requests.
 - `checkoutStore.withLockedOrder(userId, productId, callback)` creates or locks the user's current pending business order, with authorization and a database lock or durable reservation across processes. Persist its expected product, price, currency and credit entitlement from your server's catalog.
-- `markCreationPending` durably records creation in progress **before** calling Kyren. `attachSession` stores the Session ID, URL, amount, currency and expiry, verifies them against the order, and clears that marker. Keep the marker on timeouts or failed local saves; releasing a lock must not roll it back. Do not automatically create another Session for an uncertain request: the current API has no Checkout creation idempotency key.
+- `markCreationPending` durably records creation in progress **before** calling KyrenPay. `attachSession` stores the Session ID, URL, amount, currency and expiry, verifies them against the order, and clears that marker. Keep the marker on timeouts or failed local saves; releasing a lock must not roll it back. Do not automatically create another Session for an uncertain request: the current API has no Checkout creation idempotency key.
 - `webhookInbox.insertIfAbsent` durably inserts a pending event with a unique event ID. Existing events are acknowledged without resetting their processing state. A worker must claim pending events and retry failures until handled or escalated.
-- `fulfillPaidOrderIdempotently` checks the business order association, product, base amount and currency using decimal arithmetic. In one database transaction, uniquely record the Kyren order ID, mark the business order fulfilled and credit its recorded user and entitlement. Reject missing or mismatched associations. Apply it to both Webhooks and reconciliation.
+- `fulfillPaidOrderIdempotently` checks the business order association, product, base amount and currency using decimal arithmetic. In one database transaction, uniquely record the KyrenPay order ID, mark the business order fulfilled and credit its recorded user and entitlement. Reject missing or mismatched associations. Apply it to both Webhooks and reconciliation.
 
 Register JSON parsing only on normal routes, as shown below. Never register a global `express.json()` before the raw Webhook route.
 
@@ -256,7 +257,7 @@ async function reconcilePayment(order) {
 
 Load reconciliation orders from your own database; do not accept arbitrary order IDs from the browser. Handle refunds separately using [Webhook events](/webhooks/events). Both payment paths must use the same fulfillment transaction so a late Webhook cannot credit an already reconciled order again.
 
-Checkout expires after 24 hours and uses `OPEN`, `COMPLETE`, `EXPIRED`. Its successful Kyren `orderId` is available through the authenticated Session query; it is not returned when creating the Session. An expired or canceled browser flow is not proof that an existing payment attempt failed. Reconcile before offering a replacement purchase. Show pending status on `successUrl` until your backend confirms payment; never credit from a browser redirect. Use the exact returned `data.url`, without constructing the hosted path yourself.
+Checkout expires after 24 hours and uses `OPEN`, `COMPLETE`, `EXPIRED`. Its successful KyrenPay `orderId` is available through the authenticated Session query; it is not returned when creating the Session. An expired or canceled browser flow is not proof that an existing payment attempt failed. Reconcile before offering a replacement purchase. Show pending status on `successUrl` until your backend confirms payment; never credit from a browser redirect. Use the exact returned `data.url`, without constructing the hosted path yourself.
 
 ## 7. Start the Server
 
@@ -274,15 +275,15 @@ KYREN_API_KEY=kyren_live_xxx KYREN_WEBHOOK_SECRET=whsec_xxx KYREN_PRODUCT_ID=pro
 
 ## 8. Test the Flow
 
-1. If Kyren has issued staging credentials or enabled a test-capable gateway for your merchant account, run the flow with those credentials and the payment scenarios Kyren provides.
+1. If KyrenPay has issued staging credentials or enabled a test-capable gateway for your merchant account, run the flow with those credentials and the payment scenarios KyrenPay provides.
 2. If you only have live credentials, verify the flow with a low-risk real payment in production.
-3. Confirm your customer is redirected to the Kyren Pay checkout page.
+3. Confirm your customer is redirected to the KyrenPay checkout page.
 4. Confirm your server receives the payment Webhook and that your fulfillment logic handles the event correctly.
    Test duplicate and concurrent notifications, unavailable inbox storage, worker restart, a Webhook racing reconciliation, and expired Sessions. Each business order must credit at most once, and failed persistence must return a non-`2xx` response.
-5. If you used a real payment for verification, refund or handle it operationally according to Kyren support guidance if needed.
+5. If you used a real payment for verification, refund or handle it operationally according to KyrenPay support guidance if needed.
 
 <Check>
-  Your integration is ready when checkout creation, redirect handling, Webhook receipt, and fulfillment have all been verified with the credentials and gateway Kyren has enabled for your account.
+  Your integration is ready when checkout creation, redirect handling, Webhook receipt, and fulfillment have all been verified with the credentials and gateway KyrenPay has enabled for your account.
 </Check>
 
 ## Next Steps

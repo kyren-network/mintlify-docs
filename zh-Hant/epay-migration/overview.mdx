@@ -1,6 +1,7 @@
 ---
-title: "Epay 相容遷移"
-description: "將現有 Epay 風格整合遷移到 Kyren Pay 相容端點。"
+title: "易支付遷移與相容 API"
+sidebarTitle: "Epay 相容遷移"
+description: "將現有易支付整合遷移到 KyrenPay，了解 submit.php、mapi.php、api.php 相容端點、MD5 簽名與非同步支付通知。"
 language: zh-Hant
 audience: developer
 product_area: epay
@@ -10,13 +11,13 @@ last_verified_at: 2026-07-08
 source_owner: engineering
 ---
 
-如果你已經有 Epay 風格的整合，並希望在遷移到 Kyren Pay 時保留原有請求格式，請使用 Epay 相容路徑。新接入建議優先使用原生 Kyren Checkout，參考[快速開始](/zh-Hant/quickstart)，因為原生 Checkout 直接使用 Kyren API 認證和目前訂單模型。
+如果你已經有 Epay 風格的整合，並希望在遷移到 KyrenPay 時保留原有請求格式，請使用 Epay 相容路徑。新接入建議優先使用原生 KyrenPay Checkout，參考[快速開始](/zh-Hant/quickstart)，因為原生 Checkout 直接使用 KyrenPay API 認證和目前訂單模型。
 
-透過這些相容端點建立的 Epay 來源訂單，會進入與原生 Checkout 訂單相同的 Kyren 訂單與結算系統。相容層只影響入口路徑和回應格式。
+透過這些相容端點建立的 Epay 來源訂單，會進入與原生 Checkout 訂單相同的 KyrenPay 訂單與結算系統。相容層只影響入口路徑和回應格式。
 
 ## 端點對照
 
-| 原 Epay 路徑 | 方法 | 用途 | Kyren 行為 |
+| 原 Epay 路徑 | 方法 | 用途 | KyrenPay 行為 |
 | --- | --- | --- | --- |
 | `/epay/submit.php` | `GET` 或 `POST` | 頁面跳轉收銀台 | 建立或復用訂單，然後返回 HTTP `302` 到 `/epay/redirect/{orderId}` 或上游支付頁面。 |
 | `/epay/mapi.php` | `POST` | 服務端直連建立支付 | 建立或復用訂單，並依渠道返回 `payurl`、`qrcode`、`img`、`trade_no` 等 Epay 風格欄位。 |
@@ -25,8 +26,8 @@ source_owner: engineering
 
 ## 遷移流程
 
-1. 將 Epay 基礎 URL 替換為 Kyren Pay API 基礎 URL，並保留相容路徑。
-2. 使用 Kyren 發放的 `pid` 和商戶密鑰進行 Epay 相容簽名。
+1. 將 Epay 基礎 URL 替換為 KyrenPay API 基礎 URL，並保留相容路徑。
+2. 使用 KyrenPay 發放的 `pid` 和商戶密鑰進行 Epay 相容簽名。
 3. Epay 相容請求繼續使用 `pid + sign` 認證。不要發送 `x-api-key`。
 4. 將支付 `type` 對應到支援值，例如 `alipay`、`wxpay`、`creditcard`、`crypto` 或 `paynow`。
 5. 瀏覽器收銀台流量接入 [`submit.php`](/zh-Hant/epay-migration/submit-php)，服務端建立支付接入 [`mapi.php`](/zh-Hant/epay-migration/mapi-php)。

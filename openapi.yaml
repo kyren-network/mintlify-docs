@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
-  title: Kyren Pay API
+  title: KyrenPay API
   description: |
-    The Kyren Pay API enables merchants to accept payments from customers worldwide.
+    The KyrenPay API enables merchants to accept payments from customers worldwide.
     Integrate checkout sessions, manage products, track orders, and handle webhooks.
 
     **Authentication**: Server-side merchant integrations use `x-api-key`.
@@ -19,7 +19,7 @@ info:
     - **calendar date**: Agreement `effectiveDate` uses a `YYYY-MM-DD` string; it is a calendar date, not an event timestamp.
   version: "1.0.0"
   contact:
-    name: Kyren Pay Support
+    name: KyrenPay Support
     email: support@kyrenpay.com
     url: https://kyrenpay.com
 
@@ -27,7 +27,7 @@ servers:
   - url: https://api.kyrenpay.com
     description: Production
   - url: https://staging-api.kyren.top
-    description: Staging, available only with credentials issued by Kyren
+    description: Staging, available only with credentials issued by KyrenPay
 
 security:
   - ApiKeyAuth: []
@@ -42,7 +42,7 @@ tags:
   - name: Orders
     description: View and manage orders created from completed checkout sessions.
   - name: Refunds
-    description: Create and retrieve refunds for eligible paid Kyren API orders.
+    description: Create and retrieve refunds for eligible paid KyrenPay API orders.
   - name: Balance
     description: View your account balance and transaction history.
   - name: Epay Compatibility
@@ -572,7 +572,7 @@ paths:
       tags: [Refunds]
       summary: Create a refund
       description: |
-        Creates a full or partial refund for an eligible paid order created through the native Kyren API.
+        Creates a full or partial refund for an eligible paid order created through the native KyrenPay API.
         Epay-source orders must be refunded through the Epay compatibility API.
       parameters:
         - name: orderId
@@ -580,7 +580,7 @@ paths:
           required: true
           schema:
             type: string
-          description: The Kyren order ID to refund
+          description: The KyrenPay order ID to refund
       requestBody:
         required: true
         content:
@@ -637,7 +637,7 @@ paths:
           required: true
           schema:
             type: string
-          description: The Kyren refund ID
+          description: The KyrenPay refund ID
       responses:
         "200":
           description: The refund object
@@ -773,7 +773,7 @@ paths:
         This endpoint also accepts GET with the same parameters.
 
         Paydify：商户一次性加密货币通道绑定 Paydify 时使用 `type=crypto`（不是 `paydify`）。
-        返回 302 到 Kyren 本地 `/epay/redirect/{orderId}`，入口受理时不创建上游支付。
+        返回 302 到 KyrenPay 本地 `/epay/redirect/{orderId}`，入口受理时不创建上游支付。
         买家在本地页选择 App / 网络并确认 USDT 报价后，才创建上游支付和展示二维码。
         无需商户提交 App、网络或 Paydify 专用 `channel_param`。目标环境须已部署且渠道已开通。
 
@@ -834,7 +834,7 @@ paths:
         For redirect-style channels, response includes `payurl`.
 
         Paydify：商户一次性加密货币通道绑定 Paydify 时使用 `type=crypto`，沿用 MD5 签名。
-        返回 `code=1/trade_no/out_trade_no/payurl`，其中 `payurl` 指向 Kyren 本地支付页；不返回上游 `qrcode/img`。
+        返回 `code=1/trade_no/out_trade_no/payurl`，其中 `payurl` 指向 KyrenPay 本地支付页；不返回上游 `qrcode/img`。
         买家选择 App / 网络并确认有效 USDT 报价后才创建上游支付；不新增商户必填参数，目前不支持 USDC。
         `money/money_type` 表示原商品计价金额，不是应付 USDT 数量；入口 `code=1` 不代表已付款。
         同一商户 `out_trade_no` 重试必须保持金额、币种和支付方式一致，不能用重建订单处理未知支付结果。
@@ -996,7 +996,7 @@ components:
       in: header
       name: x-api-key
       description: |
-        Your API key. Public production API-key endpoints accept `kyren_live_*` keys. Staging credentials are environment-specific and must be used only with the staging environment for which Kyren issued them.
+        Your API key. Public production API-key endpoints accept `kyren_live_*` keys. Staging credentials are environment-specific and must be used only with the staging environment for which KyrenPay issued them.
 
   parameters:
     ResourceId:
@@ -1227,7 +1227,7 @@ components:
           description: |
             Optional stable merchant-side customer ID, also accepted as merchant_customer_id.
             This is separate from metadata used to associate your business order for fulfillment.
-            For DOKU OVO, an explicitly identified end customer must already be registered with Kyren;
+            For DOKU OVO, an explicitly identified end customer must already be registered with KyrenPay;
             omit this field to use the hosted anonymous browser binding flow.
         displayMerchantName:
           type: string
@@ -1309,7 +1309,7 @@ components:
         display_merchant_name:
           type: string
           maxLength: 80
-          description: Optional per-payment merchant display name shown on Kyren intermediate payment pages
+          description: Optional per-payment merchant display name shown on KyrenPay intermediate payment pages
         userId:
           type: string
           description: Optional merchant user identifier passed to the payment gateway when supported.
@@ -1366,7 +1366,7 @@ components:
         display_merchant_name:
           type: string
           maxLength: 80
-          description: Optional per-payment merchant display name shown on Kyren intermediate payment pages
+          description: Optional per-payment merchant display name shown on KyrenPay intermediate payment pages
         clientip:
           type: string
           description: Client IP address
@@ -1447,7 +1447,7 @@ components:
           type: ["string","null"]
           description: >-
             Redirect URL for browser/app payment flows.
-            Paydify 返回 Kyren 本地 `/epay/redirect/{orderId}`，不是上游付款二维码内容或已付款凭据。
+            Paydify 返回 KyrenPay 本地 `/epay/redirect/{orderId}`，不是上游付款二维码内容或已付款凭据。
         qrcode:
           type: ["string","null"]
           description: >-
@@ -1522,7 +1522,7 @@ components:
           description: Merchant refund number when provided
         refund_id:
           type: string
-          description: Kyren refund ID
+          description: KyrenPay refund ID
         money:
           type: string
           description: Refund amount
@@ -1588,7 +1588,7 @@ components:
           description: Product billing mode; this guide's one-time integration uses ONE_TIME.
         orderId:
           type: string
-          description: Kyren order ID for the final successful payment. Present only after the checkout has been linked to that order.
+          description: KyrenPay order ID for the final successful payment. Present only after the checkout has been linked to that order.
         url:
           type: string
           format: uri
@@ -1958,7 +1958,7 @@ components:
       properties:
         code:
           type: integer
-          description: Kyren business error code, not the HTTP status. For example, HTTP 400 may contain code 40001.
+          description: KyrenPay business error code, not the HTTP status. For example, HTTP 400 may contain code 40001.
         message:
           type: string
         error:

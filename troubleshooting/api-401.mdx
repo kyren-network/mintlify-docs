@@ -1,6 +1,6 @@
 ---
 title: "API request returns 401"
-description: "Diagnose Kyren Pay API authentication failures."
+description: "Diagnose KyrenPay API authentication failures."
 language: en
 audience: merchant
 product_area: troubleshooting
@@ -12,7 +12,7 @@ source_owner: support
 
 ## Symptom
 
-Your server calls a Kyren Pay API endpoint and receives `401 Unauthorized`.
+Your server calls a KyrenPay API endpoint and receives `401 Unauthorized`.
 
 If your Checkout API call returns `401`, check authentication before changing product or Session parameters. Check the `x-api-key` header, the credential's environment and your server's IP allowlist entry. See [Checkout Quickstart](/quickstart) for the required server-side credentials.
 
@@ -24,7 +24,7 @@ If your Checkout API call returns `401`, check authentication before changing pr
 - IP allowlisting is enabled and the request comes from an unlisted server IP.
 - The key was exposed and should no longer be trusted.
 
-## Check this in Kyren
+## Check this in KyrenPay
 
 - Open **Dashboard > Developer settings** and confirm the active API key.
 - If IP allowlisting is enabled, confirm your outbound server IP is listed.
@@ -34,7 +34,7 @@ If your Checkout API call returns `401`, check authentication before changing pr
 
 - Confirm the request sends `x-api-key` exactly as an HTTP header.
 - Check that secrets were loaded into the running process after deployment.
-- Verify the request is going to the intended Kyren Pay API base URL.
+- Verify the request is going to the intended KyrenPay API base URL.
 - Search recent deploys for key rotation, secret name, or configuration changes.
 
 ## Fix
@@ -46,7 +46,7 @@ If your Checkout API call returns `401`, check authentication before changing pr
 
 ## Contact support if unresolved
 
-Contact Kyren support with the request time, endpoint path, response status, and merchant account. Do not send your full API key.
+Contact KyrenPay support with the request time, endpoint path, response status, and merchant account. Do not send your full API key.
 
 ## Related pages
 

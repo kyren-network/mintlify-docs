@@ -10,7 +10,7 @@ last_verified_at: 2026-07-08
 source_owner: engineering
 ---
 
-`/epay/mapi.php` is the server-to-server Epay compatibility endpoint. It accepts form `POST`, creates or reuses a Kyren order, and returns Epay-style response fields such as `payurl`, `qrcode`, `img`, and `trade_no` depending on the selected channel.
+`/epay/mapi.php` is the server-to-server Epay compatibility endpoint. It accepts form `POST`, creates or reuses a KyrenPay order, and returns Epay-style response fields such as `payurl`, `qrcode`, `img`, and `trade_no` depending on the selected channel.
 
 This endpoint uses `pid + sign`, not `x-api-key`. Because it is server-to-server, it may be subject to the API IP allowlist when enabled. A failed allowlist check can return numeric `code` `0` with `msg`.
 
@@ -20,7 +20,7 @@ Required parameters:
 
 | Parameter | Description |
 | --- | --- |
-| `pid` | Kyren-issued merchant Epay-compatible merchant ID. |
+| `pid` | KyrenPay-issued merchant Epay-compatible merchant ID. |
 | `type` | Payment type. Supported values include `alipay`, `wxpay`, `creditcard`, `crypto`, and `paynow`. |
 | `out_trade_no` | Your merchant order number. |
 | `notify_url` | Merchant payment result notification URL. |
@@ -37,10 +37,10 @@ Optional parameters:
 | `return_url` | Browser return URL when the channel uses a payment page. |
 | `money_type` | Currency or money type if provided by your existing integration. |
 | `device` | Optional device hint: `pc` or `mobile`. Reusing the same order number with a different Alipay/WeChat device flow can be rejected. |
-| `display_merchant_name` | Per-payment merchant display name shown on Kyren intermediate payment pages. |
+| `display_merchant_name` | Per-payment merchant display name shown on KyrenPay intermediate payment pages. |
 | `param` | Passthrough merchant metadata returned in notifications. |
 | `userId` | Optional merchant user identifier passed to the payment gateway when supported. |
-| `channel_param` | Optional channel-extension JSON string for non-credit-card payment types. When `type=creditcard`, its original value is included in the Epay signature but Kyren completely ignores it after signature verification. Do not send card number, expiry date, CVV, billing details, or contact information in `channel_param`; the buyer enters card details on a Kyren or upstream hosted page. Top-level `email`, `phone`, and `userId` parameters are unaffected. |
+| `channel_param` | Optional channel-extension JSON string for non-credit-card payment types. When `type=creditcard`, its original value is included in the Epay signature but KyrenPay completely ignores it after signature verification. Do not send card number, expiry date, CVV, billing details, or contact information in `channel_param`; the buyer enters card details on a KyrenPay or upstream hosted page. Top-level `email`, `phone`, and `userId` parameters are unaffected. |
 
 ## Example request
 

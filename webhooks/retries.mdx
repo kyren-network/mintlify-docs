@@ -1,13 +1,14 @@
 ---
-title: Webhook Retries
-description: How Kyren Pay retries failed webhook deliveries
+title: "Webhook retries and duplicate events"
+sidebarTitle: Webhook Retries
+description: "Understand KyrenPay Webhook retry timing, successful acknowledgments, and idempotent handling of duplicate payment notifications."
 ---
 
-If your webhook endpoint doesn't respond with a `2xx` status code, Kyren Pay will automatically retry the delivery.
+If your webhook endpoint doesn't respond with a `2xx` status code, KyrenPay will automatically retry the delivery.
 
 ## Retry Schedule
 
-For order and dispute events described in this guide, Kyren Pay makes up to **7 delivery attempts in total: the initial attempt plus 6 retries**.
+For order and dispute events described in this guide, KyrenPay makes up to **7 delivery attempts in total: the initial attempt plus 6 retries**.
 
 | Attempt | Delay After Failure |
 | --- | --- |
@@ -65,7 +66,7 @@ app.post('/webhooks/kyren', async (req, res) => {
 
 ### Return 200 Quickly
 
-For long processing, validate the signature and durably persist the event in an inbox or queue before returning `200`. A worker can then process it with its own retries. If persistence fails, return a non-`2xx` response so Kyren can retry:
+For long processing, validate the signature and durably persist the event in an inbox or queue before returning `200`. A worker can then process it with its own retries. If persistence fails, return a non-`2xx` response so KyrenPay can retry:
 
 ```javascript
 app.post('/webhooks/kyren', async (req, res) => {
@@ -85,14 +86,14 @@ app.post('/webhooks/kyren', async (req, res) => {
 
 ## Monitoring Webhook Deliveries
 
-When troubleshooting delivery, compare Kyren Webhook events with your own server logs. Record:
+When troubleshooting delivery, compare KyrenPay Webhook events with your own server logs. Record:
 
 - Your configured Webhook URL
 - The event type and order number
 - The timestamp when your server received the request
 - The response code or error your server returned
 
-If you need Kyren to check delivery attempts, contact support with those details.
+If you need KyrenPay to check delivery attempts, contact support with those details.
 
 ## Troubleshooting
 

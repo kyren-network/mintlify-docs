@@ -1,6 +1,7 @@
 ---
-title: 上線清單
-description: 在接受生產流量前檢查 Kyren Pay 設定
+title: "支付串接上線檢查清單"
+sidebarTitle: 上線清單
+description: "上線前檢查 KyrenPay API 金鑰、Webhook 驗簽、訂單履約、資金對帳及支援流程，確認生產收款準備情況。"
 language: zh-Hant
 audience: merchant
 product_area: checkout
@@ -10,7 +11,7 @@ last_verified_at: 2026-05-26
 source_owner: product
 ---
 
-在把真實客戶送到 Kyren Pay Checkout 前，使用本清單檢查你的設定。
+在把真實客戶送到 KyrenPay Checkout 前，使用本清單檢查你的設定。
 
 ## 帳戶和產品設定
 
@@ -23,12 +24,12 @@ source_owner: product
 
 - API 密鑰只保存在服務端。
 - API 密鑰沒有出現在瀏覽器 JavaScript、行動端應用、日誌、截圖或公開倉庫中。
-- 部署環境使用正確的 Kyren API Base URL。
+- 部署環境使用正確的 KyrenPay API Base URL。
 
 ## Webhook
 
 - 已在控制台設定 Webhook URL。
-- 你的服務端會驗證 Kyren Webhook 簽名。
+- 你的服務端會驗證 KyrenPay Webhook 簽名。
 - 你的服務端在處理合法事件後返回 2xx 回應。
 - 你的履約邏輯是冪等的，可以處理重複投遞。
 
@@ -36,12 +37,12 @@ source_owner: product
 
 - 你的系統只在訂單已支付或收到支付成功 Webhook 後履約。
 - 需要對帳時，你會在 metadata 中保存內部訂單 ID 或使用者 ID。
-- 團隊知道如何在 Kyren 控制台查找訂單。
+- 團隊知道如何在 KyrenPay 控制台查找訂單。
 
 ## 支援準備
 
 - 支援團隊知道在哪裡找到訂單號。
-- 聯絡 Kyren 支援時，團隊可以提供 Checkout Session ID、訂單號、時間戳、Webhook URL，以及你的服務端觀察到的回應或錯誤。
+- 聯絡 KyrenPay 支援時，團隊可以提供 Checkout Session ID、訂單號、時間戳、Webhook URL，以及你的服務端觀察到的回應或錯誤。
 
 ## 相關頁面
 

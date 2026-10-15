@@ -1,73 +1,74 @@
 ---
-title: 簡介
-description: 使用啟潤支付接收來自全球客戶的付款
+title: 支付 API 與 Checkout 開發文檔
+sidebarTitle: 文檔概覽
+description: 面向出海 AI 應用與 SaaS 團隊的 KyrenPay 開發文檔。了解支付 API、託管收銀台、Webhook 驗簽、易支付遷移、new-api 與 sub2api 串接，完成國際收款整合。
 ---
 
-## 什麼是啟潤支付？
+## 使用 KyrenPay 串接國際收款
 
-啟潤支付是專為**中國出海 AI Startup** 打造的收款平台。它提供標準化的方式來接收海外客戶的付款，讓你專注於產品開發，而非支付基礎設施。
+KyrenPay 為**中國開發者、AI 應用和 SaaS 團隊**提供國際收款能力。在這裡，你可以從建立支付連結開始，也可以透過支付 API 串接託管收銀台，完成訂單確認、履約與資金對帳。
 
-<Card title="從設定路徑開始" icon="arrow-right" href="/zh-Hant/start-here">
-  選擇先使用控制台、串接 API、收第一筆款，或準備上線。
+<Card title="選擇適合你的串接方式" icon="arrow-right" href="/zh-Hant/start-here">
+  從控制台支付連結到伺服器端 Checkout 整合，按你的產品形態找到串接路徑。
 </Card>
 
+## 從你的場景開始
+
 <CardGroup cols={2}>
-  <Card title="快速整合" icon="bolt">
-    幾分鐘內即可上線。建立產品，產生收銀連結，開始接收付款。
+  <Card title="支付 API 快速開始" icon="code" href="/zh-Hant/quickstart">
+    配置伺服器端認證，建立產品與 Checkout Session，將客戶引導至託管收銀台。
   </Card>
-  <Card title="多種支付方式" icon="credit-card">
-    透過單一整合支援信用卡、微信支付、支付寶和 PayNow。
+  <Card title="無需程式碼的支付連結" icon="link" href="/zh-Hant/dashboard/checkouts">
+    在商戶控制台建立並分享 Checkout 連結，查看訂單和支付狀態。
   </Card>
-  <Card title="安全 Webhook" icon="shield-check">
-    透過 HMAC-SHA256 簽名的 Webhook 接收即時支付通知，實現安全的伺服器間通訊。
+  <Card title="驗證支付結果通知" icon="shield-check" href="/zh-Hant/webhooks/overview">
+    接收簽名 Webhook、驗證事件並處理重複通知，可靠地完成訂單履約。
   </Card>
-  <Card title="開發者友善" icon="code">
-    簡潔的 REST API、完善的文檔和多語言程式碼範例。
+  <Card title="遷移易支付整合" icon="arrows-rotate" href="/zh-Hant/epay-migration/overview">
+    使用相容的請求格式，將已有的易支付客戶端串接 KyrenPay。
   </Card>
 </CardGroup>
 
-## 工作原理
+使用 AI 閘道管理餘額儲值？查看 [new-api 串接指南](/zh-Hant/integrations/new-api)或 [sub2api 串接指南](/zh-Hant/integrations/sub2api)，透過系統內建的易支付配置完成串接。
 
-典型的整合流程包含四個步驟：
+## 從建立 Checkout 到確認訂單
 
 <Steps>
-  <Step title="建立產品">
-    使用產品 API 定義你的產品，包括名稱、價格和貨幣。
+  <Step title="準備商戶帳戶">
+    完成串接前的帳戶準備，確認可用的[支付方式](/zh-Hant/dashboard/payment-methods)和 [API 憑證](/zh-Hant/authentication)。
   </Step>
-  <Step title="建立 Checkout Session">
-    當客戶要付款時，建立一個 Checkout Session 並將客戶重新導向到支付頁面。
+  <Step title="建立產品與 Checkout Session">
+    設定產品、價格和幣種。在伺服器端建立會話，再將客戶引導至返回的 Checkout 位址。
   </Step>
-  <Step title="客戶完成支付">
-    客戶在託管的收銀頁面上選擇支付方式（信用卡、微信支付等）並完成付款。
+  <Step title="配置並驗證 Webhook">
+    在第一筆付款前配置通知位址。使用原始請求體驗證簽名，並處理可能重複到達的事件。
   </Step>
-  <Step title="接收 Webhook 通知">
-    啟潤支付向你的伺服器發送 Webhook 確認付款。據此更新你的系統。
+  <Step title="確認支付並履約">
+    根據已驗證的支付事件與訂單記錄更新你的系統，不能僅憑瀏覽器跳轉認定支付成功。
   </Step>
 </Steps>
 
-## 支援的支付方式
+完整實作請參考[收取第一筆款項](/zh-Hant/guides/collect-first-payment)和[上線檢查清單](/zh-Hant/go-live-checklist)。
 
-| 方式 | 地區 | 貨幣 |
-| --- | --- | --- |
-| 信用卡 / Apple Pay / Google Pay | 全球 | USD、CNY、HKD |
-| 微信支付 | 中國、東南亞 | CNY、USD、HKD |
-| 支付寶 | 中國、東南亞 | CNY、USD、HKD |
-| PayNow | 新加坡 | USD、HKD |
-| 加密貨幣（USDT / USDC） | 全球 | USD |
+## 支付方式與可用範圍
 
-## 介面位址
+可用支付方式、幣種和限額取決於商戶帳戶、已綁定渠道和平台配置。串接時請查看[支付方式](/zh-Hant/dashboard/payment-methods)與[支援幣種 API](/api-reference/config/get-supported-currencies)。費用與結算條件以商戶協議及實際約定為準。
 
-| 環境 | URL |
+## API 基礎位址
+
+| 環境 | 基礎位址 |
 | --- | --- |
 | 生產環境 | `https://api.kyrenpay.com` |
 
-## 下一步
+發起支付驗證前，請先閱讀[測試指南](/zh-Hant/testing)。僅在 KyrenPay 提供環境位址和匹配憑證後使用 staging 環境。
+
+## 繼續串接
 
 <CardGroup cols={2}>
-  <Card title="快速開始" icon="rocket" href="/zh-Hant/quickstart">
-    5 分鐘內完成第一筆收款
+  <Card title="查看 API 參考" icon="book-open" href="/api-reference/config/get-supported-currencies">
+    查閱產品、Checkout、訂單、退款及餘額介面的請求參數、回應格式和範例。
   </Card>
-  <Card title="API 參考" icon="book" href="/api-reference/config/get-supported-currencies">
-    查看完整的 API 文檔
+  <Card title="尋找問題答案" icon="circle-question" href="/zh-Hant/faq/common-questions">
+    排查認證、支付通知、訂單狀態和結算資格相關問題。
   </Card>
 </CardGroup>
