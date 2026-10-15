@@ -1,6 +1,7 @@
 ---
-title: "商户常见问题"
-description: "Kyren Pay 商户高频问题的简短答案，以及对应的权威文档链接。"
+title: "支付接入与商户常见问题"
+sidebarTitle: "商户常见问题"
+description: "查看 KyrenPay 商户关于 API 接入、Checkout、Webhook、退款与结算的常见问题及对应操作指南。"
 language: zh
 audience: merchant
 product_area: faq
@@ -14,7 +15,7 @@ source_owner: support
 
 ### 应该使用哪种集成方式？
 
-新集成优先使用原生 Kyren Checkout。只有在你已经有 Epay 风格集成，并希望保留大部分现有 SDK 或请求结构时，才使用 Epay 兼容。
+新集成优先使用原生 KyrenPay Checkout。只有在你已经有 Epay 风格集成，并希望保留大部分现有 SDK 或请求结构时，才使用 Epay 兼容。
 
 阅读：[开始使用](/zh/start-here)、[Epay 兼容迁移](/zh/epay-migration/overview)。
 
@@ -46,7 +47,7 @@ source_owner: support
 
 ### 为什么客户付款了但没有加积分？
 
-检查 Kyren 订单是否已支付、你的服务器是否收到并处理 `order.paid` 事件、履约逻辑是否幂等，以及创建 Checkout 时是否在 `metadata` 中保存了内部用户或订单 ID。
+检查 KyrenPay 订单是否已支付、你的服务器是否收到并处理 `order.paid` 事件、履约逻辑是否幂等，以及创建 Checkout 时是否在 `metadata` 中保存了内部用户或订单 ID。
 
 阅读：[客户已付款但未到账](/zh/troubleshooting/paid-but-not-credited)。
 
@@ -54,13 +55,13 @@ source_owner: support
 
 ### 在哪里查订单？
 
-使用订单控制台搜索并查看支付状态。咨询具体支付问题时，请向支持提供 Kyren 订单号。
+使用订单控制台搜索并查看支付状态。咨询具体支付问题时，请向支持提供 KyrenPay 订单号。
 
 阅读：[订单控制台](/zh/dashboard/orders)、[订单状态不符合预期](/zh/troubleshooting/order-status)。
 
 ### 为什么无法结算？
 
-结算资格可能取决于 KYC/KYB 状态、可用余额、待结余额、冻结资金和配置阈值。Kyren 支持可以协助查看，但文档不能保证审批或时间。
+结算资格可能取决于 KYC/KYB 状态、可用余额、待结余额、冻结资金和配置阈值。KyrenPay 支持可以协助查看，但文档不能保证审批或时间。
 
 阅读：[未满足结款条件](/zh/troubleshooting/settlement-eligibility)。
 
@@ -74,7 +75,7 @@ source_owner: support
 
 ### 可以继续使用 Epay 风格 SDK 吗？
 
-很多情况下可以。你需要替换 Base URL，使用 Kyren 签发的 `pid` 和商户密钥，验证 MD5 签名，并将支付类型映射到 Kyren 支持的值。
+很多情况下可以。你需要替换 Base URL，使用 KyrenPay 签发的 `pid` 和商户密钥，验证 MD5 签名，并将支付类型映射到 KyrenPay 支持的值。
 
 阅读：[Epay 迁移清单](/zh/epay-migration/migration-checklist)。
 

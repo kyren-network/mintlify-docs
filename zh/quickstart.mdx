@@ -1,15 +1,16 @@
 ---
-title: 快速开始
-description: 5 分钟内完成第一笔收款
+title: "支付 API 快速开始"
+sidebarTitle: 快速开始
+description: "通过 KyrenPay 支付 API 创建产品与 Checkout Session，跳转托管收银台，并在服务端校验 Webhook 通知、处理订单履约。"
 ---
 
-当你希望服务端通过 API 创建 Kyren Pay Checkout Session 时，请使用本指南。
+当你希望服务端通过 API 创建 KyrenPay Checkout Session 时，请使用本指南。
 
 如果你想先了解控制台，请从 [控制台总览](/zh/dashboard/overview) 开始。
 
 ## 前提条件
 
-- 一个启润支付商户账号（[点此注册](https://merchant.kyrenpay.com)）
+- 一个KyrenPay商户账号（[点此注册](https://merchant.kyrenpay.com)）
 - 你的 API 密钥（在控制台的「开发者」页面获取）
 - 已在控制台或通过 Products API 创建产品
 - 一个可以安全保存 API 密钥的服务端环境
@@ -93,13 +94,13 @@ curl -X POST https://api.kyrenpay.com/v1/checkouts \
 
 ```javascript
 // 示例：在你的 Web 应用中重定向
-// checkoutUrl 由已认证的业务后端提供，来自 Kyren 响应的 data.url。
+// checkoutUrl 由已认证的业务后端提供，来自 KyrenPay 响应的 data.url。
 window.location.href = checkoutUrl;
 ```
 
 ## 第五步：处理 Webhook
 
-付款完成后，启润支付会向已配置的 Webhook URL 发送签名 JSON POST。原始请求体路由必须先于任何全局 JSON 解析器注册。下列路由需要[签名验证函数](/zh/webhooks/signatures)和[完整示例](/zh/guides/collect-first-payment)中说明的持久化通知适配器：
+付款完成后，KyrenPay会向已配置的 Webhook URL 发送签名 JSON POST。原始请求体路由必须先于任何全局 JSON 解析器注册。下列路由需要[签名验证函数](/zh/webhooks/signatures)和[完整示例](/zh/guides/collect-first-payment)中说明的持久化通知适配器：
 
 ```javascript
 const crypto = require('crypto');
@@ -150,7 +151,7 @@ app.post('/webhooks/kyren',
 ```
 
 <Info>
-  在 **控制台 > 开发者工具 > Webhook 设置** 中配置 Webhook URL。验签、持久化成功后，在 10 秒内返回 `2xx`。持久化工作进程负责履约失败重试，按事件 ID 去重，并以 Kyren 订单 ID 唯一约束和数据库事务保证每笔业务订单只入账一次。
+  在 **控制台 > 开发者工具 > Webhook 设置** 中配置 Webhook URL。验签、持久化成功后，在 10 秒内返回 `2xx`。持久化工作进程负责履约失败重试，按事件 ID 去重，并以 KyrenPay 订单 ID 唯一约束和数据库事务保证每笔业务订单只入账一次。
 </Info>
 
 `successUrl` 和 `cancelUrl` 是浏览器导航，不是付款凭证。服务端查询 `GET /v1/checkouts/{id}`：`OPEN` 为待付款，`COMPLETE` 包含成功关联的 `orderId`，`EXPIRED` 为会话过期。遗漏通知时，通过 `GET /v1/orders/{orderId}` 核对付款及产品、基础金额、币种和 metadata 关联，再调用与 Webhook 相同的幂等入账事务。创建 Session 时不返回 `orderId`，不要自行拼接收银台 URL。`successUrl` 必填，`cancelUrl` 可选。
@@ -165,7 +166,7 @@ app.post('/webhooks/kyren',
     实现安全的 Webhook 签名验证
   </Card>
   <Card title="测试" icon="flask" href="/zh/testing">
-    使用 Kyren 提供的 Staging 凭证或低风险真实付款安全测试
+    使用 KyrenPay 提供的 Staging 凭证或低风险真实付款安全测试
   </Card>
   <Card title="代码示例" icon="code" href="/zh/guides/code-examples">
     查看 Python、Node.js、Go 等语言的示例

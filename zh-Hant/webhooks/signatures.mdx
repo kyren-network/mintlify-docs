@@ -1,13 +1,14 @@
 ---
-title: Webhook 簽名驗證
-description: 驗證 Webhook 請求的真實性
+title: "Webhook HMAC-SHA256 簽名驗證"
+sidebarTitle: Webhook 簽名驗證
+description: "使用 Webhook secret、原始請求體與 HMAC-SHA256 驗證 KyrenPay 通知簽名，確認支付事件的真實性與完整性。"
 ---
 
-啟潤支付的每個 Webhook 請求都包含一個加密簽名，你應該驗證此簽名以確保請求是真實的且未被篡改。
+KyrenPay的每個 Webhook 請求都包含一個加密簽名，你應該驗證此簽名以確保請求是真實的且未被篡改。
 
 ## 簽名演算法
 
-啟潤支付使用 **HMAC-SHA256** 對 Webhook 載荷進行簽名：
+KyrenPay使用 **HMAC-SHA256** 對 Webhook 載荷進行簽名：
 
 ```
 signature = "sha256=" + HMAC-SHA256(timestamp + "." + payload, webhook_secret)

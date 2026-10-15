@@ -1,6 +1,7 @@
 ---
-title: "Common merchant questions"
-description: "Short answers to frequent Kyren Pay merchant questions with links to canonical docs."
+title: "Payment integration and merchant FAQ"
+sidebarTitle: "Common merchant questions"
+description: "Find answers to KyrenPay merchant questions about API access, Checkout, Webhooks, refunds, and settlement, with links to detailed guides."
 language: en
 audience: merchant
 product_area: faq
@@ -14,7 +15,7 @@ source_owner: support
 
 ### Which integration path should I use?
 
-Use native Kyren Checkout for new integrations. Use Epay compatibility only if you already have an Epay-style integration and want to keep most of your existing SDK or request shape.
+Use native KyrenPay Checkout for new integrations. Use Epay compatibility only if you already have an Epay-style integration and want to keep most of your existing SDK or request shape.
 
 Read: [Start here](/start-here), [Epay-compatible migration](/epay-migration/overview).
 
@@ -46,7 +47,7 @@ Read: [Webhook signature verification fails](/troubleshooting/webhook-signature-
 
 ### Why did my customer pay but not receive credits?
 
-Check whether the Kyren order is paid, whether your server received and processed the `order.paid` event, whether your fulfillment logic is idempotent, and whether you stored an internal user or order ID in `metadata`.
+Check whether the KyrenPay order is paid, whether your server received and processed the `order.paid` event, whether your fulfillment logic is idempotent, and whether you stored an internal user or order ID in `metadata`.
 
 Read: [Customer paid but was not credited](/troubleshooting/paid-but-not-credited).
 
@@ -54,13 +55,13 @@ Read: [Customer paid but was not credited](/troubleshooting/paid-but-not-credite
 
 ### Where do I find an order?
 
-Use the Orders dashboard to search and inspect payment state. Share the Kyren order number with support when asking about a specific payment.
+Use the Orders dashboard to search and inspect payment state. Share the KyrenPay order number with support when asking about a specific payment.
 
 Read: [Orders dashboard](/dashboard/orders), [Order status does not match expectation](/troubleshooting/order-status).
 
 ### Why is settlement not available?
 
-Settlement eligibility can depend on KYC/KYB status, available balance, pending balance, frozen funds, and configured thresholds. Kyren support can review a case, but the docs cannot guarantee approval or timing.
+Settlement eligibility can depend on KYC/KYB status, available balance, pending balance, frozen funds, and configured thresholds. KyrenPay support can review a case, but the docs cannot guarantee approval or timing.
 
 Read: [Settlement eligibility is not met](/troubleshooting/settlement-eligibility).
 
@@ -74,7 +75,7 @@ Read: [Support escalation checklist](/copilot/support-escalation).
 
 ### Can I keep using my Epay-style SDK?
 
-In many cases, yes. Replace the base URL, use Kyren-issued `pid` and merchant key, verify MD5 signing, and map payment types to Kyren-supported values.
+In many cases, yes. Replace the base URL, use KyrenPay-issued `pid` and merchant key, verify MD5 signing, and map payment types to KyrenPay-supported values.
 
 Read: [Epay migration checklist](/epay-migration/migration-checklist).
 

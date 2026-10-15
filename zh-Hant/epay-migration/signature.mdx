@@ -1,6 +1,7 @@
 ---
-title: "Epay MD5 簽名"
-description: "為 Kyren Pay 遷移端點產生並驗證 Epay 相容 MD5 簽名。"
+title: "易支付 Epay MD5 sign 簽名產生與驗證"
+sidebarTitle: "Epay MD5 簽名"
+description: "按照 KyrenPay 易支付相容規則產生 sign 參數並驗證非同步通知，了解參數排序、空值過濾、商戶密鑰與 MD5 簽名計算。"
 language: zh-Hant
 audience: developer
 product_area: epay
@@ -57,7 +58,7 @@ money=9.99&name=AI credits&notify_url=https://merchant.example.com/notify&out_tr
 
 ## 驗證清單
 
-- 使用收款商戶帳號對應的 Kyren 發放 `pid` 和商戶密鑰。
+- 使用收款商戶帳號對應的 KyrenPay 發放 `pid` 和商戶密鑰。
 - 簽名前排除 `sign` 和 `sign_type`。
 - 排序前移除空值參數。
 - 按原始參數 key 排序，不按顯示名稱或 JSON 順序排序。

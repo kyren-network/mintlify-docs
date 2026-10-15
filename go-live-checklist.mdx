@@ -1,6 +1,7 @@
 ---
-title: Go-live checklist
-description: Review your Kyren Pay setup before accepting production traffic
+title: "Payment integration go-live checklist"
+sidebarTitle: Go-live checklist
+description: "Review your KyrenPay API keys, Webhook signatures, order fulfillment, reconciliation, and support procedures before accepting production traffic."
 language: en
 audience: merchant
 product_area: checkout
@@ -10,7 +11,7 @@ last_verified_at: 2026-05-26
 source_owner: product
 ---
 
-Use this checklist before sending real customers to Kyren Pay checkout.
+Use this checklist before sending real customers to KyrenPay checkout.
 
 ## Account and product setup
 
@@ -23,12 +24,12 @@ Use this checklist before sending real customers to Kyren Pay checkout.
 
 - Your API key is stored only on your server.
 - Your API key is not included in browser JavaScript, mobile apps, logs, screenshots, or public repositories.
-- Your deployment environment uses the correct Kyren API base URL.
+- Your deployment environment uses the correct KyrenPay API base URL.
 
 ## Webhooks
 
 - Your Webhook URL is configured in the dashboard.
-- Your server verifies the Kyren Webhook signature.
+- Your server verifies the KyrenPay Webhook signature.
 - Your server returns a 2xx response after processing a valid event.
 - Your fulfillment logic is idempotent and can handle repeated delivery.
 
@@ -36,12 +37,12 @@ Use this checklist before sending real customers to Kyren Pay checkout.
 
 - Your system fulfills only after a paid order or payment-success Webhook event.
 - Your internal order or user ID is stored in metadata when needed.
-- Your team knows how to find an order in the Kyren dashboard.
+- Your team knows how to find an order in the KyrenPay dashboard.
 
 ## Support readiness
 
 - Your support team knows where to find order numbers.
-- Your team can provide the checkout session ID, order number, timestamp, Webhook URL, and the response or error observed on your server when contacting Kyren support.
+- Your team can provide the checkout session ID, order number, timestamp, Webhook URL, and the response or error observed on your server when contacting KyrenPay support.
 
 ## Related pages
 

@@ -1,6 +1,7 @@
 ---
-title: "Epay 兼容迁移"
-description: "将现有 Epay 风格集成迁移到 Kyren Pay 兼容端点。"
+title: "易支付迁移与兼容 API"
+sidebarTitle: "Epay 兼容迁移"
+description: "将现有易支付集成迁移到 KyrenPay，了解 submit.php、mapi.php、api.php 兼容端点、MD5 签名与异步支付通知。"
 language: zh
 audience: developer
 product_area: epay
@@ -10,13 +11,13 @@ last_verified_at: 2026-07-08
 source_owner: engineering
 ---
 
-如果你已经有 Epay 风格的集成，并希望在迁移到 Kyren Pay 时保留原有请求格式，请使用 Epay 兼容路径。新接入建议优先使用原生 Kyren Checkout，参考[快速开始](/zh/quickstart)，因为原生 Checkout 直接使用 Kyren API 认证和当前订单模型。
+如果你已经有 Epay 风格的集成，并希望在迁移到 KyrenPay 时保留原有请求格式，请使用 Epay 兼容路径。新接入建议优先使用原生 KyrenPay Checkout，参考[快速开始](/zh/quickstart)，因为原生 Checkout 直接使用 KyrenPay API 认证和当前订单模型。
 
-通过这些兼容端点创建的 Epay 来源订单，会进入与原生 Checkout 订单相同的 Kyren 订单与结算系统。兼容层只影响入口路径和响应格式。
+通过这些兼容端点创建的 Epay 来源订单，会进入与原生 Checkout 订单相同的 KyrenPay 订单与结算系统。兼容层只影响入口路径和响应格式。
 
 ## 端点映射
 
-| 原 Epay 路径 | 方法 | 用途 | Kyren 行为 |
+| 原 Epay 路径 | 方法 | 用途 | KyrenPay 行为 |
 | --- | --- | --- | --- |
 | `/epay/submit.php` | `GET` 或 `POST` | 页面跳转收银台 | 创建或复用订单，然后返回 HTTP `302` 到 `/epay/redirect/{orderId}` 或上游支付页面。 |
 | `/epay/mapi.php` | `POST` | 服务端直连创建支付 | 创建或复用订单，并根据渠道返回 `payurl`、`qrcode`、`img`、`trade_no` 等 Epay 风格字段。 |
@@ -29,7 +30,7 @@ source_owner: engineering
 
 | 项目 | Paydify 行为 |
 | --- | --- |
-| `submit.php` | HTTP `302` 跳转到 Kyren 本地支付页 `/epay/redirect/{orderId}`。 |
+| `submit.php` | HTTP `302` 跳转到 KyrenPay 本地支付页 `/epay/redirect/{orderId}`。 |
 | `mapi.php` | 返回本地支付页 `payurl`，不返回上游 `qrcode/img`；商户应让买家打开该页面。 |
 | 金额 | `money` 是 `money_type` 指定的商品计价金额，省略币种时为 `CNY`；不是应付 USDT 数量。 |
 | 买家操作 | 在本地页选择当前可用 App / 网络并确认 USDT 报价后，才创建上游支付和展示该笔二维码。 |
@@ -42,8 +43,8 @@ source_owner: engineering
 
 ## 迁移流程
 
-1. 将 Epay 基础 URL 替换为 Kyren Pay API 基础 URL，并保留兼容路径。
-2. 使用 Kyren 发放的 `pid` 和商户密钥进行 Epay 兼容签名。
+1. 将 Epay 基础 URL 替换为 KyrenPay API 基础 URL，并保留兼容路径。
+2. 使用 KyrenPay 发放的 `pid` 和商户密钥进行 Epay 兼容签名。
 3. Epay 兼容请求继续使用 `pid + sign` 认证。不要发送 `x-api-key`。
 4. 将支付 `type` 映射到支持值，例如 `alipay`、`wxpay`、`creditcard`、`crypto` 或 `paynow`。
 5. 浏览器收银台流量接入 [`submit.php`](/zh/epay-migration/submit-php)，服务端创建支付接入 [`mapi.php`](/zh/epay-migration/mapi-php)。

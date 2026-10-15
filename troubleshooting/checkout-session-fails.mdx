@@ -23,7 +23,7 @@ Creating a Checkout Session returns an error or no hosted checkout URL is create
 - Required `successUrl` (also accepted as `success_url`) is missing or invalid. `cancelUrl` / `cancel_url` is optional; omitting it does not fail creation.
 - Authentication failed before the checkout request was processed.
 
-## Check this in Kyren
+## Check this in KyrenPay
 
 - Confirm the product is active in **Dashboard > Products**.
 - Check the product price and currency in the dashboard.
@@ -36,7 +36,7 @@ Creating a Checkout Session returns an error or no hosted checkout URL is create
 - When creating or updating a product, send `price` as a decimal string such as `"9.99"` and use an allowed three-letter currency code.
 - `successUrl` is required and accepts `http://` or `https://`; use absolute HTTPS URLs in production. If supplied, use a valid site URL for `cancelUrl` too.
 - If an API IP whitelist is configured, check your server's outbound IP. Read `data.id` and `data.url`, not top-level fields.
-- Log the request body and Kyren response status, excluding secrets.
+- Log the request body and KyrenPay response status, excluding secrets.
 
 ## Fix
 
@@ -44,7 +44,7 @@ Use your merchant's active product, the required success URL and a valid `x-api-
 
 ## Contact support if unresolved
 
-Contact Kyren support with the request time, product ID, currency, response status, and error message. Do not send API keys.
+Contact KyrenPay support with the request time, product ID, currency, response status, and error message. Do not send API keys.
 
 ## Related pages
 

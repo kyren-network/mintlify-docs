@@ -37,10 +37,10 @@ Create or sign in to your [merchant account](https://merchant.kyrenpay.com), che
 
 Set secrets privately in your application's server environment or secret manager. Do not paste them into Agent conversations or commit them. The native Webhook secret is different from the API key. Configure Webhook before the first native payment, because adding it afterward does not automatically create past `order.paid` events.
 
-There is currently no self-service sandbox key. Use [staging](/testing) only when Kyren supplies its Base URL and matching credentials. Do not use test cards on an unconfirmed live channel.
+There is currently no self-service sandbox key. Use [staging](/testing) only when KyrenPay supplies its Base URL and matching credentials. Do not use test cards on an unconfirmed live channel.
 
 ## Review the result
 
 Ask the Agent to identify changed files, run local tests and report pending actions. Check signature rejection, duplicate-notification protection, amount/currency association and recovery. Your application must not fulfill purchases from a browser redirect.
 
-Local mock tests do not prove a real payment. When you have an authorized test environment, complete its payment step yourself, then verify both the Kyren paid order and your application's fulfillment record. Review the [go-live checklist](/go-live-checklist) before production acceptance. Until those steps have been run, the Agent should label them unverified.
+Local mock tests do not prove a real payment. When you have an authorized test environment, complete its payment step yourself, then verify both the KyrenPay paid order and your application's fulfillment record. Review the [go-live checklist](/go-live-checklist) before production acceptance. Until those steps have been run, the Agent should label them unverified.

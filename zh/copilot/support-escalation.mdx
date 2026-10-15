@@ -1,12 +1,13 @@
 ---
 title: "支持升级清单"
-description: "帮助 Kyren Copilot 在引导商户联系支持前，收集安全且有用的信息。"
+description: "帮助 KyrenPay Copilot 在引导商户联系支持前，收集安全且有用的信息。"
 language: zh
 audience: copilot
 product_area: copilot
 intent: support_handoff
 visibility: public
 last_verified_at: 2026-05-27
+noindex: true
 source_owner: support
 ---
 
@@ -16,7 +17,7 @@ source_owner: support
 
 - 商户账户或商户 ID。
 - 受影响的端点、控制台页面或业务流程。
-- 可用时提供 Kyren 订单号、Checkout Session ID 或商户 `out_trade_no`。
+- 可用时提供 KyrenPay 订单号、Checkout Session ID 或商户 `out_trade_no`。
 - 商户时区下的时间；如果是 API 请求，相关时可提供 Unix 毫秒时间戳。
 - 响应状态、错误码和错误信息。
 - 已脱敏的服务端日志，包含请求时间、端点和响应。
@@ -59,9 +60,9 @@ source_owner: support
 
 索取：
 
-- Kyren 订单号。
+- KyrenPay 订单号。
 - 商户内部用户 ID 或订单 ID，如果已保存。
-- Kyren 显示的支付成功时间。
+- KyrenPay 显示的支付成功时间。
 - 该时间附近的履约任务日志。
 - 履约处理是否具备幂等性。
 
@@ -86,14 +87,14 @@ source_owner: support
 - `out_trade_no` 或 `trade_no`。
 - 支付 `type`。
 - 已脱敏的签名字符串输入。
-- Kyren 返回的数字 `code` 和 `msg`。
+- KyrenPay 返回的数字 `code` 和 `msg`。
 
 不要索取原始商户密钥。
 
 ## 升级话术
 
 ```text
-这个问题需要账户级审核，建议由 Kyren 支持查看。请提供商户账户、受影响的订单或 Checkout Session ID、请求时间、端点或控制台页面，以及完整错误信息。不要发送完整 API Key、Webhook secret、卡数据或其他私密凭证。
+这个问题需要账户级审核，建议由 KyrenPay 支持查看。请提供商户账户、受影响的订单或 Checkout Session ID、请求时间、端点或控制台页面，以及完整错误信息。不要发送完整 API Key、Webhook secret、卡数据或其他私密凭证。
 ```
 
 ## 相关页面

@@ -10,7 +10,7 @@ last_verified_at: 2026-07-08
 source_owner: engineering
 ---
 
-`/epay/mapi.php` 是服务端到服务端的 Epay 兼容端点。它接收表单 `POST`，创建或复用 Kyren 订单，并根据所选渠道返回 `payurl`、`qrcode`、`img`、`trade_no` 等 Epay 风格字段。
+`/epay/mapi.php` 是服务端到服务端的 Epay 兼容端点。它接收表单 `POST`，创建或复用 KyrenPay 订单，并根据所选渠道返回 `payurl`、`qrcode`、`img`、`trade_no` 等 Epay 风格字段。
 
 该端点使用 `pid + sign`，不使用 `x-api-key`。由于它是服务端直连端点，开启 API IP 白名单时可能会校验来源 IP。白名单校验失败时可能返回数字 `code` 为 `0`，并附带 `msg`。
 
@@ -20,7 +20,7 @@ source_owner: engineering
 
 | 参数 | 说明 |
 | --- | --- |
-| `pid` | Kyren 发放的商户 Epay 兼容商户 ID。 |
+| `pid` | KyrenPay 发放的商户 Epay 兼容商户 ID。 |
 | `type` | 支付类型。支持值包括 `alipay`、`wxpay`、`creditcard`、`crypto`、`paynow`。 |
 | `out_trade_no` | 你的商户订单号。 |
 | `notify_url` | 商户支付结果通知 URL。 |
@@ -37,10 +37,10 @@ source_owner: engineering
 | `return_url` | 渠道需要支付页时使用的浏览器返回 URL。 |
 | `money_type` | 你的现有集成传入的币种或金额类型。 |
 | `device` | 可选设备提示：`pc` 或 `mobile`。同一订单号复用到不同支付宝/微信设备支付形态时可能被拒绝。 |
-| `display_merchant_name` | 本次支付在 Kyren 中间页展示的商户名称。 |
+| `display_merchant_name` | 本次支付在 KyrenPay 中间页展示的商户名称。 |
 | `param` | 商户透传元数据，会在通知中返回。 |
 | `userId` | 可选的商户用户标识；渠道支持时会传给支付网关。 |
-| `channel_param` | 非信用卡支付类型可选的渠道扩展 JSON 字符串。当 `type=creditcard` 时，其原始值仍参与 Epay 签名，但 Kyren 在验签后会完全忽略该值。禁止通过 `channel_param` 传入卡号、有效期、CVV、账单资料或联系信息；买家将在 Kyren 或上游托管页面输入卡片资料。顶层 `email`、`phone` 和 `userId` 参数不受影响。 |
+| `channel_param` | 非信用卡支付类型可选的渠道扩展 JSON 字符串。当 `type=creditcard` 时，其原始值仍参与 Epay 签名，但 KyrenPay 在验签后会完全忽略该值。禁止通过 `channel_param` 传入卡号、有效期、CVV、账单资料或联系信息；买家将在 KyrenPay 或上游托管页面输入卡片资料。顶层 `email`、`phone` 和 `userId` 参数不受影响。 |
 
 ## 请求示例
 
@@ -72,7 +72,7 @@ curl -X POST https://api.kyrenpay.com/epay/mapi.php \
 
 ## Paydify：返回本地支付页，不直接返回付款码
 
-商户一次性加密货币通道绑定 Paydify 时，传 `type=crypto`，沿用标准签名，不新增 App / 网络等商户必填字段。`money` 为商品计价金额，`money_type` 省略时为 `CNY`；应付 USDT 数量由 Kyren 本地页的有效报价确定。
+商户一次性加密货币通道绑定 Paydify 时，传 `type=crypto`，沿用标准签名，不新增 App / 网络等商户必填字段。`money` 为商品计价金额，`money_type` 省略时为 `CNY`；应付 USDT 数量由 KyrenPay 本地页的有效报价确定。
 
 以下是响应结构示例，**不是实际交易回包**：
 

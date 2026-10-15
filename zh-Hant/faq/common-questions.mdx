@@ -1,6 +1,7 @@
 ---
-title: "商戶常見問題"
-description: "Kyren Pay 商戶高頻問題的簡短答案，以及對應的權威文檔連結。"
+title: "支付串接與商戶常見問題"
+sidebarTitle: "商戶常見問題"
+description: "查看 KyrenPay 商戶關於 API 串接、Checkout、Webhook、退款與結算的常見問題及對應操作指南。"
 language: zh-Hant
 audience: merchant
 product_area: faq
@@ -14,7 +15,7 @@ source_owner: support
 
 ### 應該使用哪種整合方式？
 
-新整合優先使用原生 Kyren Checkout。只有在你已經有 Epay 風格整合，並希望保留大部分現有 SDK 或請求結構時，才使用 Epay 相容。
+新整合優先使用原生 KyrenPay Checkout。只有在你已經有 Epay 風格整合，並希望保留大部分現有 SDK 或請求結構時，才使用 Epay 相容。
 
 閱讀：[開始使用](/zh-Hant/start-here)、[Epay 相容遷移](/zh-Hant/epay-migration/overview)。
 
@@ -46,7 +47,7 @@ source_owner: support
 
 ### 為什麼客戶付款了但沒有加積分？
 
-檢查 Kyren 訂單是否已支付、你的伺服器是否收到並處理 `order.paid` 事件、履約邏輯是否冪等，以及建立 Checkout 時是否在 `metadata` 中保存了內部使用者或訂單 ID。
+檢查 KyrenPay 訂單是否已支付、你的伺服器是否收到並處理 `order.paid` 事件、履約邏輯是否冪等，以及建立 Checkout 時是否在 `metadata` 中保存了內部使用者或訂單 ID。
 
 閱讀：[客戶已付款但未入帳](/zh-Hant/troubleshooting/paid-but-not-credited)。
 
@@ -54,13 +55,13 @@ source_owner: support
 
 ### 在哪裡查訂單？
 
-使用訂單控制台搜尋並查看支付狀態。諮詢具體支付問題時，請向支援提供 Kyren 訂單號。
+使用訂單控制台搜尋並查看支付狀態。諮詢具體支付問題時，請向支援提供 KyrenPay 訂單號。
 
 閱讀：[訂單控制台](/zh-Hant/dashboard/orders)、[訂單狀態不符合預期](/zh-Hant/troubleshooting/order-status)。
 
 ### 為什麼無法結算？
 
-結算資格可能取決於 KYC/KYB 狀態、可用餘額、待結餘額、凍結資金和配置門檻。Kyren 支援可以協助查看，但文檔不能保證審批或時間。
+結算資格可能取決於 KYC/KYB 狀態、可用餘額、待結餘額、凍結資金和配置門檻。KyrenPay 支援可以協助查看，但文檔不能保證審批或時間。
 
 閱讀：[未滿足結款條件](/zh-Hant/troubleshooting/settlement-eligibility)。
 
@@ -74,7 +75,7 @@ source_owner: support
 
 ### 可以繼續使用 Epay 風格 SDK 嗎？
 
-很多情況下可以。你需要替換 Base URL，使用 Kyren 簽發的 `pid` 和商戶密鑰，驗證 MD5 簽名，並將支付類型映射到 Kyren 支援的值。
+很多情況下可以。你需要替換 Base URL，使用 KyrenPay 簽發的 `pid` 和商戶密鑰，驗證 MD5 簽名，並將支付類型映射到 KyrenPay 支援的值。
 
 閱讀：[Epay 遷移清單](/zh-Hant/epay-migration/migration-checklist)。
 

@@ -10,7 +10,7 @@ last_verified_at: 2026-10-15
 source_owner: engineering
 ---
 
-Use Developer settings to connect your server to Kyren Pay.
+Use Developer settings to connect your server to KyrenPay.
 
 ## API keys
 
@@ -18,11 +18,11 @@ Open **Dashboard > Developer Tools > API Keys** (`/dashboard/developers/api-keys
 
 Use API keys only from your server. Do not expose them in frontend JavaScript, mobile apps, logs, screenshots, or public repositories.
 
-If you regenerate an API key, update every server environment that calls Kyren Pay. The previous key stops working after regeneration.
+If you regenerate an API key, update every server environment that calls KyrenPay. The previous key stops working after regeneration.
 
 ## Webhooks
 
-Configure a Webhook URL that Kyren Pay can reach over HTTPS. Your server should verify the Webhook signature before trusting the event body.
+Configure a Webhook URL that KyrenPay can reach over HTTPS. Your server should verify the Webhook signature before trusting the event body.
 
 Open **Dashboard > Developer Tools > Webhooks** (`/dashboard/developers/webhooks`), enter your application's actual public HTTPS callback URL and save. First configuration generates a separate Webhook Secret. Copy its full value into the private server-side `KYREN_WEBHOOK_SECRET` setting. If no Secret exists, click Generate; otherwise use your securely saved original. It is not the API key, and its masked display cannot verify signatures. Regeneration immediately invalidates the old Secret and requires updating the relevant servers. Do not overwrite another application's callback URL just to set up a new application.
 
@@ -36,7 +36,7 @@ These variable names are examples; follow your application's implementation. Rel
 
 ## IP allowlist
 
-If IP allowlist is enabled for your merchant account, make sure every server that calls Kyren Pay is included. Missing server IPs can cause authentication or authorization failures.
+If IP allowlist is enabled for your merchant account, make sure every server that calls KyrenPay is included. Missing server IPs can cause authentication or authorization failures.
 
 ## Related pages
 

@@ -1,73 +1,74 @@
 ---
-title: Introduction
-description: Accept payments from customers worldwide with Kyren Pay
+title: Payment API & Checkout documentation
+sidebarTitle: Overview
+description: Integrate KyrenPay payments for your AI or SaaS product. Explore payment APIs, hosted Checkout, signed Webhooks, Epay migration, and merchant guides.
 ---
 
-## What is Kyren Pay?
+## Build your payment integration with KyrenPay
 
-Kyren Pay is a payment platform designed for **Chinese AI startups going global**. It provides a standardized way to accept payments from international customers, so you can focus on building your product instead of dealing with payment infrastructure.
+KyrenPay helps **Chinese developers, AI applications, and SaaS teams** accept payments from international customers. Use these guides to create a payment link, integrate the payment API, confirm orders, and reconcile funds.
 
-<Card title="Start with your setup path" icon="arrow-right" href="/start-here">
-  Choose whether you want to use the dashboard, integrate the API, collect your first payment, or prepare for production.
+<Card title="Start your integration" icon="arrow-right" href="/start-here">
+  Choose an integration path for your product, from dashboard payment links to a server-side Checkout flow.
 </Card>
 
+## Choose your path
+
 <CardGroup cols={2}>
-  <Card title="Quick Integration" icon="bolt">
-    Get up and running in minutes with our simple API. Create a product, generate a checkout link, and start accepting payments.
+  <Card title="Payment API quickstart" icon="code" href="/quickstart">
+    Authenticate your server, create a product and Checkout Session, and send customers to hosted checkout.
   </Card>
-  <Card title="Multiple Payment Methods" icon="credit-card">
-    Accept Credit Cards, WeChat Pay, Alipay, and PayNow — all through a single integration.
+  <Card title="Payment links without code" icon="link" href="/dashboard/checkouts">
+    Create and share Checkout links from the merchant dashboard, then track orders and payment status.
   </Card>
-  <Card title="Secure Webhooks" icon="shield-check">
-    Receive real-time payment notifications with HMAC-SHA256 signed webhooks for secure server-to-server communication.
+  <Card title="Verify payment notifications" icon="shield-check" href="/webhooks/overview">
+    Handle signed Webhooks, verify events, and make fulfillment safe to retry.
   </Card>
-  <Card title="Developer Friendly" icon="code">
-    Clean REST API with comprehensive documentation and code examples in multiple languages.
+  <Card title="Migrate an Epay integration" icon="arrows-rotate" href="/epay-migration/overview">
+    Keep compatible request formats while connecting an existing Epay client to KyrenPay.
   </Card>
 </CardGroup>
 
-## How it works
+Using an AI gateway? Follow the dedicated [new-api](/integrations/new-api) or [sub2api](/integrations/sub2api) guide to connect balance top-ups through its built-in Epay integration.
 
-The typical integration flow involves four steps:
+## From Checkout to a confirmed order
 
 <Steps>
-  <Step title="Create a Product">
-    Define your product with a name, price, and currency using the Products API.
+  <Step title="Prepare your merchant account">
+    Review onboarding, enabled [payment methods](/dashboard/payment-methods), and [API credentials](/authentication) before starting.
   </Step>
-  <Step title="Create a Checkout Session">
-    When your customer wants to pay, create a checkout session and redirect them to the payment page.
+  <Step title="Create a product and Checkout Session">
+    Define your product, price, and currency. Create the session on your server and redirect the customer to its Checkout URL.
   </Step>
-  <Step title="Customer Completes Payment">
-    The customer selects a payment method (credit card, WeChat Pay, etc.) and completes the payment on our hosted checkout page.
+  <Step title="Configure and verify Webhooks">
+    Set your notification URL before the first payment. Verify signatures against the original request body and handle duplicate events.
   </Step>
-  <Step title="Receive Webhook Notification">
-    Kyren Pay sends a webhook to your server confirming the payment. Update your system accordingly.
+  <Step title="Confirm payment and fulfill the order">
+    Use verified payment events and order records to update your system. A browser redirect alone is not proof of payment.
   </Step>
 </Steps>
 
-## Supported Payment Methods
+For a complete implementation, see [Collect your first payment](/guides/collect-first-payment) and the [go-live checklist](/go-live-checklist).
 
-| Method | Regions | Currency |
-| --- | --- | --- |
-| Credit Card / Apple Pay / Google Pay | Global | USD, CNY, HKD |
-| WeChat Pay | China, Southeast Asia | CNY, USD, HKD |
-| Alipay | China, Southeast Asia | CNY, USD, HKD |
-| PayNow | Singapore | USD, HKD |
-| Crypto (USDT / USDC) | Global | USD |
+## Payment methods and availability
 
-## Base URLs
+Available payment methods, currencies, and limits depend on your merchant account, bound channels, and platform configuration. Check [Payment methods](/dashboard/payment-methods) and the [supported currencies API](/api-reference/config/get-supported-currencies) for your integration. Fees and settlement conditions follow your merchant agreement.
 
-| Environment | URL |
+## API base URL
+
+| Environment | Base URL |
 | --- | --- |
 | Production | `https://api.kyrenpay.com` |
 
-## Next Steps
+Review [Testing](/testing) before running payment checks. Use staging only with the environment and credentials provided by KyrenPay.
+
+## Keep building
 
 <CardGroup cols={2}>
-  <Card title="Quickstart" icon="rocket" href="/quickstart">
-    Get your first payment in 5 minutes
+  <Card title="Explore the API reference" icon="book-open" href="/api-reference/config/get-supported-currencies">
+    Find request fields, response formats, and examples for products, Checkout, orders, refunds, and balances.
   </Card>
-  <Card title="API Reference" icon="book" href="/api-reference/config/get-supported-currencies">
-    Explore the full API documentation
+  <Card title="Find an answer" icon="circle-question" href="/faq/common-questions">
+    Get help with authentication, payment notifications, order status, and settlement eligibility.
   </Card>
 </CardGroup>

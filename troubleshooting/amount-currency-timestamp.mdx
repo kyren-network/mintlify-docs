@@ -12,7 +12,7 @@ source_owner: support
 
 ## Symptom
 
-Kyren Pay rejects a request because an amount, currency, or timestamp field is invalid.
+KyrenPay rejects a request because an amount, currency, or timestamp field is invalid.
 
 ## Likely causes
 
@@ -23,7 +23,7 @@ Kyren Pay rejects a request because an amount, currency, or timestamp field is i
 - Timestamps are sent in seconds or formatted date strings instead of Unix milliseconds.
 - Date-range queries use the wrong timezone or swap start and end timestamps.
 
-## Check this in Kyren
+## Check this in KyrenPay
 
 - Confirm supported currencies before creating checkout sessions.
 - Compare the product currency with the request currency.
@@ -38,11 +38,11 @@ Kyren Pay rejects a request because an amount, currency, or timestamp field is i
 
 ## Fix
 
-Normalize request data before calling Kyren: convert decimal amounts to strings, validate currency codes against supported currencies, and convert dates to Unix milliseconds.
+Normalize request data before calling KyrenPay: convert decimal amounts to strings, validate currency codes against supported currencies, and convert dates to Unix milliseconds.
 
 ## Contact support if unresolved
 
-Contact Kyren support with the endpoint path, response error, amount string, currency code, and timestamp values used in the request.
+Contact KyrenPay support with the endpoint path, response error, amount string, currency code, and timestamp values used in the request.
 
 ## Related pages
 

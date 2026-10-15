@@ -1,0 +1,14 @@
+/* Keep the official wordmark intact, with at least half its height as clear space. */
+.nav-logo {
+  box-sizing: content-box;
+  width: 168px;
+  height: auto;
+  max-width: none;
+  padding: 9px;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "PingFang TC", "Noto Sans CJK SC", "Noto Sans CJK TC", "Microsoft YaHei",
+    sans-serif;
+}

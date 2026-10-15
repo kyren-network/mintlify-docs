@@ -10,7 +10,7 @@ last_verified_at: 2026-10-15
 source_owner: engineering
 ---
 
-使用開發者設定把你的服務端接入 Kyren Pay。
+使用開發者設定把你的服務端接入 KyrenPay。
 
 ## API 密鑰
 
@@ -18,11 +18,11 @@ source_owner: engineering
 
 API 密鑰只能在服務端使用。不要把密鑰暴露在前端 JavaScript、行動端應用、日誌、截圖或公開倉庫中。
 
-如果重新產生 API 密鑰，需要更新所有呼叫 Kyren Pay 的服務端環境。舊密鑰會在重新產生後失效。
+如果重新產生 API 密鑰，需要更新所有呼叫 KyrenPay 的服務端環境。舊密鑰會在重新產生後失效。
 
 ## Webhook
 
-配置一個 Kyren Pay 可以透過 HTTPS 存取的 Webhook URL。你的服務端應在信任事件內容前驗證 Webhook 簽名。
+配置一個 KyrenPay 可以透過 HTTPS 存取的 Webhook URL。你的服務端應在信任事件內容前驗證 Webhook 簽名。
 
 打開 **控制台 > 開發者工具 > Webhooks**（`/dashboard/developers/webhooks`），填寫應用實際實作的公網 HTTPS 回調位址並儲存。首次設定會產生獨立的 Webhook Secret；複製完整值，私下填入服務端的 `KYREN_WEBHOOK_SECRET`。如果還沒有 Secret，點擊「產生」；已有 Secret 使用之前儲存的原始值。它不是 API Key，頁面上的遮蔽值不能用於驗簽。重新產生會立即使舊 Secret 失效，需要同步更新相關服務端。不要為了新應用直接覆蓋其他應用正在使用的 Webhook URL。
 
@@ -36,7 +36,7 @@ API 密鑰只能在服務端使用。不要把密鑰暴露在前端 JavaScript�
 
 ## IP 白名單
 
-如果你的商戶帳戶啟用了 IP 白名單，確保所有呼叫 Kyren Pay 的伺服器 IP 都已加入。缺少伺服器 IP 可能導致認證或授權失敗。
+如果你的商戶帳戶啟用了 IP 白名單，確保所有呼叫 KyrenPay 的伺服器 IP 都已加入。缺少伺服器 IP 可能導致認證或授權失敗。
 
 ## 相關頁面
 

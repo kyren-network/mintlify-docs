@@ -10,7 +10,7 @@ last_verified_at: 2026-07-08
 source_owner: engineering
 ---
 
-`/epay/mapi.php` 是服務端到服務端的 Epay 相容端點。它接收表單 `POST`，建立或復用 Kyren 訂單，並依所選渠道返回 `payurl`、`qrcode`、`img`、`trade_no` 等 Epay 風格欄位。
+`/epay/mapi.php` 是服務端到服務端的 Epay 相容端點。它接收表單 `POST`，建立或復用 KyrenPay 訂單，並依所選渠道返回 `payurl`、`qrcode`、`img`、`trade_no` 等 Epay 風格欄位。
 
 該端點使用 `pid + sign`，不使用 `x-api-key`。由於它是服務端直連端點，開啟 API IP 白名單時可能會驗證來源 IP。白名單驗證失敗時可能返回數字 `code` 為 `0`，並附帶 `msg`。
 
@@ -20,7 +20,7 @@ source_owner: engineering
 
 | 參數 | 說明 |
 | --- | --- |
-| `pid` | Kyren 發放的商戶 Epay 相容商戶 ID。 |
+| `pid` | KyrenPay 發放的商戶 Epay 相容商戶 ID。 |
 | `type` | 支付類型。支援值包括 `alipay`、`wxpay`、`creditcard`、`crypto`、`paynow`。 |
 | `out_trade_no` | 你的商戶訂單號。 |
 | `notify_url` | 商戶支付結果通知 URL。 |
@@ -37,10 +37,10 @@ source_owner: engineering
 | `return_url` | 渠道需要支付頁時使用的瀏覽器返回 URL。 |
 | `money_type` | 你的現有整合傳入的幣種或金額類型。 |
 | `device` | 可選裝置提示：`pc` 或 `mobile`。同一訂單號復用到不同支付寶/微信裝置支付形態時可能被拒絕。 |
-| `display_merchant_name` | 本次支付在 Kyren 中間頁展示的商戶名稱。 |
+| `display_merchant_name` | 本次支付在 KyrenPay 中間頁展示的商戶名稱。 |
 | `param` | 商戶透傳中繼資料，會在通知中返回。 |
 | `userId` | 可選的商戶使用者標識；渠道支援時會傳給支付網關。 |
-| `channel_param` | 非信用卡支付類型可選的渠道擴展 JSON 字串。當 `type=creditcard` 時，其原始值仍參與 Epay 簽名，但 Kyren 在驗簽後會完全忽略該值。禁止透過 `channel_param` 傳入卡號、有效期、CVV、帳單資料或聯絡資訊；買家將在 Kyren 或上游託管頁面輸入卡片資料。頂層 `email`、`phone` 和 `userId` 參數不受影響。 |
+| `channel_param` | 非信用卡支付類型可選的渠道擴展 JSON 字串。當 `type=creditcard` 時，其原始值仍參與 Epay 簽名，但 KyrenPay 在驗簽後會完全忽略該值。禁止透過 `channel_param` 傳入卡號、有效期、CVV、帳單資料或聯絡資訊；買家將在 KyrenPay 或上游託管頁面輸入卡片資料。頂層 `email`、`phone` 和 `userId` 參數不受影響。 |
 
 ## 請求範例
 

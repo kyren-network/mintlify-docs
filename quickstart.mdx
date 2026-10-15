@@ -1,15 +1,16 @@
 ---
-title: Quickstart
-description: Accept your first payment in 5 minutes
+title: "Payment API quickstart"
+sidebarTitle: Quickstart
+description: "Create a KyrenPay product and Checkout Session, redirect customers to hosted checkout, and verify signed payment Webhooks on your server."
 ---
 
-Follow this guide when you want your server to create Kyren Pay checkout sessions through the API.
+Follow this guide when you want your server to create KyrenPay checkout sessions through the API.
 
 If you want to learn the dashboard first, start with [Dashboard overview](/dashboard/overview).
 
 ## Prerequisites
 
-- A Kyren Pay merchant account ([sign up here](https://merchant.kyrenpay.com))
+- A KyrenPay merchant account ([sign up here](https://merchant.kyrenpay.com))
 - Your API key (found in the Developer section of your dashboard)
 - A product created in the dashboard or through the Products API
 - A server-side environment where your API key can be stored securely
@@ -93,13 +94,13 @@ Redirect the customer to the checkout URL returned in Step 3. They will see a ho
 
 ```javascript
 // Example: redirect in your web app
-// checkoutUrl is supplied by your authenticated backend, from Kyren's data.url.
+// checkoutUrl is supplied by your authenticated backend, from KyrenPay's data.url.
 window.location.href = checkoutUrl;
 ```
 
 ## Step 5: Handle the Webhook
 
-After payment, Kyren Pay sends a signed JSON POST to your configured Webhook URL. Register the raw-body route before any global JSON parser. The following route requires the [signature function](/webhooks/signatures) and the durable inbox adapter described in the [full example](/guides/collect-first-payment):
+After payment, KyrenPay sends a signed JSON POST to your configured Webhook URL. Register the raw-body route before any global JSON parser. The following route requires the [signature function](/webhooks/signatures) and the durable inbox adapter described in the [full example](/guides/collect-first-payment):
 
 ```javascript
 const crypto = require('crypto');
@@ -150,7 +151,7 @@ app.post('/webhooks/kyren',
 ```
 
 <Info>
-  Configure your URL in **Dashboard > Developer Tools > Webhook Settings**. Verify, persist, then return `2xx` within 10 seconds. A durable worker must retry failures, deduplicate event IDs and credit each business order only once using a unique Kyren order ID and a database transaction.
+  Configure your URL in **Dashboard > Developer Tools > Webhook Settings**. Verify, persist, then return `2xx` within 10 seconds. A durable worker must retry failures, deduplicate event IDs and credit each business order only once using a unique KyrenPay order ID and a database transaction.
 </Info>
 
 `successUrl` and `cancelUrl` are browser navigation, not payment evidence. Your backend can query `GET /v1/checkouts/{id}`: `OPEN` is pending, `COMPLETE` includes the successfully associated `orderId`, and `EXPIRED` closes the Session. For missed notifications, query `GET /v1/orders/{orderId}`, verify payment and its product/base amount/currency/metadata association, and use the same idempotent fulfillment transaction as Webhooks. Session creation does not return an `orderId`. Use the exact returned `data.url`. `successUrl` is required; `cancelUrl` is optional.
@@ -165,7 +166,7 @@ app.post('/webhooks/kyren',
     Implement secure webhook verification
   </Card>
   <Card title="Testing" icon="flask" href="/testing">
-    Test safely with Kyren-issued staging credentials or low-risk live checks
+    Test safely with KyrenPay-issued staging credentials or low-risk live checks
   </Card>
   <Card title="Code Examples" icon="code" href="/guides/code-examples">
     See examples in Python, Node.js, Go, and more

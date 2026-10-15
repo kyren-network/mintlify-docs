@@ -1,6 +1,6 @@
 ---
 title: Testing
-description: Test your Kyren Pay integration before going live
+description: Test your KyrenPay integration before going live
 ---
 
 Use this page to test your integration without making assumptions about unsupported environments.
@@ -12,10 +12,10 @@ Use this page to test your integration without making assumptions about unsuppor
 | Production API | `https://api.kyrenpay.com` |
 | Production API key prefix | `kyren_live_` |
 | Self-service test keys | Not currently exposed in the merchant dashboard |
-| Staging access | Available only with a base URL and credentials issued by Kyren |
+| Staging access | Available only with a base URL and credentials issued by KyrenPay |
 
 <Warning>
-  Do not send test traffic to an arbitrary staging URL unless Kyren has issued credentials for that environment.
+  Do not send test traffic to an arbitrary staging URL unless KyrenPay has issued credentials for that environment.
 </Warning>
 
 ## Test API Keys
@@ -29,7 +29,7 @@ curl https://api.kyrenpay.com/v1/products \
 
 ## Test Card Numbers
 
-Use these card numbers only when Kyren has issued a staging or test-capable environment, or when Kyren has enabled a test-capable payment gateway for your merchant. Do not assume these card numbers produce deterministic outcomes on production checkout sessions.
+Use these card numbers only when KyrenPay has issued a staging or test-capable environment, or when KyrenPay has enabled a test-capable payment gateway for your merchant. Do not assume these card numbers produce deterministic outcomes on production checkout sessions.
 
 | Card Number | Behavior |
 | --- | --- |
@@ -45,7 +45,7 @@ For all test cards:
 
 ## Test WeChat Pay / Alipay
 
-QR payment behavior depends on the gateway configuration attached to your merchant. Use Kyren-provided credentials for the target environment or coordinate a callback simulation when validating asynchronous status updates.
+QR payment behavior depends on the gateway configuration attached to your merchant. Use KyrenPay-provided credentials for the target environment or coordinate a callback simulation when validating asynchronous status updates.
 
 ## Testing Webhooks
 
@@ -78,7 +78,7 @@ Before switching to production, make sure you have:
     Use the production key issued for `api.kyrenpay.com`
   </Step>
   <Step title="Update base URL">
-    If Kyren issued a staging base URL, change from that URL to `api.kyrenpay.com`
+    If KyrenPay issued a staging base URL, change from that URL to `api.kyrenpay.com`
   </Step>
   <Step title="Update webhook URL">
     Set your production webhook endpoint in the Dashboard
