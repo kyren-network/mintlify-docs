@@ -29,9 +29,24 @@ description: 5 分钟内完成第一笔收款
   请妥善保管你的 API 密钥。切勿在客户端代码或公开仓库中暴露密钥。
 </Warning>
 
+将完整值私下填入应用服务端的 `KYREN_API_KEY` 配置，不要发送到 Agent 聊天中。如果尚无密钥，在该页面生成；已有密钥优先使用之前妥善保存的完整值，不要为了接入而直接重新生成。
+
+### 配置 Webhook 并获取 Secret
+
+1. 打开 **控制台 > 开发者工具 > Webhooks**。
+2. 在 **Webhook URL** 中填写应用实际接收通知的公网 HTTPS 地址并保存，例如 `https://你的应用域名/webhooks/kyren`。路径以接入代码实现为准；本机 `localhost` 地址不能供 Kyren 访问，本地测试需要可访问的 HTTPS 域名或已授权的隧道。
+3. 首次配置会生成 Webhook Secret，立即复制完整值，私下填入应用服务端的 `KYREN_WEBHOOK_SECRET`。如果还没有 Secret，点击“生成”。
+4. 如果已经配置过 Secret，使用之前安全保存的原始值；页面上的遮蔽值不能用于验签。重新生成会立即使旧 Secret 失效，需要同步更新使用它的服务端，不能作为默认接入步骤。
+
+Webhook Secret 与 API Key 不同，不要填同一个值。已有 Webhook URL 可能服务于其他应用，修改前先确认影响。操作详情见[开发者设置](/zh/dashboard/developer-settings)。
+
+本文使用生产地址；如果本次接入已选择 Kyren 提供的 development 或其他环境，使用该环境的商户后台、API Base URL 和匹配凭证，不要改回示例中的生产地址。
+
 ## 第二步：创建产品
 
-创建一个代表你所售商品的产品：
+可以在 **控制台 > 产品管理** 创建或选择一个价格和币种与业务一致、状态为 `ACTIVE` 的一次性产品。在产品列表的 **产品 ID** 列点击复制，将完整 ID 填入应用服务端的 `KYREN_PRODUCT_ID` 配置。
+
+也可以通过 Products API 创建一个代表你所售商品的产品：
 
 ```bash
 curl -X POST https://api.kyrenpay.com/v1/products \
@@ -46,6 +61,8 @@ curl -X POST https://api.kyrenpay.com/v1/products \
 ```
 
 保存 JSON 响应中的 `data.id`。例如 `{ "code": 0, "message": "success", "data": { "id": "prod_abc123" } }` 展示响应包装结构，其他产品字段已省略。
+
+产品 ID 不是密钥，也不是商户 PID、Checkout ID 或订单 ID。`KYREN_PRODUCT_ID` 是单商品示例的配置名称；多个商品应在服务端分别保存本地 SKU 与 Kyren 产品 ID 的映射。配置方式和名称以应用实现为准；填写后按应用启动说明重新加载服务端配置。
 
 ## 第三步：创建 Checkout Session
 

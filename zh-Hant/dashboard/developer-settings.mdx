@@ -6,13 +6,15 @@ audience: developer
 product_area: api
 intent: how-to
 visibility: public
-last_verified_at: 2026-05-26
+last_verified_at: 2026-10-15
 source_owner: engineering
 ---
 
 使用開發者設定把你的服務端接入 Kyren Pay。
 
 ## API 密鑰
+
+打開 **控制台 > 開發者工具 > API Keys**（`/dashboard/developers/api-keys`）。如果尚無密鑰，點擊「產生」並立即儲存完整值；已有密鑰使用之前安全儲存的原始值。完整密鑰只在產生時顯示，不能複製遮蔽值作為應用設定。將其私下填入服務端的 `KYREN_API_KEY` 或應用對應設定，不要傳送到 Agent 聊天中。
 
 API 密鑰只能在服務端使用。不要把密鑰暴露在前端 JavaScript、行動端應用、日誌、截圖或公開倉庫中。
 
@@ -21,6 +23,16 @@ API 密鑰只能在服務端使用。不要把密鑰暴露在前端 JavaScript�
 ## Webhook
 
 配置一個 Kyren Pay 可以透過 HTTPS 存取的 Webhook URL。你的服務端應在信任事件內容前驗證 Webhook 簽名。
+
+打開 **控制台 > 開發者工具 > Webhooks**（`/dashboard/developers/webhooks`），填寫應用實際實作的公網 HTTPS 回調位址並儲存。首次設定會產生獨立的 Webhook Secret；複製完整值，私下填入服務端的 `KYREN_WEBHOOK_SECRET`。如果還沒有 Secret，點擊「產生」；已有 Secret 使用之前儲存的原始值。它不是 API Key，頁面上的遮蔽值不能用於驗簽。重新產生會立即使舊 Secret 失效，需要同步更新相關服務端。不要為了新應用直接覆蓋其他應用正在使用的 Webhook URL。
+
+本機 `localhost` 位址不能接收平台通知，需要 HTTPS 部署位址或已授權隧道的目前位址；回調路徑以應用實作為準。首筆付款前完成設定，事後設定不會自動補發過去的普通付款通知。
+
+## 產品 ID 與應用設定
+
+在 **控制台 > 產品管理**（`/dashboard/products`）建立或選擇價格、幣種相符的 `ACTIVE` 一次性產品，複製列表中的 **產品 ID**。透過 API 建立時讀取回應的 `data.id`。將其填入應用的 `KYREN_PRODUCT_ID` 或商品映射；它不是密鑰，也不是商戶 PID、Checkout ID 或訂單 ID。多商品需要各自的映射。
+
+上述變數名稱是範例，以應用實作為準。填寫到實際服務端環境設定後，按應用說明重新載入或重啟。所有值必須來自本次接入所選環境的商戶後台；development 接入不能混用生產後台與憑證。逐步操作見[快速開始](/zh-Hant/quickstart)。
 
 ## IP 白名單
 

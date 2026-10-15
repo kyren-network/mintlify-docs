@@ -6,13 +6,15 @@ audience: developer
 product_area: api
 intent: how-to
 visibility: public
-last_verified_at: 2026-05-26
+last_verified_at: 2026-10-15
 source_owner: engineering
 ---
 
 Use Developer settings to connect your server to Kyren Pay.
 
 ## API keys
+
+Open **Dashboard > Developer Tools > API Keys** (`/dashboard/developers/api-keys`). If no key exists, click Generate and immediately save its full value. Otherwise use the original you securely saved. Full keys are shown only when generated; a masked value cannot configure your application. Privately put it in the server-side `KYREN_API_KEY` setting or its application-specific equivalent, not in an Agent chat.
 
 Use API keys only from your server. Do not expose them in frontend JavaScript, mobile apps, logs, screenshots, or public repositories.
 
@@ -21,6 +23,16 @@ If you regenerate an API key, update every server environment that calls Kyren P
 ## Webhooks
 
 Configure a Webhook URL that Kyren Pay can reach over HTTPS. Your server should verify the Webhook signature before trusting the event body.
+
+Open **Dashboard > Developer Tools > Webhooks** (`/dashboard/developers/webhooks`), enter your application's actual public HTTPS callback URL and save. First configuration generates a separate Webhook Secret. Copy its full value into the private server-side `KYREN_WEBHOOK_SECRET` setting. If no Secret exists, click Generate; otherwise use your securely saved original. It is not the API key, and its masked display cannot verify signatures. Regeneration immediately invalidates the old Secret and requires updating the relevant servers. Do not overwrite another application's callback URL just to set up a new application.
+
+Kyren cannot send notifications to localhost. Use your HTTPS deployment or an authorized tunnel's current URL, with the callback path implemented by your application. Configure it before the first payment; later configuration does not automatically backfill ordinary past payment notifications.
+
+## Product ID and application settings
+
+In **Dashboard > Product Management** (`/dashboard/products`), create or select an `ACTIVE` one-time product matching your price and currency, then copy **Product ID** from the list. API creation returns it in `data.id`. Put it in the application's `KYREN_PRODUCT_ID` setting or product mapping. It is not a secret, merchant PID, Checkout ID or order ID. Multiple products require separate mappings.
+
+These variable names are examples; follow your application's implementation. Reload or restart according to its instructions after updating the actual server configuration. Obtain all values from the selected environment's dashboard; do not mix a development integration with production settings or credentials. See [Quickstart](/quickstart) for the walkthrough.
 
 ## IP allowlist
 

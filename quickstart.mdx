@@ -29,9 +29,24 @@ After signing up, navigate to **Dashboard > Developer Tools > API Keys**. A full
   Keep your API keys secure. Never expose them in client-side code or public repositories.
 </Warning>
 
+Privately put the full value in your application's server-side `KYREN_API_KEY` setting, not in an Agent chat. Generate a key on this page if none exists. If you already have one, use its securely saved full value rather than regenerating it as a routine integration step.
+
+### Configure Webhook and get its Secret
+
+1. Open **Dashboard > Developer Tools > Webhooks**.
+2. Enter your application's actual public HTTPS callback URL in **Webhook URL** and save, for example `https://your-app.example/webhooks/kyren`. Use the path implemented by your application. Kyren cannot reach localhost; local testing needs a reachable HTTPS host or an authorized tunnel.
+3. First configuration generates a Webhook Secret. Immediately copy its full value into your application's private server-side `KYREN_WEBHOOK_SECRET` setting. If no Secret exists, click Generate.
+4. If a Secret is already configured, use its securely saved original. Its masked display cannot verify signatures. Regeneration immediately invalidates the old Secret and requires updating every server that uses it; do not rotate it as a default setup step.
+
+The Webhook Secret and API key are different values. An existing Webhook URL may serve another application; confirm its use before changing it. See [Developer settings](/dashboard/developer-settings).
+
+This guide uses production addresses. If your integration selects a Kyren-provided development or other environment, use that environment's dashboard, API Base URL and matching credentials throughout instead of switching to the production examples.
+
 ## Step 2: Create a Product
 
-Create a product that represents what you're selling:
+In **Dashboard > Product Management**, create or select an `ACTIVE` one-time product with the agreed price and currency. Copy its **Product ID** from the product list into your application's server-side `KYREN_PRODUCT_ID` setting.
+
+Alternatively, use the Products API to create a product that represents what you're selling:
 
 ```bash
 curl -X POST https://api.kyrenpay.com/v1/products \
@@ -46,6 +61,8 @@ curl -X POST https://api.kyrenpay.com/v1/products \
 ```
 
 Save `data.id` from the JSON response. For example, `{ "code": 0, "message": "success", "data": { "id": "prod_abc123" } }` illustrates the envelope with other product fields omitted.
+
+A product ID is not a secret, merchant PID, Checkout ID or order ID. `KYREN_PRODUCT_ID` is the setting name in a single-product example; for multiple products, store a server-side mapping from each local SKU to its Kyren product ID. Use your application's actual setting names and reload its server configuration according to its startup instructions.
 
 ## Step 3: Create a Checkout Session
 
