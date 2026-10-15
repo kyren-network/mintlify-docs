@@ -58,6 +58,8 @@ npm install express axios
 
 JSON 解析只注册到普通业务路由，不要在原始 Webhook 路由前注册全局 `express.json()`。
 
+下方代码刻意使用 `KYREN_PRODUCT_ID` 展示最小单商品示例；它不是平台要求必须配置的环境变量，也不是 Agent 接入的默认流程。已有应用优先按[快速开始](/zh/quickstart)实现可重复执行的初始化：查询、复用或经授权创建产品，并持久化本地 SKU 映射。创建 Checkout 时从可信服务端商品目录读取对应产品 ID，不要将此单商品常量用于所有购买。
+
 ```javascript
 // server.js
 const express = require('express');
@@ -79,7 +81,7 @@ if (!KYREN_API_KEY || !KYREN_WEBHOOK_SECRET || !KYREN_PRODUCT_ID) {
 
 ## 2. 创建产品（一次性操作）
 
-固定价格产品只需通过 API 或控制台创建一次，将返回的 `data.id` 设置为 `KYREN_PRODUCT_ID`。Checkout 金额和币种取自产品，不支持每次创建时覆盖价格、数量或币种。产品 metadata 不会自动合并到 Checkout metadata，应发额度应保存在自己的业务订单中。
+本可选单商品示例通过 API 或控制台创建或选择一次固定价格产品，将其 `data.id` 设置为 `KYREN_PRODUCT_ID`；采用应用管理映射时，则将该 ID 保存在对应本地 SKU 的记录中。Checkout 金额和币种取自产品，不支持每次创建时覆盖价格、数量或币种。产品 metadata 不会自动合并到 Checkout metadata，应发额度应保存在自己的业务订单中。
 
 在启动 `server.js` 前先创建产品，因为启动时必须提供产品 ID。例如，先在当前终端设置 `KYREN_API_KEY`，再执行：
 

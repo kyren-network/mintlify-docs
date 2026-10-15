@@ -43,11 +43,13 @@ Webhook Secret 与 API Key 不同，不要填同一个值。已有 Webhook URL �
 
 本文使用生产地址；如果本次接入已选择 Kyren 提供的 development 或其他环境，使用该环境的商户后台、API Base URL 和匹配凭证，不要改回示例中的生产地址。
 
-## 第二步：创建产品
+## 第二步：建立商品映射
 
-可以在 **控制台 > 产品管理** 创建或选择一个价格和币种与业务一致、状态为 `ACTIVE` 的一次性产品。在产品列表的 **产品 ID** 列点击复制，将完整 ID 填入应用服务端的 `KYREN_PRODUCT_ID` 配置。
+实际应用建议由接入程序或 Agent 根据已有商品目录完成一次初始化：通过 `GET /v1/products` 分页查询，复用身份、价格和币种明确匹配的 `ACTIVE` 一次性产品；没有匹配项时，在已有授权范围内通过 `POST /v1/products` 创建。列表读取 `data.items` 和 `data.pagination`，创建读取 `data.id`。
 
-也可以通过 Products API 创建一个代表你所售商品的产品：
+将“本地 SKU → Kyren 产品 ID”的映射持久化到应用数据库或已有商品配置，并按环境和商户隔离。创建 Checkout 时由后端自动读取映射，不需要用户逐个手填产品 ID。多个产品不能只按金额判断匹配；存在歧义时请用户选择，缺少凭证或创建授权时明确提示待办。重复初始化应复用映射，创建超时或本地保存失败先核查结果，不在每次启动或下单时重复创建产品。
+
+以下是单商品手动创建示例，也可以在 **控制台 > 产品管理** 创建或选择产品并复制 **产品 ID**：
 
 ```bash
 curl -X POST https://api.kyrenpay.com/v1/products \
@@ -63,7 +65,7 @@ curl -X POST https://api.kyrenpay.com/v1/products \
 
 保存 JSON 响应中的 `data.id`。例如 `{ "code": 0, "message": "success", "data": { "id": "prod_abc123" } }` 展示响应包装结构，其他产品字段已省略。
 
-产品 ID 不是密钥，也不是商户 PID、Checkout ID 或订单 ID。`KYREN_PRODUCT_ID` 是单商品示例的配置名称；多个商品应在服务端分别保存本地 SKU 与 Kyren 产品 ID 的映射。配置方式和名称以应用实现为准；填写后按应用启动说明重新加载服务端配置。
+产品 ID 不是密钥，也不是商户 PID、Checkout ID 或订单 ID。`KYREN_PRODUCT_ID` 仅是简单单商品项目可选的配置方式，不是平台要求必须配置的环境变量。使用 Agent 接入时，优先由它实现查询、经授权创建和持久化映射；用户确认商品与价格并私下配置密钥即可。具体初始化与重新加载命令由应用实现提供。
 
 ## 第三步：创建 Checkout Session
 

@@ -30,7 +30,9 @@ Kyren cannot send notifications to localhost. Use your HTTPS deployment or an au
 
 ## Product ID and application settings
 
-In **Dashboard > Product Management** (`/dashboard/products`), create or select an `ACTIVE` one-time product matching your price and currency, then copy **Product ID** from the list. API creation returns it in `data.id`. Put it in the application's `KYREN_PRODUCT_ID` setting or product mapping. It is not a secret, merchant PID, Checkout ID or order ID. Multiple products require separate mappings.
+For application integration, prefer setup code or an Agent that queries/reuses or, within authorization, creates `ACTIVE` one-time products through the Products API. Persist each local SKU-to-Kyren-product-ID mapping in the database or existing durable catalog, scoped to the environment and merchant. Lists use `data.items` and `data.pagination`; creation returns `data.id`. Repeated initialization reuses mappings. Check price and currency, but do not identify products by price alone; ask the user to resolve ambiguity and do not create a new product per purchase.
+
+Manual creation, selection and copying **Product ID** in **Dashboard > Product Management** (`/dashboard/products`) remain available for manual setup. `KYREN_PRODUCT_ID` is an optional shortcut for a simple single-product application, not a general integration prerequisite. A product ID is not a secret, merchant PID, Checkout ID or order ID; users need not obtain it manually as a third credential.
 
 These variable names are examples; follow your application's implementation. Reload or restart according to its instructions after updating the actual server configuration. Obtain all values from the selected environment's dashboard; do not mix a development integration with production settings or credentials. See [Quickstart](/quickstart) for the walkthrough.
 

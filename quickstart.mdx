@@ -43,11 +43,13 @@ The Webhook Secret and API key are different values. An existing Webhook URL may
 
 This guide uses production addresses. If your integration selects a Kyren-provided development or other environment, use that environment's dashboard, API Base URL and matching credentials throughout instead of switching to the production examples.
 
-## Step 2: Create a Product
+## Step 2: Initialize Product Mappings
 
-In **Dashboard > Product Management**, create or select an `ACTIVE` one-time product with the agreed price and currency. Copy its **Product ID** from the product list into your application's server-side `KYREN_PRODUCT_ID` setting.
+For an application integration, have its setup code or Agent initialize products from the existing catalog. Query the paginated `GET /v1/products` list and reuse an unambiguously matching `ACTIVE` one-time product, checking identity, price and currency. If none matches, create one with `POST /v1/products` within the user's authorization. Read `data.items` and `data.pagination` for lists and `data.id` for creation.
 
-Alternatively, use the Products API to create a product that represents what you're selling:
+Persist each local SKU-to-Kyren-product-ID mapping in the application's database or existing durable catalog, scoped to the environment and merchant. Its backend resolves the mapping when creating Checkout; users do not need to copy every product ID themselves. Price alone is not a product identity. Ask the user to resolve ambiguous matches, and identify missing credentials or creation authorization. Repeated initialization should reuse mappings. Reconcile a create timeout or failed local save before retrying; do not recreate products on every startup or purchase.
+
+The following is a manual single-product example. You can also create/select a product in **Dashboard > Product Management** and copy its **Product ID**:
 
 ```bash
 curl -X POST https://api.kyrenpay.com/v1/products \
@@ -63,7 +65,7 @@ curl -X POST https://api.kyrenpay.com/v1/products \
 
 Save `data.id` from the JSON response. For example, `{ "code": 0, "message": "success", "data": { "id": "prod_abc123" } }` illustrates the envelope with other product fields omitted.
 
-A product ID is not a secret, merchant PID, Checkout ID or order ID. `KYREN_PRODUCT_ID` is the setting name in a single-product example; for multiple products, store a server-side mapping from each local SKU to its Kyren product ID. Use your application's actual setting names and reload its server configuration according to its startup instructions.
+A product ID is not a secret, merchant PID, Checkout ID or order ID. `KYREN_PRODUCT_ID` is only an optional setting for a simple single-product application, not an environment variable the platform requires. For Agent-assisted integration, prefer implementing lookup, authorized creation and durable mappings; the user confirms the catalog/prices and privately configures credentials. The application provides its actual initialization and reload commands.
 
 ## Step 3: Create a Checkout Session
 

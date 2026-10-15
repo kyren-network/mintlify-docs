@@ -58,6 +58,8 @@ Create your server file. Implement `app-adapters.js` using your application's au
 
 Register JSON parsing only on normal routes, as shown below. Never register a global `express.json()` before the raw Webhook route.
 
+The code below deliberately uses `KYREN_PRODUCT_ID` as a minimal single-product shortcut. This is not a platform-required environment variable or the default Agent integration workflow. For an existing application, prefer a repeatable setup step that queries/reuses or, within authorization, creates products and persists local SKU mappings, as described in [Quickstart](/quickstart). Resolve the mapped product ID from the trusted server catalog when creating Checkout instead of copying this single-product constant into every purchase.
+
 ```javascript
 // server.js
 const express = require('express');
@@ -79,7 +81,7 @@ if (!KYREN_API_KEY || !KYREN_WEBHOOK_SECRET || !KYREN_PRODUCT_ID) {
 
 ## 2. Create a Product (One-Time Setup)
 
-Create a fixed-price product once via the API or dashboard and set its returned `data.id` as `KYREN_PRODUCT_ID`. Checkout takes its amount and currency from that product; it does not accept per-session price, quantity or currency overrides. Product metadata is not automatically merged into Checkout metadata. Keep the expected entitlement in your business order.
+For this optional single-product example, create or select a fixed-price product once via the API or dashboard and set its `data.id` as `KYREN_PRODUCT_ID`. In an application-managed mapping flow, persist that ID against its local SKU instead. Checkout takes its amount and currency from that product; it does not accept per-session price, quantity or currency overrides. Product metadata is not automatically merged into Checkout metadata. Keep the expected entitlement in your business order.
 
 Create the product before starting `server.js`, because startup requires its ID. For example, with `KYREN_API_KEY` already set in your shell:
 
