@@ -1,12 +1,13 @@
 ---
 title: "支援升級清單"
-description: "幫助 Kyren Copilot 在引導商戶聯絡支援前，收集安全且有用的資訊。"
+description: "幫助 KyrenPay Copilot 在引導商戶聯絡支援前，收集安全且有用的資訊。"
 language: zh-Hant
 audience: copilot
 product_area: copilot
 intent: support_handoff
 visibility: public
 last_verified_at: 2026-05-27
+noindex: true
 source_owner: support
 ---
 
@@ -16,7 +17,7 @@ source_owner: support
 
 - 商戶帳戶或商戶 ID。
 - 受影響的端點、控制台頁面或業務流程。
-- 可用時提供 Kyren 訂單號、Checkout Session ID 或商戶 `out_trade_no`。
+- 可用時提供 KyrenPay 訂單號、Checkout Session ID 或商戶 `out_trade_no`。
 - 商戶時區下的時間；如果是 API 請求，相關時可提供 Unix 毫秒時間戳。
 - 回應狀態、錯誤碼和錯誤資訊。
 - 已脫敏的服務端日誌，包含請求時間、端點和回應。
@@ -59,9 +60,9 @@ source_owner: support
 
 索取：
 
-- Kyren 訂單號。
+- KyrenPay 訂單號。
 - 商戶內部使用者 ID 或訂單 ID，如果已保存。
-- Kyren 顯示的支付成功時間。
+- KyrenPay 顯示的支付成功時間。
 - 該時間附近的履約任務日誌。
 - 履約處理是否具備冪等性。
 
@@ -86,14 +87,14 @@ source_owner: support
 - `out_trade_no` 或 `trade_no`。
 - 支付 `type`。
 - 已脫敏的簽名字串輸入。
-- Kyren 返回的數字 `code` 和 `msg`。
+- KyrenPay 返回的數字 `code` 和 `msg`。
 
 不要索取原始商戶密鑰。
 
 ## 升級話術
 
 ```text
-這個問題需要帳戶級審核，建議由 Kyren 支援查看。請提供商戶帳戶、受影響的訂單或 Checkout Session ID、請求時間、端點或控制台頁面，以及完整錯誤資訊。不要發送完整 API Key、Webhook secret、卡資料或其他私密憑證。
+這個問題需要帳戶級審核，建議由 KyrenPay 支援查看。請提供商戶帳戶、受影響的訂單或 Checkout Session ID、請求時間、端點或控制台頁面，以及完整錯誤資訊。不要發送完整 API Key、Webhook secret、卡資料或其他私密憑證。
 ```
 
 ## 相關頁面

@@ -1,17 +1,17 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Kyren Pay",
+  "name": "KyrenPay",
   "colors": {
-    "primary": "#2563EB",
-    "light": "#3B82F6",
-    "dark": "#1D4ED8"
+    "primary": "#0069FF",
+    "light": "#05B7E8",
+    "dark": "#0069FF"
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/logo/kyrenpay-wordmark.png",
+    "dark": "/logo/kyrenpay-wordmark.png"
   },
-  "favicon": "/logo/favicon.svg",
+  "favicon": "/logo/kyrenpay-icon.png",
   "navigation": {
     "languages": [
       {
@@ -110,7 +110,58 @@
             "tab": "API Reference",
             "openapi": "openapi.yaml"
           }
-        ]
+        ],
+        "navbar": {
+          "links": [
+            {
+              "label": "Website",
+              "href": "https://kyrenpay.com"
+            }
+          ],
+          "primary": {
+            "type": "button",
+            "label": "Merchant dashboard",
+            "href": "https://merchant.kyrenpay.com"
+          }
+        },
+        "footer": {
+          "links": [
+            {
+              "header": "Get started",
+              "items": [
+                {
+                  "label": "Quickstart",
+                  "href": "/quickstart"
+                },
+                {
+                  "label": "API authentication",
+                  "href": "/authentication"
+                },
+                {
+                  "label": "Launch checklist",
+                  "href": "/go-live-checklist"
+                }
+              ]
+            },
+            {
+              "header": "Resources",
+              "items": [
+                {
+                  "label": "Website",
+                  "href": "https://kyrenpay.com"
+                },
+                {
+                  "label": "Brand guidelines",
+                  "href": "https://kyrenpay.com/branding/"
+                },
+                {
+                  "label": "Support",
+                  "href": "mailto:support@kyrenpay.com"
+                }
+              ]
+            }
+          ]
+        }
       },
       {
         "language": "zh",
@@ -207,7 +258,58 @@
             "tab": "API 参考",
             "openapi": "openapi.yaml"
           }
-        ]
+        ],
+        "navbar": {
+          "links": [
+            {
+              "label": "官方网站",
+              "href": "https://kyrenpay.com"
+            }
+          ],
+          "primary": {
+            "type": "button",
+            "label": "商户控制台",
+            "href": "https://merchant.kyrenpay.com"
+          }
+        },
+        "footer": {
+          "links": [
+            {
+              "header": "开始接入",
+              "items": [
+                {
+                  "label": "快速开始",
+                  "href": "/zh/quickstart"
+                },
+                {
+                  "label": "API 认证",
+                  "href": "/zh/authentication"
+                },
+                {
+                  "label": "上线检查",
+                  "href": "/zh/go-live-checklist"
+                }
+              ]
+            },
+            {
+              "header": "资源与支持",
+              "items": [
+                {
+                  "label": "官方网站",
+                  "href": "https://kyrenpay.com"
+                },
+                {
+                  "label": "品牌指南",
+                  "href": "https://kyrenpay.com/branding/"
+                },
+                {
+                  "label": "联系支持",
+                  "href": "mailto:support@kyrenpay.com"
+                }
+              ]
+            }
+          ]
+        }
       },
       {
         "language": "zh-Hant",
@@ -304,13 +406,83 @@
             "tab": "API 參考",
             "openapi": "openapi.yaml"
           }
-        ]
+        ],
+        "navbar": {
+          "links": [
+            {
+              "label": "官方網站",
+              "href": "https://kyrenpay.com"
+            }
+          ],
+          "primary": {
+            "type": "button",
+            "label": "商戶控制台",
+            "href": "https://merchant.kyrenpay.com"
+          }
+        },
+        "footer": {
+          "links": [
+            {
+              "header": "開始串接",
+              "items": [
+                {
+                  "label": "快速開始",
+                  "href": "/zh-Hant/quickstart"
+                },
+                {
+                  "label": "API 認證",
+                  "href": "/zh-Hant/authentication"
+                },
+                {
+                  "label": "上線檢查",
+                  "href": "/zh-Hant/go-live-checklist"
+                }
+              ]
+            },
+            {
+              "header": "資源與支援",
+              "items": [
+                {
+                  "label": "官方網站",
+                  "href": "https://kyrenpay.com"
+                },
+                {
+                  "label": "品牌指南",
+                  "href": "https://kyrenpay.com/branding/"
+                },
+                {
+                  "label": "聯絡支援",
+                  "href": "mailto:support@kyrenpay.com"
+                }
+              ]
+            }
+          ]
+        }
       }
     ]
   },
-  "footer": {
-    "socials": {
-      "website": "https://kyrenpay.com"
+  "description": "KyrenPay developer documentation for payment APIs, hosted Checkout, Webhooks, Epay migration, and merchant operations for AI and SaaS teams.",
+  "background": {
+    "color": {
+      "light": "#FFFFFF",
+      "dark": "#081421"
+    }
+  },
+  "seo": {
+    "indexing": "navigable",
+    "metatags": {
+      "canonical": "https://docs.kyrenpay.com",
+      "og:site_name": "KyrenPay",
+      "og:image": "https://docs.kyrenpay.com/logo/kyrenpay-share.png",
+      "og:image:alt": "KyrenPay",
+      "twitter:image": "https://docs.kyrenpay.com/logo/kyrenpay-share.png",
+      "twitter:image:alt": "KyrenPay",
+      "twitter:card": "summary_large_image"
+    },
+    "organization": {
+      "name": "KyrenPay",
+      "url": "https://kyrenpay.com",
+      "logo": "https://docs.kyrenpay.com/logo/kyrenpay-icon.png"
     }
   }
 }

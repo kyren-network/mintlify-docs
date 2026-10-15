@@ -1,6 +1,7 @@
 ---
-title: "Epay MD5 signature"
-description: "Build and verify Epay-compatible MD5 signatures for Kyren Pay migration endpoints."
+title: "Epay MD5 sign generation and verification"
+sidebarTitle: "Epay MD5 signature"
+description: "Generate the Epay sign parameter and verify payment notifications with MD5. Follow KyrenPay field sorting, empty-value, and merchant-key rules."
 language: en
 audience: developer
 product_area: epay
@@ -57,7 +58,7 @@ The resulting `sign` is the lowercase MD5 hexadecimal digest of that signing str
 
 ## Verification checklist
 
-- Use the Kyren-issued `pid` and merchant key for the merchant account receiving the order.
+- Use the KyrenPay-issued `pid` and merchant key for the merchant account receiving the order.
 - Exclude both `sign` and `sign_type` before signing.
 - Drop empty values before sorting.
 - Sort by raw parameter key, not by display label or JSON order.

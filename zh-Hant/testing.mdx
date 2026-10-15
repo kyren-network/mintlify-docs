@@ -1,6 +1,6 @@
 ---
 title: 測試
-description: 上線前測試你的 Kyren Pay 整合
+description: 上線前測試你的 KyrenPay 整合
 ---
 
 使用本頁測試你的整合，不要假設未公開支援的環境或密鑰類型。
@@ -12,10 +12,10 @@ description: 上線前測試你的 Kyren Pay 整合
 | 生產 API | `https://api.kyrenpay.com` |
 | 生產 API 密鑰前綴 | `kyren_live_` |
 | 自助測試密鑰 | 商戶控制台目前不提供 |
-| Staging 存取 | 僅在 Kyren 提供 Base URL 和憑證後可用 |
+| Staging 存取 | 僅在 KyrenPay 提供 Base URL 和憑證後可用 |
 
 <Warning>
-  除非 Kyren 已向你提供對應環境的憑證，否則不要向任意 Staging URL 傳送測試流量。
+  除非 KyrenPay 已向你提供對應環境的憑證，否則不要向任意 Staging URL 傳送測試流量。
 </Warning>
 
 ## 測試 API 密鑰
@@ -29,7 +29,7 @@ curl https://api.kyrenpay.com/v1/products \
 
 ## 測試卡號
 
-只有在 Kyren 已向你提供 Staging 或可測試環境，或為你的商戶啟用可測試支付閘道時，才應使用以下卡號。不要假設這些卡號會在生產收銀台中產生確定性的測試結果。
+只有在 KyrenPay 已向你提供 Staging 或可測試環境，或為你的商戶啟用可測試支付閘道時，才應使用以下卡號。不要假設這些卡號會在生產收銀台中產生確定性的測試結果。
 
 | 卡號 | 行為 |
 | --- | --- |
@@ -45,7 +45,7 @@ curl https://api.kyrenpay.com/v1/products \
 
 ## 測試微信支付 / 支付寶
 
-二維碼支付行為取決於商戶綁定的閘道配置。驗證非同步狀態更新時，請使用 Kyren 為目標環境提供的憑證，或配合回調模擬。
+二維碼支付行為取決於商戶綁定的閘道配置。驗證非同步狀態更新時，請使用 KyrenPay 為目標環境提供的憑證，或配合回調模擬。
 
 ## 測試 Webhook
 
@@ -78,7 +78,7 @@ https://abc123.ngrok.io/webhooks/kyren
     使用 `api.kyrenpay.com` 對應的生產密鑰
   </Step>
   <Step title="更新介面位址">
-    如果 Kyren 向你提供了 Staging Base URL，請從該位址切換到 `api.kyrenpay.com`
+    如果 KyrenPay 向你提供了 Staging Base URL，請從該位址切換到 `api.kyrenpay.com`
   </Step>
   <Step title="更新 Webhook URL">
     在控制台中設定生產環境的 Webhook 端點

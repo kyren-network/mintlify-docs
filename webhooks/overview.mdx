@@ -1,16 +1,17 @@
 ---
-title: Webhook Overview
-description: Receive real-time payment notifications via webhooks
+title: "Payment Webhooks integration"
+sidebarTitle: Webhook Overview
+description: "Configure KyrenPay payment Webhooks, understand event delivery, and connect signature verification, retries, and order fulfillment."
 ---
 
-Webhooks allow Kyren Pay to notify your server when a payment or refund succeeds. See [Events](/webhooks/events) for supported events and optional dispute notifications.
+Webhooks allow KyrenPay to notify your server when a payment or refund succeeds. See [Events](/webhooks/events) for supported events and optional dispute notifications.
 
 ## How Webhooks Work
 
 ```mermaid
 sequenceDiagram
     participant Customer
-    participant KyrenPay as Kyren Pay
+    participant KyrenPay as KyrenPay
     participant YourServer as Your Server
 
     Customer->>KyrenPay: Completes payment
@@ -23,7 +24,7 @@ sequenceDiagram
 ```
 
 1. An event occurs (e.g., a customer completes a payment)
-2. Kyren Pay sends an HTTP POST request to your configured webhook URL
+2. KyrenPay sends an HTTP POST request to your configured webhook URL
 3. The request includes a signature for verification
 4. Your server verifies the signature, persists the event, and returns `200` within 10 seconds
 5. Your worker processes the persisted event with idempotency and its own retries
@@ -80,13 +81,13 @@ The request body is a JSON object:
     Always verify the `X-Kyren-Signature` header to ensure the webhook is authentic. See [Webhook Signatures](/webhooks/signatures).
   </Card>
   <Card title="Return 200 Quickly" icon="clock">
-    Verify the signature and durably store the event before returning `200`. Return non-`2xx` if persistence fails, so Kyren can retry.
+    Verify the signature and durably store the event before returning `200`. Return non-`2xx` if persistence fails, so KyrenPay can retry.
   </Card>
   <Card title="Handle Duplicates" icon="copy">
     Use the event `id` to deduplicate. Your endpoint may receive the same event more than once due to retries.
   </Card>
   <Card title="Use a Queue" icon="list">
-    For asynchronous processing, persist to a durable inbox or queue and acknowledge only after storage succeeds. Workers need their own retries after Kyren receives `2xx`.
+    For asynchronous processing, persist to a durable inbox or queue and acknowledge only after storage succeeds. Workers need their own retries after KyrenPay receives `2xx`.
   </Card>
 </CardGroup>
 

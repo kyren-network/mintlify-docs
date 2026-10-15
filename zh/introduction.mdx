@@ -1,73 +1,74 @@
 ---
-title: 简介
-description: 使用启润支付接收来自全球客户的付款
+title: 支付 API 与 Checkout 开发文档
+sidebarTitle: 文档概览
+description: 面向出海 AI 应用与 SaaS 团队的 KyrenPay 开发文档。了解支付 API、托管收银台、Webhook 验签、易支付迁移、new-api 与 sub2api 接入，完成国际收款集成。
 ---
 
-## 什么是启润支付？
+## 使用 KyrenPay 接入国际收款
 
-启润支付是专为**中国出海 AI Startup** 打造的收款平台。它提供标准化的方式来接收海外客户的付款，让你专注于产品开发，而非支付基础设施。
+KyrenPay 为**中国开发者、AI 应用和 SaaS 团队**提供国际收款能力。在这里，你可以从创建支付链接开始，也可以通过支付 API 接入托管收银台，完成订单确认、履约与资金对账。
 
-<Card title="从设置路径开始" icon="arrow-right" href="/zh/start-here">
-  选择先使用控制台、对接 API、收第一笔款，或准备上线。
+<Card title="选择适合你的接入方式" icon="arrow-right" href="/zh/start-here">
+  从控制台支付链接到服务端 Checkout 集成，按你的产品形态找到接入路径。
 </Card>
 
+## 从你的场景开始
+
 <CardGroup cols={2}>
-  <Card title="快速集成" icon="bolt">
-    几分钟内即可上线。创建产品，生成收银链接，开始接收付款。
+  <Card title="支付 API 快速开始" icon="code" href="/zh/quickstart">
+    配置服务端认证，创建产品与 Checkout Session，将客户引导至托管收银台。
   </Card>
-  <Card title="多种支付方式" icon="credit-card">
-    通过单一集成支持信用卡、微信支付、支付宝和 PayNow。
+  <Card title="无需代码的支付链接" icon="link" href="/zh/dashboard/checkouts">
+    在商户控制台创建并分享 Checkout 链接，查看订单和支付状态。
   </Card>
-  <Card title="安全 Webhook" icon="shield-check">
-    通过 HMAC-SHA256 签名的 Webhook 接收实时支付通知，实现安全的服务器间通信。
+  <Card title="验证支付结果通知" icon="shield-check" href="/zh/webhooks/overview">
+    接收签名 Webhook、验证事件并处理重复通知，可靠地完成订单履约。
   </Card>
-  <Card title="开发者友好" icon="code">
-    简洁的 REST API、完善的文档和多语言代码示例。
+  <Card title="迁移易支付集成" icon="arrows-rotate" href="/zh/epay-migration/overview">
+    使用兼容的请求格式，将已有的易支付客户端接入 KyrenPay。
   </Card>
 </CardGroup>
 
-## 工作原理
+使用 AI 网关管理余额充值？查看 [new-api 接入指南](/zh/integrations/new-api)或 [sub2api 接入指南](/zh/integrations/sub2api)，通过系统内置的易支付配置完成接入。
 
-典型的集成流程包含四个步骤：
+## 从创建 Checkout 到确认订单
 
 <Steps>
-  <Step title="创建产品">
-    使用产品 API 定义你的产品，包括名称、价格和货币。
+  <Step title="准备商户账户">
+    完成接入前的账户准备，确认可用的[支付方式](/zh/dashboard/payment-methods)和 [API 凭证](/zh/authentication)。
   </Step>
-  <Step title="创建 Checkout Session">
-    当客户要付款时，创建一个 Checkout Session 并将客户重定向到支付页面。
+  <Step title="创建产品与 Checkout Session">
+    设置产品、价格和币种。在服务端创建会话，再将客户引导至返回的 Checkout 地址。
   </Step>
-  <Step title="客户完成支付">
-    客户在托管的收银页面上选择支付方式（信用卡、微信支付等）并完成付款。
+  <Step title="配置并验证 Webhook">
+    在第一笔付款前配置通知地址。使用原始请求体校验签名，并处理可能重复到达的事件。
   </Step>
-  <Step title="接收 Webhook 通知">
-    启润支付向你的服务器发送 Webhook 确认付款。据此更新你的系统。
+  <Step title="确认支付并履约">
+    根据已验证的支付事件与订单记录更新你的系统，不能仅凭浏览器跳转认定支付成功。
   </Step>
 </Steps>
 
-## 支持的支付方式
+完整实现请参考[收取第一笔款项](/zh/guides/collect-first-payment)和[上线检查清单](/zh/go-live-checklist)。
 
-| 方式 | 地区 | 货币 |
-| --- | --- | --- |
-| 信用卡 / Apple Pay / Google Pay | 全球 | USD、CNY、HKD |
-| 微信支付 | 中国、东南亚 | CNY、USD、HKD |
-| 支付宝 | 中国、东南亚 | CNY、USD、HKD |
-| PayNow | 新加坡 | USD、HKD |
-| 加密货币（USDT / USDC） | 全球 | USD |
+## 支付方式与可用范围
 
-## 接口地址
+可用支付方式、币种和限额取决于商户账户、已绑定渠道和平台配置。接入时请查看[支付方式](/zh/dashboard/payment-methods)与[支持币种 API](/api-reference/config/get-supported-currencies)。费用与结算条件以商户协议及实际约定为准。
 
-| 环境 | URL |
+## API 基础地址
+
+| 环境 | 基础地址 |
 | --- | --- |
 | 生产环境 | `https://api.kyrenpay.com` |
 
-## 下一步
+发起支付验证前，请先阅读[测试指南](/zh/testing)。仅在 KyrenPay 提供环境地址和匹配凭证后使用 staging 环境。
+
+## 继续接入
 
 <CardGroup cols={2}>
-  <Card title="快速开始" icon="rocket" href="/zh/quickstart">
-    5 分钟内完成第一笔收款
+  <Card title="查看 API 参考" icon="book-open" href="/api-reference/config/get-supported-currencies">
+    查阅产品、Checkout、订单、退款及余额接口的请求参数、响应格式和示例。
   </Card>
-  <Card title="API 参考" icon="book" href="/api-reference/config/get-supported-currencies">
-    查看完整的 API 文档
+  <Card title="查找问题答案" icon="circle-question" href="/zh/faq/common-questions">
+    排查认证、支付通知、订单状态和结算资格相关问题。
   </Card>
 </CardGroup>

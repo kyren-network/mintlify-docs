@@ -1,6 +1,6 @@
 ---
 title: "Webhook 签名验证失败"
-description: "修复常见 Kyren Pay Webhook 签名验证错误。"
+description: "修复常见 KyrenPay Webhook 签名验证错误。"
 language: zh
 audience: merchant
 product_area: troubleshooting
@@ -23,7 +23,7 @@ source_owner: support
 - 待签名字符串拼接格式错误。
 - 签名比较没有使用恒定时间比较函数。
 
-## 在 Kyren 中检查
+## 在 KyrenPay 中检查
 
 - 从开发者设置复制当前 Webhook 密钥。
 - 确认请求头包含 `X-Kyren-Signature` 和 `X-Kyren-Timestamp`。
@@ -38,11 +38,11 @@ source_owner: support
 
 ## 修复
 
-调整路由，让 Kyren Webhook 使用原始请求体；使用当前 Webhook 密钥；将时间戳按 Unix 毫秒处理；并严格匹配文档中的签名格式。
+调整路由，让 KyrenPay Webhook 使用原始请求体；使用当前 Webhook 密钥；将时间戳按 Unix 毫秒处理；并严格匹配文档中的签名格式。
 
 ## 仍未解决时联系支持
 
-联系 Kyren 支持时，请提供事件时间、订单号、时间戳请求头，以及脱敏后的验签代码说明。不要发送 Webhook 密钥。
+联系 KyrenPay 支持时，请提供事件时间、订单号、时间戳请求头，以及脱敏后的验签代码说明。不要发送 Webhook 密钥。
 
 ## 相关页面
 

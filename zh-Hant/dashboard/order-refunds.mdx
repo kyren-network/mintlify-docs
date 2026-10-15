@@ -10,7 +10,7 @@ last_verified_at: 2026-06-02
 source_owner: product
 ---
 
-當客戶需要對已支付的 Kyren Pay 訂單進行全額或部分退款時，使用訂單退款流程。退款會先成為商戶退款申請，經審核後 Kyren Pay 才會嘗試執行退款。
+當客戶需要對已支付的 KyrenPay 訂單進行全額或部分退款時，使用訂單退款流程。退款會先成為商戶退款申請，經審核後 KyrenPay 才會嘗試執行退款。
 
 ## 什麼時候可以申請退款
 
@@ -39,7 +39,7 @@ source_owner: product
 | 狀態 | 含義 |
 | --- | --- |
 | `PENDING` | 申請已提交，等待審核。 |
-| `REVIEWING` | Kyren Pay 正在審核該申請，或正在嘗試執行退款。 |
+| `REVIEWING` | KyrenPay 正在審核該申請，或正在嘗試執行退款。 |
 | `APPROVED` | 申請已通過，並關聯到退款記錄。 |
 | `REJECTED` | 申請已拒絕。如有審核備註，請查看備註內容。 |
 
@@ -48,7 +48,7 @@ source_owner: product
 | 狀態 | 含義 |
 | --- | --- |
 | `CREATED` | 退款記錄已建立。 |
-| `SUBMITTING` | Kyren Pay 正在向支付通道提交退款。 |
+| `SUBMITTING` | KyrenPay 正在向支付通道提交退款。 |
 | `PROCESSING` | 支付通道正在處理退款。 |
 | `SUCCEEDED` | 退款已成功。 |
 | `FAILED` | 退款失敗。請查看錯誤資訊，或聯絡支援。 |
@@ -56,17 +56,17 @@ source_owner: product
 
 ## 資金和對帳
 
-退款成功後，Kyren Pay 會在資金中記錄退款扣減，並更新訂單退款狀態。請同時核對訂單詳情頁、交易流水和你自己的履約系統。
+退款成功後，KyrenPay 會在資金中記錄退款扣減，並更新訂單退款狀態。請同時核對訂單詳情頁、交易流水和你自己的履約系統。
 
 如果你的系統會自動履約，請以冪等方式處理退款更新，並根據你自己的產品政策撤銷或調整客戶權益。
 
 ## Webhook 通知
 
-當訂單退款生效時，Kyren Pay 會發送 `order.refunded` Webhook 事件。你可以使用該事件更新權益、餘額或對帳記錄。
+當訂單退款生效時，KyrenPay 會發送 `order.refunded` Webhook 事件。你可以使用該事件更新權益、餘額或對帳記錄。
 
 ## Epay 相容
 
-`/epay/api.php?act=refund` 僅用於透過 Epay 相容端點建立的訂單，且商戶帳戶必須已開通退款權限。原生 Kyren API 訂單應使用原生退款 API；人工營運退款仍可在控制台處理。
+`/epay/api.php?act=refund` 僅用於透過 Epay 相容端點建立的訂單，且商戶帳戶必須已開通退款權限。原生 KyrenPay API 訂單應使用原生退款 API；人工營運退款仍可在控制台處理。
 
 ## 相關頁面
 

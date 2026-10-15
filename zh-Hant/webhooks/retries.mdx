@@ -1,13 +1,14 @@
 ---
-title: Webhook 重試機制
-description: 啟潤支付如何重試失敗的 Webhook 投遞
+title: "Webhook 重試與重複通知處理"
+sidebarTitle: Webhook 重試機制
+description: "了解 KyrenPay Webhook 的重試時間、成功回應要求及冪等處理方式，避免重複通知導致重複履約。"
 ---
 
-如果你的 Webhook 端點未返回 `2xx` 狀態碼，啟潤支付將自動重試投遞。
+如果你的 Webhook 端點未返回 `2xx` 狀態碼，KyrenPay將自動重試投遞。
 
 ## 重試計畫
 
-對於本文檔中的訂單和爭議事件，啟潤支付最多進行 **7 次投遞：首次投遞加 6 次重試**。
+對於本文檔中的訂單和爭議事件，KyrenPay最多進行 **7 次投遞：首次投遞加 6 次重試**。
 
 | 重試次數 | 失敗後等待時間 |
 | --- | --- |
@@ -65,7 +66,7 @@ app.post('/webhooks/kyren', async (req, res) => {
 
 ### 快速返回 200
 
-處理時間較長時，應先驗證簽名，將事件持久化到接收表或佇列，再返回 `200`。工作程序隨後處理並負責自己的重試。若持久化失敗，請返回非 `2xx` 回應，讓 Kyren 重試：
+處理時間較長時，應先驗證簽名，將事件持久化到接收表或佇列，再返回 `200`。工作程序隨後處理並負責自己的重試。若持久化失敗，請返回非 `2xx` 回應，讓 KyrenPay 重試：
 
 ```javascript
 app.post('/webhooks/kyren', async (req, res) => {
@@ -85,14 +86,14 @@ app.post('/webhooks/kyren', async (req, res) => {
 
 ## 監控 Webhook 投遞
 
-排查投遞問題時，請將 Kyren Webhook 事件與你自己的服務端日誌對照。請記錄：
+排查投遞問題時，請將 KyrenPay Webhook 事件與你自己的服務端日誌對照。請記錄：
 
 - 你設定的 Webhook URL
 - 事件類型和訂單號
 - 你的服務端收到請求的時間
 - 你的服務端返回的回應碼或錯誤
 
-如果需要 Kyren 協助檢查投遞嘗試，請帶上這些資訊聯絡支援。
+如果需要 KyrenPay 協助檢查投遞嘗試，請帶上這些資訊聯絡支援。
 
 ## 故障排除
 

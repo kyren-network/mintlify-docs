@@ -1,6 +1,6 @@
 ---
 title: "Webhook not received"
-description: "Find why your server did not receive a Kyren Pay Webhook event."
+description: "Find why your server did not receive a KyrenPay Webhook event."
 language: en
 audience: merchant
 product_area: troubleshooting
@@ -24,11 +24,11 @@ An expected payment event occurred, but your Webhook endpoint did not receive a 
 - Local development uses no tunnel or a stale tunnel URL.
 - The expected event type does not match the action that occurred.
 
-## Check this in Kyren
+## Check this in KyrenPay
 
 - Compare the Webhook URL configured in the dashboard with your current endpoint.
 - Confirm the URL includes the correct scheme, host, path, and trailing slash behavior.
-- Confirm you are expecting an event type that Kyren sends for that payment state.
+- Confirm you are expecting an event type that KyrenPay sends for that payment state.
 
 ## Check this in your server
 
@@ -40,11 +40,11 @@ An expected payment event occurred, but your Webhook endpoint did not receive a 
 
 ## Fix
 
-Update the configured Webhook URL, make the endpoint publicly reachable, and return a fast `2xx` response. Remove network rules that block Kyren requests.
+Update the configured Webhook URL, make the endpoint publicly reachable, and return a fast `2xx` response. Remove network rules that block KyrenPay requests.
 
 ## Contact support if unresolved
 
-Contact Kyren support with the order number, expected event type, configured Webhook URL host and path, and your server log timestamps.
+Contact KyrenPay support with the order number, expected event type, configured Webhook URL host and path, and your server log timestamps.
 
 ## Related pages
 

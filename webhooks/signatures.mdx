@@ -1,13 +1,14 @@
 ---
-title: Webhook Signatures
-description: Verify the authenticity of webhook requests
+title: "Verify Webhook signatures with HMAC-SHA256"
+sidebarTitle: Webhook Signatures
+description: "Verify KyrenPay Webhook signatures using HMAC-SHA256, the original request body, and your Webhook secret before trusting payment events."
 ---
 
-Every webhook request from Kyren Pay includes a cryptographic signature that you should verify to ensure the request is authentic and hasn't been tampered with.
+Every webhook request from KyrenPay includes a cryptographic signature that you should verify to ensure the request is authentic and hasn't been tampered with.
 
 ## Signature Algorithm
 
-Kyren Pay uses **HMAC-SHA256** to sign webhook payloads:
+KyrenPay uses **HMAC-SHA256** to sign webhook payloads:
 
 ```
 signature = "sha256=" + HMAC-SHA256(timestamp + "." + payload, webhook_secret)

@@ -22,26 +22,26 @@ The customer completed payment, but your application did not grant access, credi
 - The checkout metadata did not include your internal user ID or order ID.
 - Your system checked order status before payment processing finished.
 
-## Check this in Kyren
+## Check this in KyrenPay
 
 - Open **Dashboard > Orders** and search by order number, customer email, or time range.
-- Confirm the Kyren order status is `paid`.
+- Confirm the KyrenPay order status is `paid`.
 - Compare the order amount, currency, and paid time with your internal record.
 
 ## Check this in your server
 
-- Search your Webhook endpoint logs for the event time and Kyren order ID.
+- Search your Webhook endpoint logs for the event time and KyrenPay order ID.
 - Confirm the event handler maps `metadata` to the correct internal user or order.
 - Check fulfillment retries, queue failures, and database write errors.
-- Make fulfillment idempotent by Kyren order ID or event ID.
+- Make fulfillment idempotent by KyrenPay order ID or event ID.
 
 ## Fix
 
-If the Kyren order is paid, reconcile it against your internal order and re-run fulfillment using your own recovery process. Store internal user IDs in checkout metadata so future events can be matched reliably.
+If the KyrenPay order is paid, reconcile it against your internal order and re-run fulfillment using your own recovery process. Store internal user IDs in checkout metadata so future events can be matched reliably.
 
 ## Contact support if unresolved
 
-Contact Kyren support with the Kyren order number, paid time, amount, currency, and your server log timestamps.
+Contact KyrenPay support with the KyrenPay order number, paid time, amount, currency, and your server log timestamps.
 
 ## Related pages
 

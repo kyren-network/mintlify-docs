@@ -57,9 +57,9 @@ Example failure response:
 
 Call `GET` or `POST` `/epay/api.php?act=refund` with `pid`, raw merchant `key`, `money`, and one of `out_trade_no` or `trade_no`.
 
-Refunds through this path are only for orders created by Epay compatibility endpoints. Native Kyren API orders should use the native refund API. The merchant account must have refund access enabled, and the order must still have enough refundable amount.
+Refunds through this path are only for orders created by Epay compatibility endpoints. Native KyrenPay API orders should use the native refund API. The merchant account must have refund access enabled, and the order must still have enough refundable amount.
 
-Optional `refund_no` is used for idempotency. If omitted, Kyren uses the order ID and normalized refund amount as the compatibility idempotency key.
+Optional `refund_no` is used for idempotency. If omitted, KyrenPay uses the order ID and normalized refund amount as the compatibility idempotency key.
 
 ```bash
 curl "https://api.kyrenpay.com/epay/api.php?act=refund&pid=10001&key=merchant_secret&trade_no=K202605260001&money=9.99&refund_no=REFUND_10002"

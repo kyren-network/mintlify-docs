@@ -1,6 +1,7 @@
 ---
-title: "設定 sub2api"
-description: "使用 sub2api 內建易支付服務商接入啟潤支付，完成餘額儲值。"
+title: "sub2api 易支付儲值串接"
+sidebarTitle: "設定 sub2api"
+description: "透過 sub2api 內建 EasyPay 服務商串接 KyrenPay，配置商戶憑證、支付方式與儲值選項，並核對通知和餘額到帳。"
 language: zh-Hant
 audience: developer
 product_area: epay
@@ -10,7 +11,7 @@ last_verified_at: 2026-10-14
 source_owner: engineering
 ---
 
-透過 sub2api 內建的 **EasyPay（易支付）** 服務商接入啟潤支付，收取餘額儲值款。本指南適用於 [Wei-Shaw/sub2api 提交 `42bc7f6`](https://github.com/Wei-Shaw/sub2api/tree/42bc7f6cffe24bcb471608e48e66b4a0afa1f882)，核驗日期為 2026 年 10 月 1 日。舊版本和分支的設定可能不同，請先確認已安裝版本包含內建服務商及下列欄位。
+透過 sub2api 內建的 **EasyPay（易支付）** 服務商接入KyrenPay，收取餘額儲值款。本指南適用於 [Wei-Shaw/sub2api 提交 `42bc7f6`](https://github.com/Wei-Shaw/sub2api/tree/42bc7f6cffe24bcb471608e48e66b4a0afa1f882)，核驗日期為 2026 年 10 月 1 日。舊版本和分支的設定可能不同，請先確認已安裝版本包含內建服務商及下列欄位。
 
 ## 接入準備
 
@@ -35,7 +36,7 @@ source_owner: engineering
 | sub2api 設定 | 填寫值 |
 | --- | --- |
 | 服務商 | `easypay` / EasyPay |
-| 實例名稱 | `啟潤支付` |
+| 實例名稱 | `KyrenPay` |
 | PID（`pid`） | 啟潤商戶帳號 ID |
 | PKey（`pkey`） | 目前完整的 `kyren_live_...` API Key |
 | API 位址（`apiBase`） | `https://api.kyrenpay.com/epay` |
@@ -48,7 +49,7 @@ source_owner: engineering
 
 ## 選擇支付方式
 
-按商戶開通情況選擇內建的 `alipay` 和 / 或 `wxpay`。核驗版本還提供**自訂支付方式**編輯器。需要其他已記錄的啟潤支付方式時，新增以下本地類型與上游類型對應，並勾選新增的支援方式：
+按商戶開通情況選擇內建的 `alipay` 和 / 或 `wxpay`。核驗版本還提供**自訂支付方式**編輯器。需要其他已記錄的KyrenPay方式時，新增以下本地類型與上游類型對應，並勾選新增的支援方式：
 
 | 本地類型 | 上游類型 | 顯示名稱 |
 | --- | --- | --- |

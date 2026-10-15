@@ -1,6 +1,6 @@
 ---
 title: "Epay migration checklist"
-description: "Checklist for moving an Epay-style integration to Kyren Pay compatibility endpoints."
+description: "Checklist for moving an Epay-style integration to KyrenPay compatibility endpoints."
 language: en
 audience: developer
 product_area: epay
@@ -10,12 +10,12 @@ last_verified_at: 2026-07-08
 source_owner: engineering
 ---
 
-Use this checklist when replacing an existing Epay-style integration with Kyren Pay compatibility endpoints.
+Use this checklist when replacing an existing Epay-style integration with KyrenPay compatibility endpoints.
 
 ## Checklist
 
-- Replace the old Epay base URL with the Kyren Pay API base URL and keep the compatible paths you use.
-- Set the Kyren-issued `pid` and merchant key for the merchant account.
+- Replace the old Epay base URL with the KyrenPay API base URL and keep the compatible paths you use.
+- Set the KyrenPay-issued `pid` and merchant key for the merchant account.
 - Verify the [Epay MD5 signature](/epay-migration/signature) implementation before sending live traffic.
 - Map payment type values to supported values such as `alipay`, `wxpay`, `creditcard`, `crypto`, and `paynow`.
 - Confirm `notify_url` is reachable and can verify the Epay-compatible notification signature.
@@ -24,6 +24,6 @@ Use this checklist when replacing an existing Epay-style integration with Kyren 
 - Verify [`submit.php`](/epay-migration/submit-php) browser checkout or [`mapi.php`](/epay-migration/mapi-php) direct payment creation, depending on your integration path.
 - Verify [`api.php?act=order`](/epay-migration/api-php) queries by `out_trade_no` or `trade_no`.
 - If you need automated refunds for Epay-source orders, verify `api.php?act=refund` with an eligible paid order, refund access enabled, and an idempotent `refund_no`.
-- Reconcile migrated Epay source orders in Kyren orders and settlements.
+- Reconcile migrated Epay source orders in KyrenPay orders and settlements.
 
-For testing, use Kyren-issued credentials. Low-risk live checks should only be performed when approved by Kyren or support.
+For testing, use KyrenPay-issued credentials. Low-risk live checks should only be performed when approved by KyrenPay or support.

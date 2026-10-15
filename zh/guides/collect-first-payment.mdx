@@ -1,6 +1,7 @@
 ---
-title: 收取第一笔付款
-description: 使用启润支付完成端到端收款的完整指南
+title: "使用 Checkout 收取第一笔款项"
+sidebarTitle: 收取第一笔付款
+description: "完成 KyrenPay 首笔收款接入：创建产品与 Checkout、验证 Webhook 签名、持久化处理支付事件并确认订单履约。"
 ---
 
 本指南以 Node.js 后端为例说明一次性原生 Checkout 接入。示例需要接入你自己的登录和数据库适配器后才能运行，相同流程适用于其他编程语言。
@@ -25,7 +26,7 @@ description: 使用启润支付完成端到端收款的完整指南
 sequenceDiagram
     participant Customer as 客户
     participant YourServer as 你的服务器
-    participant KyrenPay as 启润支付 API
+    participant KyrenPay as KyrenPay API
     participant Checkout as 收银页面
 
     Customer->>YourServer: 点击「购买额度」
@@ -51,9 +52,9 @@ npm install express axios
 
 - `requireUser` 拒绝未登录请求，通过已验证的登录态设置 `req.user`，不使用客户端传入的用户 ID。使用 Cookie 登录时，购买接口还需接入应用自身的 CSRF 防护。
 - `checkoutStore.withLockedOrder(userId, productId, callback)` 创建或锁定用户当前的待付款业务订单，并完成归属校验。锁或持久化占位必须跨进程有效；产品、预期金额、币种和应发额度来自服务端商品配置。
-- `markCreationPending` 在调用 Kyren **之前**持久化“创建中”标记；`attachSession` 核对并保存 Session ID、URL、金额、币种和有效期后清除标记。超时或本地保存失败时保留标记，释放锁不能回滚它。结果不确定时先对账，不自动重建 Session：当前 Checkout 创建 API 没有幂等键。
+- `markCreationPending` 在调用 KyrenPay **之前**持久化“创建中”标记；`attachSession` 核对并保存 Session ID、URL、金额、币种和有效期后清除标记。超时或本地保存失败时保留标记，释放锁不能回滚它。结果不确定时先对账，不自动重建 Session：当前 Checkout 创建 API 没有幂等键。
 - `webhookInbox.insertIfAbsent` 按唯一事件 ID 持久化待处理通知；重复事件不重置处理状态。工作进程领取待处理事件，并负责失败重试和最终告警。
-- `fulfillPaidOrderIdempotently` 校验业务订单关联、产品、基础金额和币种，金额用十进制计算。在同一数据库事务中，以 Kyren 订单 ID 唯一约束防重、标记业务订单已履约，并向订单记录的用户发放记录的额度。关联缺失或不匹配时拒绝入账；Webhook 和查单补偿均调用此函数。
+- `fulfillPaidOrderIdempotently` 校验业务订单关联、产品、基础金额和币种，金额用十进制计算。在同一数据库事务中，以 KyrenPay 订单 ID 唯一约束防重、标记业务订单已履约，并向订单记录的用户发放记录的额度。关联缺失或不匹配时拒绝入账；Webhook 和查单补偿均调用此函数。
 
 JSON 解析只注册到普通业务路由，不要在原始 Webhook 路由前注册全局 `express.json()`。
 
@@ -256,7 +257,7 @@ async function reconcilePayment(order) {
 
 对账订单从自己的数据库读取，不接受浏览器指定的任意订单 ID。退款另按 [Webhook 事件](/zh/webhooks/events)处理。两条付款确认路径使用同一个入账事务，防止补偿入账后迟到的 Webhook 再次充值。
 
-Checkout 有效期为 24 小时，状态为 `OPEN`、`COMPLETE`、`EXPIRED`。成功关联的 Kyren `orderId` 通过服务端 Session 查询取得，创建时不返回。过期或浏览器取消不代表已存在的支付尝试一定失败，提供新的购买前需对账。`successUrl` 先展示处理中，待后端确认付款后再更新，不根据浏览器跳转入账。直接使用响应的 `data.url`，不要自行拼接收银台路径。
+Checkout 有效期为 24 小时，状态为 `OPEN`、`COMPLETE`、`EXPIRED`。成功关联的 KyrenPay `orderId` 通过服务端 Session 查询取得，创建时不返回。过期或浏览器取消不代表已存在的支付尝试一定失败，提供新的购买前需对账。`successUrl` 先展示处理中，待后端确认付款后再更新，不根据浏览器跳转入账。直接使用响应的 `data.url`，不要自行拼接收银台路径。
 
 ## 7. 启动服务器
 
@@ -276,7 +277,7 @@ KYREN_API_KEY=kyren_live_xxx KYREN_WEBHOOK_SECRET=whsec_xxx KYREN_PRODUCT_ID=pro
 
 1. 如果启润已为你的商户账号发放 staging 凭证，或启用了可测试的支付网关，请使用这些凭证和启润提供的支付场景运行流程。
 2. 如果你只有生产凭证，请在生产环境中使用低风险的真实付款验证流程。
-3. 确认客户会被重定向到启润支付收银页面。
+3. 确认客户会被重定向到KyrenPay收银页面。
 4. 确认你的服务器能收到付款 Webhook，并且履约逻辑能正确处理该事件。
    验证重复及并发通知、通知存储不可用、工作进程重启、Webhook 与查单补偿并发、Session 过期等情况。每笔业务订单最多入账一次，持久化失败返回非 `2xx`。
 5. 如果你使用真实付款进行验证，请在需要时根据启润支持团队的指引退款或做相应运营处理。

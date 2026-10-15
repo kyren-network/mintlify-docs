@@ -1,12 +1,13 @@
 ---
 title: "Support escalation checklist"
-description: "Help Kyren Copilot collect safe, useful information before routing a merchant to support."
+description: "Help KyrenPay Copilot collect safe, useful information before routing a merchant to support."
 language: en
 audience: copilot
 product_area: copilot
 intent: support_handoff
 visibility: public
 last_verified_at: 2026-05-27
+noindex: true
 source_owner: support
 ---
 
@@ -16,7 +17,7 @@ Use this checklist when a merchant question cannot be answered from public docum
 
 - Merchant account or merchant ID.
 - The affected endpoint, dashboard page, or workflow.
-- Kyren order number, checkout session ID, or merchant `out_trade_no` when available.
+- KyrenPay order number, checkout session ID, or merchant `out_trade_no` when available.
 - Timestamp in the merchant's timezone and, for API requests, the Unix millisecond timestamp if relevant.
 - Response status, error code, and error message.
 - Redacted server logs that show request time, endpoint, and response.
@@ -59,9 +60,9 @@ Do not ask for the Webhook secret or raw private payloads.
 
 Ask for:
 
-- Kyren order number.
+- KyrenPay order number.
 - Internal user ID or internal order ID, if the merchant stored one.
-- The paid time shown by Kyren.
+- The paid time shown by KyrenPay.
 - The merchant fulfillment job log around that time.
 - Whether the fulfillment handler is idempotent.
 
@@ -86,14 +87,14 @@ Ask for:
 - `out_trade_no` or `trade_no`.
 - Payment `type`.
 - Redacted signing string inputs.
-- Numeric `code` and `msg` returned by Kyren.
+- Numeric `code` and `msg` returned by KyrenPay.
 
 Do not ask for the raw merchant key.
 
 ## Escalation wording
 
 ```text
-This needs account-specific review, so Kyren support should check it. Please provide the merchant account, affected order or checkout session ID, request time, endpoint or dashboard page, and the exact error message. Do not send full API keys, Webhook secrets, card data, or other private credentials.
+This needs account-specific review, so KyrenPay support should check it. Please provide the merchant account, affected order or checkout session ID, request time, endpoint or dashboard page, and the exact error message. Do not send full API keys, Webhook secrets, card data, or other private credentials.
 ```
 
 ## Related pages
