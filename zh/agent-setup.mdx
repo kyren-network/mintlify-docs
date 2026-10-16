@@ -7,19 +7,27 @@ product_area: integration
 intent: how-to
 visibility: public
 noindex: "true"
-last_verified_at: 2026-10-14
+last_verified_at: 2026-10-16
 source_owner: engineering
 ---
 
-在你的应用项目中，将以下指令交给 Codex、Claude Code 等编程 Agent：
+在编程 Agent 中打开你的应用项目，新建会话并发送一句接入指令即可开始。Agent 会检查现有框架、登录、商品、订单、数据库及支付实现，再推荐适合的接入方案，并只询问会影响结果的缺失信息。
+
+## 选择环境并开始
+
+当前功能在 **development** 环境验证中，正式环境尚未发布。已获准使用该环境的开发者可以发送：
 
 ```text
-请阅读 https://merchant.kyrenpay.com/agent-setup/prompt.md，检查当前项目并协助我接入 KyrenPay 一次性收款。
+我想为这个项目接入 KyrenPay 收款服务。请阅读 https://test-dev-merchant.kyren.top/agent-setup/prompt.md，并协助我完成接入。
 ```
 
-[官方 Prompt](https://merchant.kyrenpay.com/agent-setup/prompt.md)、[任务索引](https://merchant.kyrenpay.com/agent-setup/tasks.md)和[验证清单](https://merchant.kyrenpay.com/agent-setup/verification.md)均为公开 Markdown，阅读无需登录。也可以在商户控制台的 **开发者工具 > API Keys** 复制接入指令。
+该环境的[官方 Prompt](https://test-dev-merchant.kyren.top/agent-setup/prompt.md)、[任务索引](https://test-dev-merchant.kyren.top/agent-setup/tasks.md)和[验证清单](https://test-dev-merchant.kyren.top/agent-setup/verification.md)为公开 Markdown，阅读无需登录。也可以在对应商户控制台的 **开发者工具 > API Keys** 复制接入指令。公开指引不代表获得测试账户、密钥或支付渠道权限。
+
+development 使用 KyrenPay 提供的商户后台 `https://test-dev-merchant.kyren.top`、API `https://dev-api.kyren.top` 和匹配凭证。如果 Agent 询问本次环境，请确认 development。正式环境发布后使用正式商户站的[Prompt 入口](https://merchant.kyrenpay.com/agent-setup/prompt.md)；其他环境以 KyrenPay 提供的地址为准。不要将测试接入切换到文档示例中的生产 API，或混用不同环境的凭证与商品映射。
 
 ## 选择接入方式
+
+以下是 Agent 判断方案时使用的路径参考。你只需说明业务目标、价格、币种和付款后的交付内容，不必先自行选择技术协议。
 
 | 你的项目 | 接入方式 |
 | --- | --- |
@@ -31,16 +39,40 @@ source_owner: engineering
 
 实际可用支付方式、金额和币种取决于商户已开通的渠道。新订阅销售目前暂停，本指引覆盖一次性收款。
 
+new-api、sub2api 的配置及通知校验取决于已安装版本；请让 Agent 核对对应指南中的金额检查、容差及恢复限制。列出接入路径不代表所有版本都已通过支付验收。
+
+## Agent 会完成哪些工作
+
+Agent 会在授权范围内适配现有代码和数据存储，准备接入、配置及测试，并报告结果。它可能需要你确认方案或缺失的业务信息；注册认证、协议接受、私密凭证填写和实际付款仍由你完成。不同 Agent 的工具和权限可能不同，不能保证所有项目都全自动完成。
+
+对于自研应用的原生 Checkout，Agent 应根据已有商品目录查询和复用匹配的 KyrenPay 一次性产品；没有匹配项时，在授权范围内创建，并将本地商品与平台产品 ID 的映射保存到应用的持久化存储中。多商品分别映射，后端在下单时读取，不在每次购买时新建产品。
+
+默认不需要你手动配置 `KYREN_PRODUCT_ID`；它只是简单单商品项目的可选配置方式。商品映射、配置名称和初始化命令由 Agent 根据项目实现，Epay 等其他接入路径按其自身配置处理。
+
 ## 准备账户与凭证
 
-注册或登录[商户账户](https://merchant.kyrenpay.com)，确认开户、渠道等前提条件，并在[开发者设置](/zh/dashboard/developer-settings)取得凭证。注册、认证、协议接受和付款由你完成；Agent 可以准备代码并引导后续步骤。
+注册或登录本次环境对应的商户账户，确认开户、渠道等前提条件，并在[开发者设置](/zh/dashboard/developer-settings)取得凭证。原生接入的主要步骤是：
+
+1. 在 **开发者工具 > API Keys** 获取已安全保存的完整 API Key；尚无密钥时生成并妥善保存。不要使用遮蔽值，也不要为读取原值而直接重新生成已有密钥。
+2. 在 **开发者工具 > Webhooks** 保存应用的公网 HTTPS 回调地址，取得独立 Webhook Secret。首次配置后及时保存完整值；已有 Secret 使用之前安全保存的原值，重新生成会使旧值失效。
+3. 按 Agent 给出的实际文件或密钥管理器设置私下填写，再执行该项目的初始化和重新加载步骤。若实现需要额外的商户 ID 等配置，Agent 应说明用途和获取位置；这不是所有项目固定的必填变量清单。
+
+Agent 应在回复中直接提供当前环境的页面链接、操作步骤、填写位置和启动命令，不能只列变量名或让你自行查阅 README。详细流程参见[快速开始](/zh/quickstart)。
 
 在应用的服务端环境变量或密钥管理器中私下配置密钥，不要粘贴到 Agent 对话或提交到版本库。原生 Webhook Secret 与 API Key 不同。原生接入应在首笔付款前配置 Webhook，事后配置不会自动生成过去的 `order.paid` 通知。
 
-目前没有自助 Sandbox 密钥。只有 KyrenPay 提供对应地址和凭证后，才使用 [Staging 环境](/zh/testing)。不要在未经确认的生产渠道使用测试卡。
+目前没有自助 Sandbox 密钥。development、Staging 或其他测试环境必须使用 KyrenPay 提供的地址和匹配凭证；环境名称和密钥前缀不能证明渠道是 Sandbox。付款前确认本次渠道及测试方式，参见[测试说明](/zh/testing)。不要在未经确认的生产渠道使用测试卡。
+
+## 本地项目如何接收通知
+
+KyrenPay 无法访问你电脑的 `localhost`。如果应用仅在本机运行，需要可公网访问的 HTTPS 测试部署，或经你授权建立的临时隧道。隧道将公网请求转发到应用实际监听的本机端口，不等同于部署应用；测试期间应用和隧道都需保持运行。
+
+已有公网 HTTPS 服务时直接使用其域名，无需另外建立隧道。Agent 应根据当前项目提供具体步骤和回调路径，获得地址后给出完整 Webhook URL；不应要求所有项目使用固定端口、工具或环境变量名。临时隧道重建后地址可能变化，需同步更新应用配置和后台回调。通过 HTTPS 测试入口登录和付款，便于支付后返回同一站点。
 
 ## 检查接入结果
 
 让 Agent 列明修改文件、执行本地测试并报告待处理事项。重点检查签名拒绝、重复通知防重、金额与币种关联及故障恢复。应用不能根据浏览器回跳判断付款成功。
+
+原生接入还应确认商品映射可重复初始化、重启后保留，并校验产品为有效的一次性产品。分别核对每个已接入商品的价格、币种和应交付权益，不把一个商品的通过结果当作全部商品都已验证。
 
 本地模拟测试不代表真实支付已通过。取得授权测试环境后，由你完成付款，再分别核对 KyrenPay 已支付订单和应用履约记录。生产验收前阅读[上线清单](/zh/go-live-checklist)；尚未执行的环节应由 Agent 明确标记为未验证。

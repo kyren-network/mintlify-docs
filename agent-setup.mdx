@@ -7,19 +7,27 @@ product_area: integration
 intent: how-to
 visibility: public
 noindex: "true"
-last_verified_at: 2026-10-14
+last_verified_at: 2026-10-16
 source_owner: engineering
 ---
 
-Give the following instruction to your coding agent, such as Codex or Claude Code, in your application project:
+Open your application project in a coding Agent and start a new conversation with one integration instruction. The Agent inspects your framework, authentication, catalog, orders, database and existing payments, then recommends a suitable approach and asks only for missing information that changes the result.
+
+## Select an environment and start
+
+The feature is currently being validated in **development** and has not been released to production. Developers authorized to use this environment can send:
 
 ```text
-Read https://merchant.kyrenpay.com/agent-setup/prompt.md, inspect this project, and help me integrate KyrenPay one-time payments.
+I want to integrate KyrenPay payments into this project. Read https://test-dev-merchant.kyren.top/agent-setup/prompt.md and help me complete the integration.
 ```
 
-The [official Prompt](https://merchant.kyrenpay.com/agent-setup/prompt.md), [task index](https://merchant.kyrenpay.com/agent-setup/tasks.md) and [verification checklist](https://merchant.kyrenpay.com/agent-setup/verification.md) are public Markdown files. You do not need a merchant login to read them. You can also copy the instruction from **Merchant Dashboard > Developer Tools > API Keys**.
+This environment's [official Prompt](https://test-dev-merchant.kyren.top/agent-setup/prompt.md), [task index](https://test-dev-merchant.kyren.top/agent-setup/tasks.md) and [verification checklist](https://test-dev-merchant.kyren.top/agent-setup/verification.md) are public Markdown files and require no merchant login to read. You can also copy the instruction from the corresponding **Merchant Dashboard > Developer Tools > API Keys**. Public documentation does not grant test accounts, credentials or payment-channel access.
+
+Development uses the KyrenPay-provided dashboard `https://test-dev-merchant.kyren.top`, API `https://dev-api.kyren.top` and matching credentials. Confirm development if the Agent asks. After production release, use the production merchant site's [Prompt endpoint](https://merchant.kyrenpay.com/agent-setup/prompt.md); use KyrenPay-provided addresses for other environments. Do not switch a test integration to production API examples or mix credentials and product mappings across environments.
 
 ## Choose a path
+
+These are reference paths the Agent uses to recommend an approach. Describe your business goal, prices, currencies and fulfillment rules; you do not need to choose a technical protocol first.
 
 | Your project | Integration |
 | --- | --- |
@@ -31,16 +39,40 @@ The [official Prompt](https://merchant.kyrenpay.com/agent-setup/prompt.md), [tas
 
 Your enabled payment channels determine which methods, amounts and currencies are available. New subscription sales are currently paused; this guide covers one-time payments.
 
+new-api and sub2api configuration and callback checks depend on the installed version. Have the Agent review the corresponding guide's amount checks, tolerances and recovery limits. Listing a path does not mean all versions have passed payment acceptance.
+
+## What the Agent helps you do
+
+Within its authorization, the Agent adapts your existing code and storage, prepares integration/configuration/tests and reports results. It may ask you to confirm a design or missing business details. You still handle account verification, agreement acceptance, private credential entry and actual payments. Agent tools and permissions vary; fully automatic completion is not guaranteed for every project.
+
+For native Checkout in a custom application, the Agent should query and reuse matching one-time products from your existing catalog, or create them within authorization. It persists each local product-to-Kyren-product-ID mapping in your application and resolves it on the backend at purchase time. Multiple products need their own mappings; do not create a new product for every purchase.
+
+You do not normally need to manually set `KYREN_PRODUCT_ID`; it is an optional shortcut for a simple single-product application. Storage, setting names and initialization commands follow the project's implementation. Other paths such as Epay use their own configuration.
+
 ## Prepare access
 
-Create or sign in to your [merchant account](https://merchant.kyrenpay.com), check onboarding and payment-channel prerequisites, and obtain credentials in [Developer settings](/dashboard/developer-settings). You handle registration, verification, agreement acceptance and payments; the Agent can prepare code and guide you through remaining steps.
+Create or sign in to the selected environment's merchant account, check onboarding and channel prerequisites, and obtain credentials in [Developer settings](/dashboard/developer-settings). For native integration:
+
+1. In **Developer Tools > API Keys**, use your securely saved full API key, or generate and save one if none exists. A masked value is unusable; do not regenerate an existing key just to retrieve it.
+2. In **Developer Tools > Webhooks**, save your application's public HTTPS callback URL and obtain its separate Webhook Secret. Save the full value on first configuration. Reuse your securely saved original when one already exists; regeneration invalidates it.
+3. Privately enter values into the actual file or secret-manager settings identified by the Agent, then run the project's initialization and reload steps. If the implementation introduces another setting such as merchant ID, the Agent should explain its purpose and where to obtain it. This is not a fixed variable checklist for all projects.
+
+The Agent should provide environment-specific page links, steps, destination settings and startup commands directly in its reply, rather than only listing variables or referring you to README. See [Quickstart](/quickstart) for details.
 
 Set secrets privately in your application's server environment or secret manager. Do not paste them into Agent conversations or commit them. The native Webhook secret is different from the API key. Configure Webhook before the first native payment, because adding it afterward does not automatically create past `order.paid` events.
 
-There is currently no self-service sandbox key. Use [staging](/testing) only when KyrenPay supplies its Base URL and matching credentials. Do not use test cards on an unconfirmed live channel.
+There is currently no self-service sandbox key. Development, staging and other test environments require KyrenPay-provided addresses and matching credentials. An environment name or key prefix does not establish a sandbox channel. Confirm the channel and test method before payment; see [Testing](/testing). Do not use test cards on an unconfirmed live channel.
+
+## Receive notifications during local development
+
+KyrenPay cannot reach your computer's localhost. A local-only application needs a public HTTPS test deployment or a temporary tunnel established with your authorization. A tunnel forwards public requests to the application's actual local port; it does not deploy the application. Keep both the application and tunnel running during testing.
+
+If your application already has public HTTPS hosting, use that domain without another tunnel. The Agent should give project-specific steps and callback paths, then provide the full Webhook URL once its origin is known. No particular port, tunnel tool or environment-variable name is required for every project. Recreated tunnels may change their address; update both application settings and dashboard callbacks. Sign in and pay through the HTTPS test origin so payment returns to the same site.
 
 ## Review the result
 
 Ask the Agent to identify changed files, run local tests and report pending actions. Check signature rejection, duplicate-notification protection, amount/currency association and recovery. Your application must not fulfill purchases from a browser redirect.
+
+For native integration, also verify repeatable product initialization, persistent mappings after restart and validation of active one-time products. Check the price, currency and intended entitlement for each integrated product; one passing product does not validate the entire catalog.
 
 Local mock tests do not prove a real payment. When you have an authorized test environment, complete its payment step yourself, then verify both the KyrenPay paid order and your application's fulfillment record. Review the [go-live checklist](/go-live-checklist) before production acceptance. Until those steps have been run, the Agent should label them unverified.

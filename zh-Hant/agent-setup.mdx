@@ -7,19 +7,27 @@ product_area: integration
 intent: how-to
 visibility: public
 noindex: "true"
-last_verified_at: 2026-10-14
+last_verified_at: 2026-10-16
 source_owner: engineering
 ---
 
-在你的應用專案中，將以下指令交給 Codex、Claude Code 等程式開發 Agent：
+在程式開發 Agent 中打開你的應用專案，新建對話並傳送一句串接指令即可開始。Agent 會檢查現有框架、登入、商品、訂單、資料庫及支付實作，再推薦適合的串接方案，並只詢問會影響結果的缺失資訊。
+
+## 選擇環境並開始
+
+目前功能在 **development** 環境驗證中，正式環境尚未發布。已獲准使用該環境的開發者可以傳送：
 
 ```text
-請閱讀 https://merchant.kyrenpay.com/agent-setup/prompt.md，檢查目前專案並協助我串接 KyrenPay 一次性收款。
+我想為這個專案串接 KyrenPay 收款服務。請閱讀 https://test-dev-merchant.kyren.top/agent-setup/prompt.md，並協助我完成串接。
 ```
 
-[官方 Prompt](https://merchant.kyrenpay.com/agent-setup/prompt.md)、[任務索引](https://merchant.kyrenpay.com/agent-setup/tasks.md)和[驗證清單](https://merchant.kyrenpay.com/agent-setup/verification.md)皆為公開 Markdown，閱讀無需登入。也可以在商戶控制台的 **開發者工具 > API Keys** 複製串接指令。
+該環境的[官方 Prompt](https://test-dev-merchant.kyren.top/agent-setup/prompt.md)、[任務索引](https://test-dev-merchant.kyren.top/agent-setup/tasks.md)和[驗證清單](https://test-dev-merchant.kyren.top/agent-setup/verification.md)皆為公開 Markdown，閱讀無需登入。也可以在對應商戶控制台的 **開發者工具 > API Keys** 複製串接指令。公開指引不代表取得測試帳戶、密鑰或支付渠道權限。
+
+development 使用 KyrenPay 提供的商戶後台 `https://test-dev-merchant.kyren.top`、API `https://dev-api.kyren.top` 和相符憑證。如果 Agent 詢問本次環境，請確認 development。正式環境發布後使用正式商戶站的[Prompt 入口](https://merchant.kyrenpay.com/agent-setup/prompt.md)；其他環境以 KyrenPay 提供的位址為準。不要將測試串接切換到文件範例中的生產 API，或混用不同環境的憑證與商品映射。
 
 ## 選擇串接方式
+
+以下是 Agent 判斷方案時使用的路徑參考。你只需說明業務目標、價格、幣別和付款後的交付內容，不必先自行選擇技術協定。
 
 | 你的專案 | 串接方式 |
 | --- | --- |
@@ -31,16 +39,40 @@ source_owner: engineering
 
 實際可用付款方式、金額和幣別取決於商戶已開通的渠道。新訂閱銷售目前暫停，本指引涵蓋一次性收款。
 
+new-api、sub2api 的設定及通知校驗取決於已安裝版本；請讓 Agent 核對對應指南中的金額檢查、容差及恢復限制。列出串接路徑不代表所有版本都已通過付款驗收。
+
+## Agent 會完成哪些工作
+
+Agent 會在授權範圍內適配現有程式碼和資料儲存，準備串接、設定及測試，並報告結果。它可能需要你確認方案或缺失的業務資訊；註冊認證、協議接受、私密憑證填寫和實際付款仍由你完成。不同 Agent 的工具和權限可能不同，不能保證所有專案都全自動完成。
+
+對於自行開發應用的原生 Checkout，Agent 應根據已有商品目錄查詢和複用相符的 KyrenPay 一次性產品；沒有相符項時，在授權範圍內建立，並將本機商品與平台產品 ID 的映射儲存到應用的持久化儲存中。多商品分別映射，後端在下單時讀取，不在每次購買時新建產品。
+
+預設不需要你手動設定 `KYREN_PRODUCT_ID`；它只是簡單單商品專案的可選設定方式。商品映射、設定名稱和初始化命令由 Agent 根據專案實作，Epay 等其他串接路徑按其自身設定處理。
+
 ## 準備帳戶與憑證
 
-註冊或登入[商戶帳戶](https://merchant.kyrenpay.com)，確認開戶、渠道等前提條件，並在[開發者設定](/zh-Hant/dashboard/developer-settings)取得憑證。註冊、認證、協議接受和付款由你完成；Agent 可以準備程式並引導後續步驟。
+註冊或登入本次環境對應的商戶帳戶，確認開戶、渠道等前提條件，並在[開發者設定](/zh-Hant/dashboard/developer-settings)取得憑證。原生串接的主要步驟是：
+
+1. 在 **開發者工具 > API Keys** 取得已安全儲存的完整 API Key；尚無密鑰時產生並妥善儲存。不要使用遮蔽值，也不要為讀取原值而直接重新產生已有密鑰。
+2. 在 **開發者工具 > Webhooks** 儲存應用的公網 HTTPS 回調位址，取得獨立 Webhook Secret。首次設定後及時儲存完整值；已有 Secret 使用之前安全儲存的原值，重新產生會使舊值失效。
+3. 按 Agent 給出的實際檔案或密鑰管理器設定私下填寫，再執行該專案的初始化和重新載入步驟。若實作需要額外的商戶 ID 等設定，Agent 應說明用途和取得位置；這不是所有專案固定的必填變數清單。
+
+Agent 應在回覆中直接提供目前環境的頁面連結、操作步驟、填寫位置和啟動命令，不能只列變數名稱或讓你自行查閱 README。詳細流程參見[快速開始](/zh-Hant/quickstart)。
 
 在應用的服務端環境變數或密鑰管理器中私下設定密鑰，不要貼到 Agent 對話或提交到版本庫。原生 Webhook Secret 與 API Key 不同。原生串接應在首筆付款前設定 Webhook，事後設定不會自動產生過去的 `order.paid` 通知。
 
-目前沒有自助 Sandbox 密鑰。只有 KyrenPay 提供對應位址和憑證後，才使用 [Staging 環境](/zh-Hant/testing)。不要在未經確認的生產渠道使用測試卡。
+目前沒有自助 Sandbox 密鑰。development、Staging 或其他測試環境必須使用 KyrenPay 提供的位址和相符憑證；環境名稱和密鑰前綴不能證明渠道是 Sandbox。付款前確認本次渠道及測試方式，參見[測試說明](/zh-Hant/testing)。不要在未經確認的生產渠道使用測試卡。
+
+## 本機專案如何接收通知
+
+KyrenPay 無法存取你電腦的 `localhost`。如果應用僅在本機執行，需要可公網存取的 HTTPS 測試部署，或經你授權建立的臨時隧道。隧道將公網請求轉發到應用實際監聽的本機連接埠，不等同於部署應用；測試期間應用和隧道都需保持執行。
+
+已有公網 HTTPS 服務時直接使用其網域，無需另外建立隧道。Agent 應根據目前專案提供具體步驟和回調路徑，取得位址後給出完整 Webhook URL；不應要求所有專案使用固定連接埠、工具或環境變數名稱。臨時隧道重建後位址可能變化，需同步更新應用設定和後台回調。透過 HTTPS 測試入口登入和付款，便於付款後返回同一站點。
 
 ## 檢查串接結果
 
 讓 Agent 列明修改檔案、執行本地測試並報告待處理事項。重點檢查簽名拒絕、重複通知防重、金額與幣別關聯及故障恢復。應用不能根據瀏覽器返回判斷付款成功。
+
+原生串接還應確認商品映射可重複初始化、重啟後保留，並校驗產品為有效的一次性產品。分別核對每個已串接商品的價格、幣別和應交付權益，不把一個商品的通過結果當作全部商品都已驗證。
 
 本地模擬測試不代表真實付款已通過。取得授權測試環境後，由你完成付款，再分別核對 KyrenPay 已付款訂單和應用履約紀錄。生產驗收前閱讀[上線清單](/zh-Hant/go-live-checklist)；尚未執行的環節應由 Agent 明確標記為未驗證。
