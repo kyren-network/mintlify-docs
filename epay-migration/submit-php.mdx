@@ -21,7 +21,7 @@ Required parameters:
 | Parameter | Description |
 | --- | --- |
 | `pid` | KyrenPay-issued merchant Epay-compatible merchant ID. |
-| `type` | Payment type. Supported values include `alipay`, `wxpay`, `creditcard`, `crypto`, and `paynow`. |
+| `type` | Payment type. Supported values include `alipay`, `wxpay`, `creditcard`, `crypto`, `paynow`, and `duitnow` (DuitNow). |
 | `out_trade_no` | Your merchant order number. |
 | `notify_url` | Merchant payment result notification URL. |
 | `return_url` | Browser return URL after checkout. |
@@ -73,3 +73,5 @@ success
 ```
 
 See [Epay MD5 signature](/epay-migration/signature) and the [`submit.php` API reference](/api-reference/epay-compatibility/submitphp-redirect-checkout-compatibility-endpoint).
+
+DuitNow uses `type=duitnow`. Availability requires an approved Waffo capability and an explicit merchant binding. The current Sandbox capability accepts USD; upstream country `MYS` is displayed as Malaysia (`MY`).

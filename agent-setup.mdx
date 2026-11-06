@@ -7,7 +7,7 @@ product_area: integration
 intent: how-to
 visibility: public
 noindex: "true"
-last_verified_at: 2026-10-16
+last_verified_at: 2026-11-06
 source_owner: engineering
 ---
 
@@ -15,15 +15,15 @@ Open your application project in a coding Agent and start a new conversation wit
 
 ## Select an environment and start
 
-The feature is currently being validated in **development** and has not been released to production. Developers authorized to use this environment can send:
+The feature is deployed to **staging**, where integration acceptance is in progress. It has not been released to production. Developers authorized to use staging can send:
 
 ```text
-I want to integrate KyrenPay payments into this project. Read https://test-dev-merchant.kyren.top/agent-setup/prompt.md and help me complete the integration.
+I want to integrate KyrenPay payments into this project. Read https://test-staging-merchant.kyren.top/agent-setup/prompt.md and help me complete the integration.
 ```
 
-This environment's [official Prompt](https://test-dev-merchant.kyren.top/agent-setup/prompt.md), [task index](https://test-dev-merchant.kyren.top/agent-setup/tasks.md) and [verification checklist](https://test-dev-merchant.kyren.top/agent-setup/verification.md) are public Markdown files and require no merchant login to read. You can also copy the instruction from the corresponding **Merchant Dashboard > Developer Tools > API Keys**. Public documentation does not grant test accounts, credentials or payment-channel access.
+This environment's [official Prompt](https://test-staging-merchant.kyren.top/agent-setup/prompt.md), [task index](https://test-staging-merchant.kyren.top/agent-setup/tasks.md) and [verification checklist](https://test-staging-merchant.kyren.top/agent-setup/verification.md) are public Markdown files and require no merchant login to read. You can also copy the instruction from the corresponding **Merchant Dashboard > Developer Tools > API Keys**. Public documentation does not grant test accounts, credentials or payment-channel access.
 
-Development uses the KyrenPay-provided dashboard `https://test-dev-merchant.kyren.top`, API `https://dev-api.kyren.top` and matching credentials. Confirm development if the Agent asks. After production release, use the production merchant site's [Prompt endpoint](https://merchant.kyrenpay.com/agent-setup/prompt.md); use KyrenPay-provided addresses for other environments. Do not switch a test integration to production API examples or mix credentials and product mappings across environments.
+For this staging integration, use dashboard `https://test-staging-merchant.kyren.top`, API `https://staging-api.kyrenpay.com` and matching staging credentials. Confirm staging if the Agent asks. Existing development results do not establish staging acceptance. When switching from development, configure staging credentials, Webhook and product mappings separately. After production release, use the production merchant site's [Prompt endpoint](https://merchant.kyrenpay.com/agent-setup/prompt.md); use KyrenPay-provided addresses for other environments. Do not switch a test integration to production API examples or mix credentials and product mappings across environments.
 
 ## Choose a path
 

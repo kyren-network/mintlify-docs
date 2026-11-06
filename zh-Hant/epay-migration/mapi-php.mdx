@@ -21,7 +21,7 @@ source_owner: engineering
 | 參數 | 說明 |
 | --- | --- |
 | `pid` | KyrenPay 發放的商戶 Epay 相容商戶 ID。 |
-| `type` | 支付類型。支援值包括 `alipay`、`wxpay`、`creditcard`、`crypto`、`paynow`。 |
+| `type` | 支付類型。支援值包括 `alipay`、`wxpay`、`creditcard`、`crypto`、`paynow`、`duitnow`（DuitNow）。 |
 | `out_trade_no` | 你的商戶訂單號。 |
 | `notify_url` | 商戶支付結果通知 URL。 |
 | `name` | 訂單或商品名稱。 |
@@ -80,3 +80,5 @@ curl -X POST https://api.kyrenpay.com/epay/mapi.php \
 ```
 
 查看 [Epay MD5 簽名](/zh-Hant/epay-migration/signature)和 [`mapi.php` API 參考](/api-reference/epay-compatibility/mapiphp-direct-create-payment-compatibility-endpoint)。
+
+DuitNow 使用 `type=duitnow`，僅在 Waffo 能力已審批且商戶已明確綁定後可用。目前 Sandbox 能力支援 USD，上游國家 `MYS` 在本地市場顯示為馬來西亞（`MY`）。

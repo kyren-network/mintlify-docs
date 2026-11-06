@@ -21,7 +21,7 @@ source_owner: engineering
 | 参数 | 说明 |
 | --- | --- |
 | `pid` | KyrenPay 发放的商户 Epay 兼容商户 ID。 |
-| `type` | 支付类型。支持值包括 `alipay`、`wxpay`、`creditcard`、`crypto`、`paynow`。 |
+| `type` | 支付类型。支持值包括 `alipay`、`wxpay`、`creditcard`、`crypto`、`paynow`、`duitnow`（DuitNow）。 |
 | `out_trade_no` | 你的商户订单号。 |
 | `notify_url` | 商户支付结果通知 URL。 |
 | `return_url` | 收银台结束后的浏览器返回 URL。 |
@@ -84,3 +84,5 @@ success
 ```
 
 查看 [Epay MD5 签名](/zh/epay-migration/signature)和 [`submit.php` API 参考](/api-reference/epay-compatibility/submitphp-redirect-checkout-compatibility-endpoint)。
+
+DuitNow 使用 `type=duitnow`，仅在 Waffo 能力已审批且商户已明确绑定后可用。当前 Sandbox 能力支持 USD，上游国家 `MYS` 在本地市场显示为马来西亚（`MY`）。
