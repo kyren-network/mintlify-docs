@@ -21,7 +21,7 @@ Required parameters:
 | Parameter | Description |
 | --- | --- |
 | `pid` | KyrenPay-issued merchant Epay-compatible merchant ID. |
-| `type` | Payment type. Supported values include `alipay`, `wxpay`, `creditcard`, `crypto`, `paynow`, and `duitnow` (DuitNow). |
+| `type` | Payment type. Supported values include `alipay`, `wxpay`, `creditcard`, `crypto`, `paynow`, `duitnow` (DuitNow), and `bangkokbank`, `kplus`, `krungsri`, `krungthai`, `scbeasy`. |
 | `out_trade_no` | Your merchant order number. |
 | `notify_url` | Merchant payment result notification URL. |
 | `name` | Order or product name. |
@@ -82,3 +82,18 @@ curl -X POST https://api.kyrenpay.com/epay/mapi.php \
 See [Epay MD5 signature](/epay-migration/signature) and the [`mapi.php` API reference](/api-reference/epay-compatibility/mapiphp-direct-create-payment-compatibility-endpoint).
 
 DuitNow uses `type=duitnow`. Availability requires an approved Waffo capability and an explicit merchant binding. The current Sandbox capability accepts USD; upstream country `MYS` is displayed as Malaysia (`MY`).
+
+
+## Thai Online Banking
+
+Thai Online Banking uses the following independent payment methods. Each bank requires an approved Waffo capability and its own merchant binding; binding one bank does not enable the others. Display only currently available methods.
+
+| Display name | Native API / order paymentMethod | Epay type |
+| --- | --- | --- |
+| Bangkok Bank | `BANGKOKBANK` | `bangkokbank` |
+| K PLUS | `KPLUS` | `kplus` |
+| Krungsri | `KRUNGSRI` | `krungsri` |
+| Krungthai | `KRUNGTHAI` | `krungthai` |
+| SCB EASY | `SCBEASY` | `scbeasy` |
+
+The local market is Thailand (`TH`; upstream country `THA`). Supported currencies, amount limits and refunds follow the approved channel configuration. Checkout respects administrator display names and submits the exact lowercase bank code as `paymentMethod` and `paymentOptionCode`. For `submit.php` and `mapi.php`, sign and send the lowercase `type` shown above. Do not send `ONLINE_BANKING` as a payment method.

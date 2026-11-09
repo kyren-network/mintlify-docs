@@ -49,3 +49,18 @@ Checkout 会计入附加费用本身产生的处理费：`（原始金额 × 客
 - [资金](/zh/dashboard/funds)
 - [商户服务协议](/zh/dashboard/merchant-agreement)
 - [Checkout 会话](/zh/dashboard/checkouts)
+
+
+## 泰国网银
+
+泰国网银（Online Banking）使用下列独立支付方式。每家银行都必须先完成 Waffo 能力审批和独立的商户绑定；绑定其中一家不会启用其他银行。仅展示当前可用的方式。
+
+| 支付方式 | 原生 API / 订单 paymentMethod | Epay type |
+| --- | --- | --- |
+| Bangkok Bank | `BANGKOKBANK` | `bangkokbank` |
+| K PLUS | `KPLUS` | `kplus` |
+| Krungsri | `KRUNGSRI` | `krungsri` |
+| Krungthai | `KRUNGTHAI` | `krungthai` |
+| SCB EASY | `SCBEASY` | `scbeasy` |
+
+市场为泰国（`TH`，上游国家 `THA`）。币种、金额范围和退款能力以已审批渠道配置为准，不能从银行名称推断。收银台显示管理员配置的名称，并将精确银行代码作为 `paymentMethod` 和 `paymentOptionCode`（小写）提交。`submit.php` 和 `mapi.php` 的 `type` 使用表中的小写值，完成签名后提交；不要发送 `ONLINE_BANKING` 作为支付方式。

@@ -49,3 +49,18 @@ The current dashboard identifies actions by payment method and does not offer a 
 - [Funds](/dashboard/funds)
 - [Merchant agreement](/dashboard/merchant-agreement)
 - [Checkout sessions](/dashboard/checkouts)
+
+
+## Thai Online Banking
+
+Thai Online Banking uses the following independent payment methods. Each bank requires an approved Waffo capability and its own merchant binding; binding one bank does not enable the others. Display only currently available methods.
+
+| Display name | Native API / order paymentMethod | Epay type |
+| --- | --- | --- |
+| Bangkok Bank | `BANGKOKBANK` | `bangkokbank` |
+| K PLUS | `KPLUS` | `kplus` |
+| Krungsri | `KRUNGSRI` | `krungsri` |
+| Krungthai | `KRUNGTHAI` | `krungthai` |
+| SCB EASY | `SCBEASY` | `scbeasy` |
+
+The local market is Thailand (`TH`; upstream country `THA`). Supported currencies, amount limits and refunds follow the approved channel configuration. Checkout respects administrator display names and submits the exact lowercase bank code as `paymentMethod` and `paymentOptionCode`. For `submit.php` and `mapi.php`, sign and send the lowercase `type` shown above. Do not send `ONLINE_BANKING` as a payment method.
