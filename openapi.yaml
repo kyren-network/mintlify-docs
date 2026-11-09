@@ -1115,7 +1115,7 @@ components:
 
     PaymentMethod:
       type: string
-      enum: [CREDIT_CARD, WECHAT_PAY, ALIPAY, PAYNOW, CRYPTO, DUITNOW, BANGKOKBANK, KPLUS, KRUNGSRI, KRUNGTHAI, SCBEASY]
+      enum: [CREDIT_CARD, WECHAT_PAY, ALIPAY, PAYNOW, CRYPTO]
       description: The payment method used by the customer
 
     RefundStatus:
@@ -1264,7 +1264,7 @@ components:
 
     EpayPaymentType:
       type: string
-      enum: [alipay, wxpay, creditcard, crypto, paynow, duitnow, bangkokbank, kplus, krungsri, krungthai, scbeasy]
+      enum: [alipay, wxpay, creditcard, crypto, paynow]
       description: >-
         Payment channel type in Epay compatibility mode.
         `crypto` 按商户绑定选择 Satogate 或 Paydify；Paydify 不新增独立 type 值，也不能通过请求参数覆盖绑定。

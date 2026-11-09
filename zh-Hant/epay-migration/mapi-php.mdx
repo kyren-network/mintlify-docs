@@ -21,7 +21,7 @@ source_owner: engineering
 | 參數 | 說明 |
 | --- | --- |
 | `pid` | KyrenPay 發放的商戶 Epay 相容商戶 ID。 |
-| `type` | 支付類型。支援值包括 `alipay`、`wxpay`、`creditcard`、`crypto`、`paynow`、`duitnow`（DuitNow）、`bangkokbank`、`kplus`、`krungsri`、`krungthai`、`scbeasy`。 |
+| `type` | 支付類型。支援值包括 `alipay`、`wxpay`、`creditcard`、`crypto`、`paynow`。 |
 | `out_trade_no` | 你的商戶訂單號。 |
 | `notify_url` | 商戶支付結果通知 URL。 |
 | `name` | 訂單或商品名稱。 |
@@ -80,20 +80,3 @@ curl -X POST https://api.kyrenpay.com/epay/mapi.php \
 ```
 
 查看 [Epay MD5 簽名](/zh-Hant/epay-migration/signature)和 [`mapi.php` API 參考](/api-reference/epay-compatibility/mapiphp-direct-create-payment-compatibility-endpoint)。
-
-DuitNow 使用 `type=duitnow`，僅在 Waffo 能力已審批且商戶已明確綁定後可用。目前 Sandbox 能力支援 USD，上游國家 `MYS` 在本地市場顯示為馬來西亞（`MY`）。
-
-
-## 泰國網銀
-
-泰國網銀（Online Banking）使用下列獨立付款方式。每家銀行都必須先完成 Waffo 能力審批和獨立的商戶綁定；綁定其中一家不會啟用其他銀行。僅展示目前可用的方式。
-
-| 付款方式 | 原生 API / 訂單 paymentMethod | Epay type |
-| --- | --- | --- |
-| Bangkok Bank | `BANGKOKBANK` | `bangkokbank` |
-| K PLUS | `KPLUS` | `kplus` |
-| Krungsri | `KRUNGSRI` | `krungsri` |
-| Krungthai | `KRUNGTHAI` | `krungthai` |
-| SCB EASY | `SCBEASY` | `scbeasy` |
-
-市場為泰國（`TH`，上游國家 `THA`）。幣種、金額範圍和退款能力以已審批渠道設定為準，不能從銀行名稱推斷。收銀台顯示管理員設定的名稱，並將精確銀行代碼作為 `paymentMethod` 和 `paymentOptionCode`（小寫）提交。`submit.php` 和 `mapi.php` 的 `type` 使用表中的小寫值，完成簽名後提交；不要傳送 `ONLINE_BANKING` 作為付款方式。
