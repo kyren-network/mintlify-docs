@@ -7,7 +7,7 @@ product_area: integration
 intent: how-to
 visibility: public
 noindex: "true"
-last_verified_at: 2026-11-06
+last_verified_at: 2026-11-09
 source_owner: engineering
 ---
 
@@ -15,15 +15,17 @@ source_owner: engineering
 
 ## 選擇環境並開始
 
-目前功能已部署到 **staging（預發布）**，正在進行該環境的串接驗收；正式環境尚未發布。已獲准使用 staging 的開發者可以傳送：
+官方 Agent 串接指引已在**正式環境**發布。在你的應用專案中傳送：
 
 ```text
-我想為這個專案串接 KyrenPay 收款服務。請閱讀 https://test-staging-merchant.kyren.top/agent-setup/prompt.md，並協助我完成串接。
+我想為這個專案串接 KyrenPay 收款服務。請閱讀 https://merchant.kyrenpay.com/agent-setup/prompt.md，並協助我完成串接。
 ```
 
-該環境的[官方 Prompt](https://test-staging-merchant.kyren.top/agent-setup/prompt.md)、[任務索引](https://test-staging-merchant.kyren.top/agent-setup/tasks.md)和[驗證清單](https://test-staging-merchant.kyren.top/agent-setup/verification.md)皆為公開 Markdown，閱讀無需登入。也可以在對應商戶控制台的 **開發者工具 > API Keys** 複製串接指令。公開指引不代表取得測試帳戶、密鑰或支付渠道權限。
+該環境的[官方 Prompt](https://merchant.kyrenpay.com/agent-setup/prompt.md)、[任務索引](https://merchant.kyrenpay.com/agent-setup/tasks.md)和[驗證清單](https://merchant.kyrenpay.com/agent-setup/verification.md)皆為公開 Markdown，閱讀無需登入。也可以在對應商戶控制台的 **開發者工具 > API Keys** 複製串接指令。公開指引不代表取得商戶帳戶、密鑰或支付渠道權限。
 
-本次 staging 串接使用商戶後台 `https://test-staging-merchant.kyren.top`、API `https://staging-api.kyrenpay.com` 和該環境的相符憑證。如果 Agent 詢問本次環境，請確認 staging。development 的既有測試結果不能代替 staging 驗收；從 development 切換時，需要重新設定該環境的密鑰、Webhook 和商品映射。正式環境發布後使用正式商戶站的[Prompt 入口](https://merchant.kyrenpay.com/agent-setup/prompt.md)；其他環境以 KyrenPay 提供的位址為準。不要將測試串接切換到文件範例中的生產 API，或混用不同環境的憑證與商品映射。
+正式環境使用商戶後台 `https://merchant.kyrenpay.com`、API `https://api.kyrenpay.com` 和該商戶的正式憑證。Agent 應確認本次串接的目標環境；如果你使用 KyrenPay 提供的 development、staging 或其他測試環境，請明確告知其後台、API 位址和相符憑證，或從對應環境的 API Keys 頁面複製串接指令。不要僅憑 Prompt 連結所在網域切換支付環境，也不要混用不同環境的密鑰、Webhook 和商品映射。
+
+指引正式發布不代表你的商戶、渠道或應用已通過生產收款驗收。正式付款可能產生真實資金交易；測試環境的既有結果不能代替本次生產驗收。
 
 ## 選擇串接方式
 

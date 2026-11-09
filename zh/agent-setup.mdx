@@ -7,7 +7,7 @@ product_area: integration
 intent: how-to
 visibility: public
 noindex: "true"
-last_verified_at: 2026-11-06
+last_verified_at: 2026-11-09
 source_owner: engineering
 ---
 
@@ -15,15 +15,17 @@ source_owner: engineering
 
 ## 选择环境并开始
 
-当前功能已部署到 **staging（预发布）**，正在进行该环境的接入验收；正式环境尚未发布。已获准使用 staging 的开发者可以发送：
+官方 Agent 接入指引已在**正式环境**发布。在你的应用项目中发送：
 
 ```text
-我想为这个项目接入 KyrenPay 收款服务。请阅读 https://test-staging-merchant.kyren.top/agent-setup/prompt.md，并协助我完成接入。
+我想为这个项目接入 KyrenPay 收款服务。请阅读 https://merchant.kyrenpay.com/agent-setup/prompt.md，并协助我完成接入。
 ```
 
-该环境的[官方 Prompt](https://test-staging-merchant.kyren.top/agent-setup/prompt.md)、[任务索引](https://test-staging-merchant.kyren.top/agent-setup/tasks.md)和[验证清单](https://test-staging-merchant.kyren.top/agent-setup/verification.md)为公开 Markdown，阅读无需登录。也可以在对应商户控制台的 **开发者工具 > API Keys** 复制接入指令。公开指引不代表获得测试账户、密钥或支付渠道权限。
+该环境的[官方 Prompt](https://merchant.kyrenpay.com/agent-setup/prompt.md)、[任务索引](https://merchant.kyrenpay.com/agent-setup/tasks.md)和[验证清单](https://merchant.kyrenpay.com/agent-setup/verification.md)为公开 Markdown，阅读无需登录。也可以在对应商户控制台的 **开发者工具 > API Keys** 复制接入指令。公开指引不代表获得商户账户、密钥或支付渠道权限。
 
-本次 staging 接入使用商户后台 `https://test-staging-merchant.kyren.top`、API `https://staging-api.kyrenpay.com` 和该环境的匹配凭证。如果 Agent 询问本次环境，请确认 staging。development 的既有测试结果不能代替 staging 验收；从 development 切换时，需要重新配置该环境的密钥、Webhook 和商品映射。正式环境发布后使用正式商户站的[Prompt 入口](https://merchant.kyrenpay.com/agent-setup/prompt.md)；其他环境以 KyrenPay 提供的地址为准。不要将测试接入切换到文档示例中的生产 API，或混用不同环境的凭证与商品映射。
+正式环境使用商户后台 `https://merchant.kyrenpay.com`、API `https://api.kyrenpay.com` 和该商户的正式凭证。Agent 应确认本次接入的目标环境；如果你使用 KyrenPay 提供的 development、staging 或其他测试环境，请明确告知其后台、API 地址和匹配凭证，或从对应环境的 API Keys 页面复制接入指令。不要仅凭 Prompt 链接所在域名切换支付环境，也不要混用不同环境的密钥、Webhook 和商品映射。
+
+指引正式发布不代表你的商户、渠道或应用已通过生产收款验收。正式付款可能产生真实资金交易；测试环境的既有结果不能代替本次生产验收。
 
 ## 选择接入方式
 
